@@ -1,10 +1,9 @@
-<header>
-  <h1>Expense Exchange</h1>
-  <nav>
-    <a routerLink="/">Home</a>
-    <br />
-    <a routerLink="/dev">Dev <small> (only on localhost)</small></a>
-    <br />
+<header class="bg-neutral-100">
+  <h1 class="container-fixed pt-4 text-2xl">Expense Exchange</h1>
+
+  <nav class="container-fixed flex flex-row flex-wrap items-baseline gap-x-4 py-4">
+    <a class="link text-lg" routerLink="/">Home</a>
+    <a class="link text-lg" routerLink="/dev">Dev <small> (only on localhost)</small></a>
   </nav>
 </header>
 
@@ -12,11 +11,17 @@
 
 <router-outlet></router-outlet>
 
+<!-- Spacer, expands to fill in the remaining space between elements above and below thus pushing footer down -->
+<div class="flex flex-1"></div>
+
 <hr />
 
-<footer>
-  <div class="">
-    Design by <a target="_blank" rel="noopener" href="http://deniszholob.com/">Denis Zholob</a>
+<footer class="bg-neutral-100">
+  <div class="container-fixed flex-row justify-between py-4">
+    <div class="">
+      Design by
+      <a class="link" target="_blank" rel="noopener" href="http://deniszholob.com/">Denis Zholob</a>
+    </div>
+    <div>Updated {{ APP_MODIFIED_DATE | date: 'y/M/d' }}</div>
   </div>
-  <div>Updated {{ APP_MODIFIED_DATE | date: 'y/M/d' }}</div>
 </footer>

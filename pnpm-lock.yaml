@@ -135,6 +135,9 @@ importers:
       '@storybook/types':
         specifier: 8.5.0
         version: 8.5.0(storybook@8.5.0(prettier@3.3.3))
+      '@tailwindcss/forms':
+        specifier: ^0.5.7
+        version: 0.5.7(tailwindcss@3.4.10(ts-node@10.9.1(@swc/core@1.10.1)(@types/node@18.19.15)(typescript@5.6.3)))
       '@types/jest':
         specifier: 29.5.12
         version: 29.5.12
@@ -207,12 +210,18 @@ importers:
       prettier-plugin-organize-attributes:
         specifier: ^1.0.0
         version: 1.0.0(prettier@3.3.3)
+      prettier-plugin-tailwindcss:
+        specifier: ^0.6.6
+        version: 0.6.6(prettier-plugin-organize-attributes@1.0.0(prettier@3.3.3))(prettier@3.3.3)
       storybook:
         specifier: 8.5.0
         version: 8.5.0(prettier@3.3.3)
       storybook-addon-angular-router:
         specifier: ^1.10.1
         version: 1.10.1(@storybook/addon-actions@8.5.0(storybook@8.5.0(prettier@3.3.3)))(@storybook/angular@8.5.0(@angular-devkit/architect@0.1900.5(chokidar@4.0.1))(@angular-devkit/build-angular@19.0.5(@angular/compiler-cli@19.1.1(@angular/compiler@19.1.1(@angular/core@19.1.1(rxjs@7.8.1)(zone.js@0.15.0)))(typescript@5.6.3))(@angular/compiler@19.1.1(@angular/core@19.1.1(rxjs@7.8.1)(zone.js@0.15.0)))(@rspack/core@1.1.6)(@swc/core@1.10.1)(@types/node@18.19.15)(chokidar@4.0.1)(html-webpack-plugin@5.6.0(@rspack/core@1.1.6)(webpack@5.88.0(@swc/core@1.10.1)(esbuild@0.24.0)))(jest-environment-jsdom@29.7.0)(jest@29.7.0(@types/node@18.19.15)(babel-plugin-macros@2.8.0)(ts-node@10.9.1(@swc/core@1.10.1)(@types/node@18.19.15)(typescript@5.6.3)))(stylus@0.64.0)(tailwindcss@3.4.10(ts-node@10.9.1(@swc/core@1.10.1)(@types/node@18.19.15)(typescript@5.6.3)))(typescript@5.6.3)(vite@5.4.11(@types/node@18.19.15)(less@4.2.0)(sass@1.80.7)(stylus@0.64.0)(terser@5.36.0)))(@angular-devkit/core@19.0.5(chokidar@4.0.1))(@angular/cli@19.0.5(@types/node@18.19.15)(chokidar@4.0.1))(@angular/common@19.1.1(@angular/core@19.1.1(rxjs@7.8.1)(zone.js@0.15.0))(rxjs@7.8.1))(@angular/compiler-cli@19.1.1(@angular/compiler@19.1.1(@angular/core@19.1.1(rxjs@7.8.1)(zone.js@0.15.0)))(typescript@5.6.3))(@angular/compiler@19.1.1(@angular/core@19.1.1(rxjs@7.8.1)(zone.js@0.15.0)))(@angular/core@19.1.1(rxjs@7.8.1)(zone.js@0.15.0))(@angular/forms@19.1.1(@angular/common@19.1.1(@angular/core@19.1.1(rxjs@7.8.1)(zone.js@0.15.0))(rxjs@7.8.1))(@angular/core@19.1.1(rxjs@7.8.1)(zone.js@0.15.0))(@angular/platform-browser@19.1.1(@angular/animations@19.1.1(@angular/core@19.1.1(rxjs@7.8.1)(zone.js@0.15.0)))(@angular/common@19.1.1(@angular/core@19.1.1(rxjs@7.8.1)(zone.js@0.15.0))(rxjs@7.8.1))(@angular/core@19.1.1(rxjs@7.8.1)(zone.js@0.15.0)))(rxjs@7.8.1))(@angular/platform-browser-dynamic@19.1.1(@angular/common@19.1.1(@angular/core@19.1.1(rxjs@7.8.1)(zone.js@0.15.0))(rxjs@7.8.1))(@angular/compiler@19.1.1(@angular/core@19.1.1(rxjs@7.8.1)(zone.js@0.15.0)))(@angular/core@19.1.1(rxjs@7.8.1)(zone.js@0.15.0))(@angular/platform-browser@19.1.1(@angular/animations@19.1.1(@angular/core@19.1.1(rxjs@7.8.1)(zone.js@0.15.0)))(@angular/common@19.1.1(@angular/core@19.1.1(rxjs@7.8.1)(zone.js@0.15.0))(rxjs@7.8.1))(@angular/core@19.1.1(rxjs@7.8.1)(zone.js@0.15.0))))(@angular/platform-browser@19.1.1(@angular/animations@19.1.1(@angular/core@19.1.1(rxjs@7.8.1)(zone.js@0.15.0)))(@angular/common@19.1.1(@angular/core@19.1.1(rxjs@7.8.1)(zone.js@0.15.0))(rxjs@7.8.1))(@angular/core@19.1.1(rxjs@7.8.1)(zone.js@0.15.0)))(@rspack/core@1.1.6)(@swc/core@1.10.1)(esbuild@0.24.0)(rxjs@7.8.1)(storybook@8.5.0(prettier@3.3.3))(typescript@5.6.3)(zone.js@0.15.0))(@storybook/preview-api@8.5.0(storybook@8.5.0(prettier@3.3.3)))(rxjs@7.8.1)
+      tailwindcss:
+        specifier: ^3.4.4
+        version: 3.4.10(ts-node@10.9.1(@swc/core@1.10.1)(@types/node@18.19.15)(typescript@5.6.3))
       ts-jest:
         specifier: ^29.1.0
         version: 29.1.2(@babel/core@7.26.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.26.0))(esbuild@0.24.0)(jest@29.7.0(@types/node@18.19.15)(babel-plugin-macros@2.8.0)(ts-node@10.9.1(@swc/core@1.10.1)(@types/node@18.19.15)(typescript@5.6.3)))(typescript@5.6.3)
@@ -2872,6 +2881,11 @@ packages:
 
   '@swc/types@0.1.17':
     resolution: {integrity: sha512-V5gRru+aD8YVyCOMAjMpWR1Ui577DD5KSJsHP8RAxopAH22jFz6GZd/qxqjO6MJHQhcsjvjOFXyDhyLQUnMveQ==}
+
+  '@tailwindcss/forms@0.5.7':
+    resolution: {integrity: sha512-QE7X69iQI+ZXwldE+rzasvbJiyV/ju1FGHH0Qn2W3FKbuYtqp8LKcy6iSw79fVUT5/Vvf+0XgLCeYVG+UV6hOw==}
+    peerDependencies:
+      tailwindcss: '>=3.0.0 || >= 3.0.0-alpha.1'
 
   '@testing-library/dom@10.4.0':
     resolution: {integrity: sha512-pemlzrSESWbdAloYml3bAJMEfNh1Z7EduzqPKprCH5S341frlpYnUEW0H72dLxa6IsYr+mPno20GiSm+h9dEdQ==}
@@ -6637,6 +6651,10 @@ packages:
     peerDependencies:
       webpack: ^5.0.0
 
+  mini-svg-data-uri@1.4.4:
+    resolution: {integrity: sha512-r9deDe9p5FJUPZAk3A59wGH7Ii9YrjjWw0jmw/liSbHl2CHiyXj6FcDXDu2K3TjVAXqiJdaw3xxwlZZr9E6nHg==}
+    hasBin: true
+
   minimalistic-assert@1.0.1:
     resolution: {integrity: sha512-UtJcAD4yEaGtjPezWuO9wC4nwUnVH/8/Im3yEHQP4b67cXlD/Qr9hdITCU1xDbSEXg2XKNaP8jsReV7vQd00/A==}
 
@@ -7553,6 +7571,61 @@ packages:
     engines: {node: '>=14.0.0'}
     peerDependencies:
       prettier: ^3.0.0
+
+  prettier-plugin-tailwindcss@0.6.6:
+    resolution: {integrity: sha512-OPva5S7WAsPLEsOuOWXATi13QrCKACCiIonFgIR6V4lYv4QLp++UXVhZSzRbZxXGimkQtQT86CC6fQqTOybGng==}
+    engines: {node: '>=14.21.3'}
+    peerDependencies:
+      '@ianvs/prettier-plugin-sort-imports': '*'
+      '@prettier/plugin-pug': '*'
+      '@shopify/prettier-plugin-liquid': '*'
+      '@trivago/prettier-plugin-sort-imports': '*'
+      '@zackad/prettier-plugin-twig-melody': '*'
+      prettier: ^3.0
+      prettier-plugin-astro: '*'
+      prettier-plugin-css-order: '*'
+      prettier-plugin-import-sort: '*'
+      prettier-plugin-jsdoc: '*'
+      prettier-plugin-marko: '*'
+      prettier-plugin-multiline-arrays: '*'
+      prettier-plugin-organize-attributes: '*'
+      prettier-plugin-organize-imports: '*'
+      prettier-plugin-sort-imports: '*'
+      prettier-plugin-style-order: '*'
+      prettier-plugin-svelte: '*'
+    peerDependenciesMeta:
+      '@ianvs/prettier-plugin-sort-imports':
+        optional: true
+      '@prettier/plugin-pug':
+        optional: true
+      '@shopify/prettier-plugin-liquid':
+        optional: true
+      '@trivago/prettier-plugin-sort-imports':
+        optional: true
+      '@zackad/prettier-plugin-twig-melody':
+        optional: true
+      prettier-plugin-astro:
+        optional: true
+      prettier-plugin-css-order:
+        optional: true
+      prettier-plugin-import-sort:
+        optional: true
+      prettier-plugin-jsdoc:
+        optional: true
+      prettier-plugin-marko:
+        optional: true
+      prettier-plugin-multiline-arrays:
+        optional: true
+      prettier-plugin-organize-attributes:
+        optional: true
+      prettier-plugin-organize-imports:
+        optional: true
+      prettier-plugin-sort-imports:
+        optional: true
+      prettier-plugin-style-order:
+        optional: true
+      prettier-plugin-svelte:
+        optional: true
 
   prettier@3.3.3:
     resolution: {integrity: sha512-i2tDNA0O5IrMO757lfrdQZCc2jPNDVntV0m/+4whiDfWaTKfMNgR7Qz0NAeGz/nRqF4m5/6CLzbP4/liHt12Ew==}
@@ -9270,8 +9343,7 @@ snapshots:
 
   '@adobe/css-tools@4.4.1': {}
 
-  '@alloc/quick-lru@5.2.0':
-    optional: true
+  '@alloc/quick-lru@5.2.0': {}
 
   '@ampproject/remapping@2.3.0':
     dependencies:
@@ -12480,6 +12552,11 @@ snapshots:
     dependencies:
       '@swc/counter': 0.1.3
 
+  '@tailwindcss/forms@0.5.7(tailwindcss@3.4.10(ts-node@10.9.1(@swc/core@1.10.1)(@types/node@18.19.15)(typescript@5.6.3)))':
+    dependencies:
+      mini-svg-data-uri: 1.4.4
+      tailwindcss: 3.4.10(ts-node@10.9.1(@swc/core@1.10.1)(@types/node@18.19.15)(typescript@5.6.3))
+
   '@testing-library/dom@10.4.0':
     dependencies:
       '@babel/code-frame': 7.26.2
@@ -13244,8 +13321,7 @@ snapshots:
 
   arg@4.1.3: {}
 
-  arg@5.0.2:
-    optional: true
+  arg@5.0.2: {}
 
   argparse@1.0.10:
     dependencies:
@@ -13661,8 +13737,7 @@ snapshots:
       pascal-case: 3.1.2
       tslib: 2.8.1
 
-  camelcase-css@2.0.1:
-    optional: true
+  camelcase-css@2.0.1: {}
 
   camelcase@5.3.1: {}
 
@@ -13842,8 +13917,7 @@ snapshots:
 
   commander@3.0.2: {}
 
-  commander@4.1.1:
-    optional: true
+  commander@4.1.1: {}
 
   commander@5.1.0: {}
 
@@ -14374,8 +14448,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  didyoumean@1.2.2:
-    optional: true
+  didyoumean@1.2.2: {}
 
   diff-sequences@29.6.3: {}
 
@@ -14389,8 +14462,7 @@ snapshots:
     dependencies:
       path-type: 4.0.0
 
-  dlv@1.1.3:
-    optional: true
+  dlv@1.1.3: {}
 
   dns-packet@5.6.1:
     dependencies:
@@ -15401,7 +15473,6 @@ snapshots:
       minimatch: 9.0.5
       minipass: 7.0.4
       path-scurry: 1.10.1
-    optional: true
 
   glob@10.4.5:
     dependencies:
@@ -16104,7 +16175,6 @@ snapshots:
       '@isaacs/cliui': 8.0.2
     optionalDependencies:
       '@pkgjs/parseargs': 0.11.0
-    optional: true
 
   jackspeak@3.4.3:
     dependencies:
@@ -16761,8 +16831,7 @@ snapshots:
     optionalDependencies:
       webpack: 5.96.1(@swc/core@1.10.1)(esbuild@0.24.0)
 
-  lilconfig@2.1.0:
-    optional: true
+  lilconfig@2.1.0: {}
 
   lilconfig@3.0.0: {}
 
@@ -17071,6 +17140,8 @@ snapshots:
       tapable: 2.2.1
       webpack: 5.96.1(@swc/core@1.10.1)(esbuild@0.24.0)
 
+  mini-svg-data-uri@1.4.4: {}
+
   minimalistic-assert@1.0.1: {}
 
   minimatch@3.1.2:
@@ -17121,8 +17192,7 @@ snapshots:
 
   minipass@5.0.0: {}
 
-  minipass@7.0.4:
-    optional: true
+  minipass@7.0.4: {}
 
   minipass@7.1.2: {}
 
@@ -17195,7 +17265,6 @@ snapshots:
       any-promise: 1.3.0
       object-assign: 4.1.1
       thenify-all: 1.6.0
-    optional: true
 
   nanoid@3.3.7: {}
 
@@ -17445,11 +17514,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  object-assign@4.1.1:
-    optional: true
+  object-assign@4.1.1: {}
 
-  object-hash@3.0.0:
-    optional: true
+  object-hash@3.0.0: {}
 
   object-inspect@1.13.1: {}
 
@@ -17711,7 +17778,6 @@ snapshots:
     dependencies:
       lru-cache: 10.2.0
       minipass: 7.0.4
-    optional: true
 
   path-scurry@1.11.1:
     dependencies:
@@ -17732,8 +17798,7 @@ snapshots:
 
   performance-now@2.1.0: {}
 
-  picocolors@1.0.0:
-    optional: true
+  picocolors@1.0.0: {}
 
   picocolors@1.1.1: {}
 
@@ -17835,13 +17900,11 @@ snapshots:
       postcss-value-parser: 4.2.0
       read-cache: 1.0.0
       resolve: 1.22.8
-    optional: true
 
   postcss-js@4.0.1(postcss@8.4.38):
     dependencies:
       camelcase-css: 2.0.1
       postcss: 8.4.38
-    optional: true
 
   postcss-load-config@4.0.2(postcss@8.4.38)(ts-node@10.9.1(@swc/core@1.10.1)(@types/node@18.19.15)(typescript@5.6.3)):
     dependencies:
@@ -17850,7 +17913,6 @@ snapshots:
     optionalDependencies:
       postcss: 8.4.38
       ts-node: 10.9.1(@swc/core@1.10.1)(@types/node@18.19.15)(typescript@5.6.3)
-    optional: true
 
   postcss-loader@6.2.1(postcss@8.4.49)(webpack@5.96.1(@swc/core@1.10.1)(esbuild@0.24.0)):
     dependencies:
@@ -17958,7 +18020,6 @@ snapshots:
     dependencies:
       postcss: 8.4.38
       postcss-selector-parser: 6.1.2
-    optional: true
 
   postcss-normalize-charset@6.0.1(postcss@8.4.49):
     dependencies:
@@ -18026,7 +18087,6 @@ snapshots:
     dependencies:
       cssesc: 3.0.0
       util-deprecate: 1.0.2
-    optional: true
 
   postcss-selector-parser@6.1.2:
     dependencies:
@@ -18058,7 +18118,6 @@ snapshots:
       nanoid: 3.3.7
       picocolors: 1.1.1
       source-map-js: 1.2.0
-    optional: true
 
   postcss@8.4.41:
     dependencies:
@@ -18097,6 +18156,12 @@ snapshots:
   prettier-plugin-organize-attributes@1.0.0(prettier@3.3.3):
     dependencies:
       prettier: 3.3.3
+
+  prettier-plugin-tailwindcss@0.6.6(prettier-plugin-organize-attributes@1.0.0(prettier@3.3.3))(prettier@3.3.3):
+    dependencies:
+      prettier: 3.3.3
+    optionalDependencies:
+      prettier-plugin-organize-attributes: 1.0.0(prettier@3.3.3)
 
   prettier@3.3.3: {}
 
@@ -19037,7 +19102,6 @@ snapshots:
       mz: 2.7.0
       pirates: 4.0.6
       ts-interface-checker: 0.1.13
-    optional: true
 
   supports-color@5.5.0:
     dependencies:
@@ -19093,7 +19157,6 @@ snapshots:
       sucrase: 3.35.0
     transitivePeerDependencies:
       - ts-node
-    optional: true
 
   tapable@2.2.1: {}
 
@@ -19169,12 +19232,10 @@ snapshots:
   thenify-all@1.6.0:
     dependencies:
       thenify: 3.3.1
-    optional: true
 
   thenify@3.3.1:
     dependencies:
       any-promise: 1.3.0
-    optional: true
 
   thingies@1.21.0(tslib@2.8.1):
     dependencies:
@@ -19257,8 +19318,7 @@ snapshots:
       '@ts-graphviz/common': 2.1.5
       '@ts-graphviz/core': 2.0.6
 
-  ts-interface-checker@0.1.13:
-    optional: true
+  ts-interface-checker@0.1.13: {}
 
   ts-jest@29.1.2(@babel/core@7.26.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.26.0))(esbuild@0.23.0)(jest@29.7.0(@types/node@18.19.15)(babel-plugin-macros@2.8.0)(ts-node@10.9.1(@swc/core@1.10.1)(@types/node@18.19.15)(typescript@5.6.3)))(typescript@5.6.3):
     dependencies:
