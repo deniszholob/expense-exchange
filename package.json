@@ -107,6 +107,7 @@
     "@storybook/test-runner": "^0.20.1",
     "@storybook/theming": "8.5.0",
     "@storybook/types": "8.5.0",
+    "@tailwindcss/forms": "^0.5.7",
     "@types/jest": "29.5.12",
     "@types/node": "^18.16.9",
     "@typescript-eslint/eslint-plugin": "7.18.0",
@@ -131,8 +132,10 @@
     "playwright": "^1.49.1",
     "prettier": "^3.3.3",
     "prettier-plugin-organize-attributes": "^1.0.0",
+    "prettier-plugin-tailwindcss": "^0.6.6",
     "storybook": "8.5.0",
     "storybook-addon-angular-router": "^1.10.1",
+    "tailwindcss": "^3.4.4",
     "ts-jest": "^29.1.0",
     "ts-node": "10.9.1",
     "typescript": "5.6.3"
