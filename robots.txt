@@ -1,0 +1,3 @@
+User-Agent: *
+Disallow: /assets/*
+Sitemap: https://deniszholob.github.io/expense-exchange/sitemap.xml
