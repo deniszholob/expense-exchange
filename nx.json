@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
-  "defaultProject": "template-nx-project",
+  "defaultProject": "expense-exchange",
   "targetDefaults": {
     "build": {
       "dependsOn": ["^build"],

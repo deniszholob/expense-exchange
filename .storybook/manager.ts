@@ -13,7 +13,7 @@
 //   // Colors
 //   colorPrimary: 'ffffff',
 //   colorSecondary: '#ffffff',
-//   brandTitle: 'template-nx-project',
+//   brandTitle: 'expense-exchange',
 //   appBg: '#000000',
 // });
 
