@@ -1,8 +1,8 @@
 {
   "$schema": "https://json.schemastore.org/web-manifest-combined.json",
-  "name": "template_nx_project_name",
-  "short_name": "template_nx_project_name",
-  "description": "template_nx_project_description",
+  "name": "Expense Exchange",
+  "short_name": "Expense Exchange",
+  "description": "Tool to keep track of expenses for multiple people",
   "theme_color": "#ffffff",
   "background_color": "#000000",
   "display": "standalone",
@@ -18,16 +18,16 @@
       "sizes": "500x850",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "template_nx_project_name Mobile",
-      "description": "template_nx_project_description"
+      "label": "Expense Exchange Mobile",
+      "description": "Tool to keep track of expenses for multiple people"
     },
     {
       "src": "assets/screenshots/screenshot_1280x720.png",
       "sizes": "1280x720",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "template_nx_project_name Desktop",
-      "description": "template_nx_project_description"
+      "label": "Expense Exchange Desktop",
+      "description": "Tool to keep track of expenses for multiple people"
     }
   ],
   "icons": [

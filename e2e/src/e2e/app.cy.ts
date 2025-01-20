@@ -1,6 +1,6 @@
 import { getGreeting } from '../support/app.po';
 
-describe('template-nx-project', () => {
+describe('expense-exchange', () => {
   beforeEach(() => cy.visit('/'));
 
   it('should display welcome message', () => {
@@ -8,6 +8,6 @@ describe('template-nx-project', () => {
     cy.login('my-email@something.com', 'myPassword');
 
     // Function helper example, see `../support/app.po.ts` file
-    getGreeting().contains('template_nx_project_name');
+    getGreeting().contains('Expense Exchange');
   });
 });
