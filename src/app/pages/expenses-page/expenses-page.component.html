@@ -1,0 +1,39 @@
+<h1 class="py-4 text-center text-2xl">Expenses</h1>
+
+@switch (this.pageState) {
+  @case (DetailsPageState.LOADING) {
+    <div class="text-center">Loading expenses...</div>
+  }
+
+  @case (DetailsPageState.NO_PARAMS) {
+    <app-expense-table
+      [expenses]="(expenses$ | async) ?? []"
+      (add)="this.onAddExpense()"
+      (edit)="this.onEditExpense($event)"
+      (delete)="this.onDeleteExpense($event)"
+    ></app-expense-table>
+  }
+
+  @case (DetailsPageState.LOADED_PARAM_DATA) {
+    <app-expense-details
+      [expense]="this.expense"
+      [users]="(this.users$ | async) ?? []"
+      (save)="this.onSaveExpense($event)"
+    ></app-expense-details>
+  }
+  @case (DetailsPageState.ERROR) {
+    <div class="text-center text-red-500">
+      <ul>
+        @for (error of this.errors; track $index) {
+          <li>{{ error }}</li>
+        }
+      </ul>
+    </div>
+  }
+}
+
+<!-- <pre>
+  expense: {{ expense$ | async | json }}
+  expenses: {{ expenses$ | async | json }}
+  users: {{ users$ | async | json }}
+</pre> -->

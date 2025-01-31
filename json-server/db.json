@@ -1,0 +1,88 @@
+{
+  "users": [
+    {
+      "name": "John Doe",
+      "id": "6a61"
+    },
+    {
+      "name": "Jane Smith",
+      "id": "e8aa"
+    }
+  ],
+  "expenses": [
+    {
+      "name": "Sausages",
+      "description": "invoice",
+      "amount": 734.11,
+      "datePaid": "2024-07-04",
+      "forDate": "2024-07-04",
+      "paidByUserId": "6a61",
+      "paidForUserIds": ["6a61", "e8aa"]
+    },
+    {
+      "name": "Table",
+      "description": "deposit",
+      "amount": 794.75,
+      "datePaid": "2024-07-04",
+      "forDate": "2024-07-04",
+      "paidByUserId": "6a61",
+      "paidForUserIds": ["6a61"]
+    },
+    {
+      "name": "Computer",
+      "description": "withdrawal",
+      "amount": 598.07,
+      "datePaid": "2024-07-04",
+      "forDate": "2024-07-04",
+      "paidByUserId": "6a61",
+      "paidForUserIds": ["e8aa"]
+    },
+    {
+      "name": "Shoes",
+      "description": "deposit",
+      "amount": 431.79,
+      "datePaid": "2024-07-04",
+      "forDate": "2024-07-04",
+      "paidByUserId": "e8aa",
+      "paidForUserIds": ["6a61", "e8aa"]
+    },
+    {
+      "name": "Pants",
+      "description": "deposit",
+      "amount": 248.06,
+      "datePaid": "2024-07-04",
+      "forDate": "2024-07-04",
+      "paidByUserId": "e8aa",
+      "paidForUserIds": ["6a61"]
+    },
+    {
+      "name": "Bike",
+      "description": "payment",
+      "amount": 711.78,
+      "datePaid": "2024-07-04",
+      "forDate": "2024-07-04",
+      "paidByUserId": "e8aa",
+      "paidForUserIds": ["e8aa"]
+    },
+    {
+      "name": "Shirt",
+      "description": "withdrawal",
+      "amount": 559.12,
+      "datePaid": "2024-05-09",
+      "forDate": "2024-10-22",
+      "paidByUserId": "6a61",
+      "paidForUserIds": ["6a61", "e8aa"],
+      "id": "a1e9"
+    },
+    {
+      "name": "Chicken",
+      "description": "deposit",
+      "amount": 348.33,
+      "datePaid": "2024-02-22",
+      "forDate": "2024-04-25",
+      "paidByUserId": "6a61",
+      "paidForUserIds": ["6a61", "e8aa"],
+      "id": "a24d"
+    }
+  ]
+}
