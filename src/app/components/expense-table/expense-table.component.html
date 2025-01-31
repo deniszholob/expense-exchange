@@ -1,0 +1,7 @@
+<app-simple-table
+  [data]="expenses()"
+  [columns]="columns"
+  (deleteRowEmitter)="onDeleteRow($event)"
+  (editRowEmitter)="onEditRow($event)"
+  (addRowEmitter)="onAddRow()"
+></app-simple-table>

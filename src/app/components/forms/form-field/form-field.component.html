@@ -1,0 +1,13 @@
+<div class="flex w-full flex-col">
+  <label class="text-sm" [for]="formField().id">{{ formField().label }}</label>
+  <ng-content></ng-content>
+  <div class="text-red-500">
+    @let errors = formField().formControl?.errors;
+
+    @if (errors) {
+      @for (error of errors | keyvalue; track $index) {
+        <div>{{ error.key }}: {{ error.value | json }}</div>
+      }
+    }
+  </div>
+</div>

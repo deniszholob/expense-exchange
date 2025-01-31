@@ -1,0 +1,63 @@
+<div class="flex flex-col gap-2 overflow-x-auto">
+  <button
+    class="rounded bg-green-500 px-4 py-2 text-center font-bold text-white hover:bg-green-700"
+    (click)="onAdd()"
+  >
+    Add New
+  </button>
+
+  <table class="min-w-full table-auto border-collapse border border-gray-300">
+    <thead class="bg-gray-100">
+      <tr>
+        <th class="border border-gray-300 px-4 py-2 text-left">Actions</th>
+        @for (column of columns(); track $index) {
+          <th class="border border-gray-300 px-4 py-2 text-left">
+            @if (column.sortable) {
+              <button
+                class="flex items-center gap-1 font-semibold hover:text-blue-500 focus:outline-none"
+                (click)="sort(column)"
+              >
+                {{ column.label }}
+
+                @if (sortKey === column.key) {
+                  {{ sortDirection === 'asc' ? '↑' : '↓' }}
+                }
+              </button>
+            } @else {
+              <span>{{ column.label }}</span>
+            }
+          </th>
+        }
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of renderTable(); track $index; let i = $index) {
+        <tr class="hover:bg-gray-100" [class.bg-gray-50]="striped() && i % 2 === 0">
+          <td class="border border-gray-300 px-4 py-2">
+            <div class="flex flex-row gap-2">
+              <button
+                class="rounded bg-amber-500 px-4 py-2 font-bold text-white hover:bg-amber-700"
+                (click)="onEdit(i, row)"
+              >
+                <i class="fa fa-edit"></i>
+              </button>
+
+              <button
+                class="rounded bg-red-500 px-4 py-2 font-bold text-white hover:bg-red-700"
+                (click)="onDelete(i, row)"
+              >
+                <i class="fa fa-trash"></i>
+              </button>
+            </div>
+          </td>
+
+          @for (cell of row.cells; track $index) {
+            <td class="border border-gray-300 px-4 py-2">
+              <div [innerHTML]="cell.cellValue"></div>
+            </td>
+          }
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
