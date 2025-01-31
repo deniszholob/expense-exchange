@@ -106,7 +106,7 @@ jobs:
               run: pnpm install
 
             - name: Lint code
-              run: pnpm run lint:check
+              run: pnpm run affected:lint:check
 
     prettier-format:
         runs-on: ubuntu-latest
@@ -140,7 +140,7 @@ jobs:
               run: pnpm install
 
             - name: Prettier Format Check
-              run: pnpm run format:check
+              run: pnpm run affected:format:check
 
     jest-tests:
         runs-on: ubuntu-latest
@@ -174,7 +174,7 @@ jobs:
               run: pnpm install
 
             - name: Run Jest Tests
-              run: pnpm run test
+              run: pnpm run affected:test
 
     cy-tests:
         runs-on: ubuntu-latest

@@ -1,5 +1,7 @@
 # TODO
 
+## General
+
 - [x] Replace `expense-exchange` with your project `dashed-name`
 - [x] Replace `Expense Exchange` with your `Project Name`
 - [x] Replace `Tool to keep track of expenses for multiple people` with your `Project Description`
@@ -14,3 +16,5 @@
 - [ ] Tweak [meta](./src/meta/) if needed: mostly modify [manifest.webmanifest](./src/meta/manifest.webmanifest)
 - [ ] Write your app
 - [ ] Add/Replace screenshots in [screenshots](./global/assets/screenshots) folder and update [readme](./README.md) and [manifest](./src/meta/manifest.webmanifest) references
+
+## App
