@@ -2,9 +2,11 @@ import { isDevMode } from '@angular/core';
 import { Route } from '@angular/router';
 
 import { PAGE_ROUTES, ROUTE_KEYWORDS } from './app.info';
+import { AuthGuard } from './guards/auth.guard';
 import {
   DashboardPageComponent,
   ExpensesPageComponent,
+  SettingsPageComponent,
   UsersPageComponent,
 } from './pages';
 
@@ -25,7 +27,12 @@ export const appRoutes: Route[] = [
   // { path: HOME_PAGE_ROOT, component: ViewPages.HomePageComponent },
   // { path: 'home', redirectTo: HOME_PAGE_ROOT, pathMatch: 'full' },
   // ======================================================================== //
-  { path: PAGE_ROUTES.DASHBOARD_PAGE_ROOT, component: DashboardPageComponent },
+  { path: PAGE_ROUTES.SETTINGS_PAGE_ROOT, component: SettingsPageComponent },
+  {
+    path: PAGE_ROUTES.DASHBOARD_PAGE_ROOT,
+    component: DashboardPageComponent,
+    canActivate: [AuthGuard],
+  },
   { path: PAGE_ROUTES.USERS_PAGE_ROOT, component: UsersPageComponent },
   {
     path: PAGE_ROUTES.EXPENSES_PAGE_ROOT,
@@ -36,6 +43,7 @@ export const appRoutes: Route[] = [
         component: ExpensesPageComponent,
       },
     ],
+    canActivate: [AuthGuard],
   },
   ...DEV_ROUTE,
   // ======================================================================== //

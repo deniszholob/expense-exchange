@@ -1,0 +1,28 @@
+<app-page-layout [title]="'Settings'">
+  <div class="container-fixed">
+    <app-form-field
+      [formField]="{
+        id: 'currentUser',
+        label: 'Current User',
+      }"
+    >
+      <select
+        id="currentUser"
+        [(ngModel)]="appService.currentUser"
+        (ngModelChange)="this.onChange($event)"
+        name="currentUser"
+      >
+        <option [ngValue]="undefined" disabled>Choose your profile</option>
+        @for (user of appService._users; track $index) {
+          <option [ngValue]="user">
+            {{ user.name }}
+          </option>
+        }
+      </select>
+    </app-form-field>
+  </div>
+
+  <!-- <pre>
+    currentUser: {{ appService.currentUser }}
+  </pre> -->
+</app-page-layout>

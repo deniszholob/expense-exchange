@@ -18,3 +18,29 @@
 - [ ] Add/Replace screenshots in [screenshots](./global/assets/screenshots) folder and update [readme](./README.md) and [manifest](./src/meta/manifest.webmanifest) references
 
 ## App
+
+- [ ] Settings
+  - [x] Set current user
+  - [x] Ability to change current user
+  - [ ] setting to filter out expenses that dont have current user in "paid for"
+  - [ ] change data source
+  - [ ] localhost data for deployed app
+- [ ] Expense
+  - [ ] add expense categories
+  - [ ] add expense tags?
+  - [ ] income + expense options (show as - vs + on table nad color the amounts)
+- [ ] Expense table screen
+  - [ ] Empty table => Add expense link like in password manager
+  - [ ] center table on page an constrain
+  - [ ] add sorting and pagination
+  - [ ] add reoccuring expenses
+    - [ ] fixed amount
+    - [ ] flexible amount
+  - [ ] Dashboard
+    - [ ] who owes who and how much
+    - [ ] month view
+      - [ ] total spent for user
+      - [ ] category totals
+      - [ ] who owes who and how much for month
+    - [ ] year view
+    - [ ] averages

@@ -1,3 +1,5 @@
-<pre>
-  {{ users | json }}
-</pre>
+<app-page-layout [title]="'Users'">
+  <div class="container-fixed">
+    <pre>{{ users | json }} </pre>
+  </div>
+</app-page-layout>

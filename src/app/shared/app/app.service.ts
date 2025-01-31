@@ -34,11 +34,22 @@ export class AppService implements OnDestroy {
   public _expenses: Expense[] = [];
   public _detailedExpenses: DetailedExpense[] = [];
 
+  public currentUser?: User;
+  public currentUserChange = new BehaviorSubject<User | undefined>(undefined);
+
   constructor(private expenseService: ExpenseService) {
     this.detailedExpenses$.subscribe();
 
     this.refreshUsers$.next();
     this.refreshExpenses$.next();
+    this.currentUserChange
+      .pipe(
+        tap((user: User | undefined) => {
+          this.currentUser = user;
+        }),
+        takeUntil(this.clearSub$),
+      )
+      .subscribe();
   }
 
   public ngOnDestroy(): void {
@@ -46,11 +57,21 @@ export class AppService implements OnDestroy {
     this.clearSub$.complete();
   }
 
+  public switchUser(user: User): void {
+    this.currentUser = user;
+  }
+
   private fetchUsers(): Observable<User[]> {
     return this.refreshUsers$.pipe(
       switchMap((): Observable<User[]> => this.expenseService.getUsers()),
       tap((users: User[]): void => {
         updateArray(this._users, users);
+      }),
+      tap((users: User[]): void => {
+        const defaultUser = users.at(0);
+        if (!this.currentUser && defaultUser) {
+          this.currentUserChange.next(defaultUser);
+        }
       }),
       shareReplay(),
       takeUntil(this.clearSub$),

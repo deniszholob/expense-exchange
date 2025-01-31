@@ -4,6 +4,7 @@ export const PAGE_ROUTES = {
   DASHBOARD_PAGE_ROOT: 'dash',
   USERS_PAGE_ROOT: 'users',
   EXPENSES_PAGE_ROOT: 'expenses',
+  SETTINGS_PAGE_ROOT: 'settings',
 } as const;
 
 export const ROUTE_KEYWORDS = {

@@ -1,0 +1,41 @@
+<div class="bg-neutral-100">
+  <header class="container-fixed gap-01">
+    <div class="flex flex-row items-baseline justify-between">
+      <h1 class="pt-4 text-2xl">Expense Exchange</h1>
+
+      <div>
+        @if (appService.currentUser != null) {
+          <ul>
+            <li>
+              <a
+                class="link text-lg no-underline"
+                [routerLink]="['/', PAGE_ROUTES.SETTINGS_PAGE_ROOT]"
+              >
+                {{ appService.currentUser.name }}
+              </a>
+            </li>
+          </ul>
+        } @else {
+          <a class="link text-lg no-underline" [routerLink]="['/', PAGE_ROUTES.SETTINGS_PAGE_ROOT]">
+            Login
+          </a>
+        }
+      </div>
+    </div>
+
+    <nav class="flex flex-row flex-wrap items-end">
+      @for (link of links; track $index) {
+        <a
+          class="link border border-b-2 border-transparent px-2 py-1 text-lg no-underline hover:border-b-blue-500"
+          routerLink="/{{ link.id }}"
+          routerLinkActive="font-bold text-blue-500"
+        >
+          {{ link.displayAs }}
+          @if (link.note) {
+            <small> ({{ link.note }})</small>
+          }
+        </a>
+      }
+    </nav>
+  </header>
+</div>
