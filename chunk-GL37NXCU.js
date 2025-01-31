@@ -1,2 +1,0 @@
-import{Ma as i,Na as s,Oa as p,Qa as n,kb as a,ya as o}from"./chunk-SB6CQQQL.js";var f=(()=>{class e{static{this.\u0275fac=function(t){return new(t||e)}}static{this.\u0275cmp=o({type:e,selectors:[["app-dev-page"]],decls:4,vars:0,consts:[[1,"container-fixed"]],template:function(t,r){t&1&&(i(0,"section",0),n(1," Space for testing out code. "),p(2,"br"),n(3,`Do not save changes to repo
-`),s())},dependencies:[a],styles:["[_nghost-%COMP%]{display:contents}"]})}}return e})();export{f as DevPageComponent};
