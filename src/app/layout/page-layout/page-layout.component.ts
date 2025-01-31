@@ -1,20 +1,15 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { User } from 'src/app/api';
-import { PageLayoutComponent } from 'src/app/layout';
-import { AppService } from 'src/app/shared/app/app.service';
+import { Component, input } from '@angular/core';
 
 @Component({
-  selector: 'app-users-page',
-  templateUrl: './users-page.component.html',
+  selector: 'app-page-layout',
+  templateUrl: './page-layout.component.html',
   // styles: [':host{display:contents}'], // Makes component host as if it was not there, can offer less css headaches. Use @HostBinding class approach for easier overrides.
   // host: { class: 'contents' },
-  imports: [CommonModule, PageLayoutComponent],
+  imports: [CommonModule],
 })
-export class UsersPageComponent {
+export class PageLayoutComponent {
   // @HostBinding('class') protected readonly class = 'contents'; // Makes component host as if it was not there, can offer less css headaches. Assumes .contents{display:contents} css class exits
-
-  protected users: User[] = this.appService._users;
-
-  constructor(private appService: AppService) {}
+  // constructor() {}
+  public title = input.required<string>();
 }

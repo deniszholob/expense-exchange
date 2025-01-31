@@ -39,6 +39,7 @@ const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 export class ExpenseDetailsComponent {
   protected readonly userComparatorBool = userComparatorBool;
 
+  public readonly currentUser: InputSignal<User | undefined> = input<User>();
   public readonly users: InputSignal<User[]> = input.required<User[]>();
   public readonly expense: InputSignal<Expense | undefined> = input<Expense>();
   public readonly save: OutputEmitterRef<Expense> = output<Expense>();
@@ -65,13 +66,13 @@ export class ExpenseDetailsComponent {
       let patchExpense: Partial<Expense> | undefined = expense;
       if (!patchExpense) {
         const date: string | undefined =
-          new Date(Date.now()).toISOString().split('T')[0] ?? undefined;
+          new Date(Date.now()).toISOString().split('T').at(0) ?? undefined;
         patchExpense = {
           ...NEW_EXPENSE,
           id: undefined,
           datePaid: date,
           forDate: date,
-          paidByUserId: users.at(0)?.id,
+          paidByUserId: (this.currentUser() ?? users.at(0))?.id,
           paidForUserIds: [...users.map((user: User): string => user.id)],
         };
       }

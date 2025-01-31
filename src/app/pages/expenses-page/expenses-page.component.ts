@@ -9,6 +9,7 @@ import { ExpenseTableComponent } from 'src/app/components/expense-table/expense-
 import {
   DetailsPageDirective,
   DetailsPageState,
+  PageLayoutComponent,
   validateIdStringAny,
 } from 'src/app/layout';
 import { AppService } from 'src/app/shared/app/app.service';
@@ -19,7 +20,12 @@ import { DetailedExpense } from 'src/app/shared/detailed-expense/detailed-expens
   templateUrl: './expenses-page.component.html',
   // styles: [':host{display:contents}'], // Makes component host as if it was not there, can offer less css headaches. Use @HostBinding class approach for easier overrides.
   // host: { class: 'contents' },
-  imports: [CommonModule, ExpenseTableComponent, ExpenseDetailsComponent],
+  imports: [
+    CommonModule,
+    ExpenseTableComponent,
+    ExpenseDetailsComponent,
+    PageLayoutComponent,
+  ],
   providers: [DatePipe],
 })
 export class ExpensesPageComponent extends DetailsPageDirective {
@@ -31,7 +37,7 @@ export class ExpensesPageComponent extends DetailsPageDirective {
   protected users = this.appService._users;
 
   constructor(
-    private appService: AppService,
+    protected appService: AppService,
     private expenseService: ExpenseService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
