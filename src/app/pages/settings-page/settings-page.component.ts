@@ -5,6 +5,10 @@ import { User } from 'src/app/api';
 import { FormFieldComponent } from 'src/app/components';
 import { PageLayoutComponent } from 'src/app/layout';
 import { AppService } from 'src/app/shared/app/app.service';
+import {
+  DATA_SOURCE_INFO_OPTIONS,
+  DataSource,
+} from 'src/app/shared/data-source.enum';
 
 @Component({
   selector: 'app-settings-page',
@@ -14,6 +18,8 @@ import { AppService } from 'src/app/shared/app/app.service';
   imports: [CommonModule, FormsModule, PageLayoutComponent, FormFieldComponent],
 })
 export class SettingsPageComponent {
+  protected readonly DataSource = DataSource;
+  protected readonly DATA_SOURCE_INFO_OPTIONS = DATA_SOURCE_INFO_OPTIONS;
   // @HostBinding('class') protected readonly class = 'contents'; // Makes component host as if it was not there, can offer less css headaches. Assumes .contents{display:contents} css class exits
   constructor(protected appService: AppService) {}
 

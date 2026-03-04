@@ -12,6 +12,7 @@ import {
 } from 'rxjs';
 
 import { Expense, ExpenseService, User } from '../../api';
+import { DATA_SOURCE_INFO, DataSource } from '../data-source.enum';
 import { DetailedExpense } from '../detailed-expense/detailed-expense.model';
 
 @Injectable({ providedIn: 'root' })
@@ -33,6 +34,12 @@ export class AppService implements OnDestroy {
   public _users: User[] = [];
   public _expenses: Expense[] = [];
   public _detailedExpenses: DetailedExpense[] = [];
+  public dataSource: DataSource = DataSource.WebStorage;
+  public dataSourcePath: Record<DataSource, string> = {
+    [DataSource.WebStorage]: DATA_SOURCE_INFO[DataSource.WebStorage].path,
+    [DataSource.RemoteApi]: DATA_SOURCE_INFO[DataSource.RemoteApi].path,
+    [DataSource.LocalFile]: DATA_SOURCE_INFO[DataSource.LocalFile].path,
+  };
 
   public currentUser?: User;
   public currentUserChange = new BehaviorSubject<User | undefined>(undefined);
