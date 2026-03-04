@@ -30,7 +30,7 @@
   - [ ] add expense tags?
   - [ ] income + expense options (show as - vs + on table nad color the amounts)
 - [ ] Expense table screen
-  - [ ] Empty table => Add expense link like in password manager
+  - [ ] Empty table => Add expense link like in my password manager
   - [ ] center table on page an constrain
   - [ ] add sorting and pagination
   - [ ] add reoccuring expenses

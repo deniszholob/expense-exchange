@@ -6,6 +6,10 @@ dist-storybook
 tmp
 /out-tsc
 
+.plan
+.dev/*
+!.dev/README.md
+
 # dependencies
 node_modules
 
@@ -34,7 +38,6 @@ npm-debug.log
 yarn-error.log
 testem.log
 /typings
-.dev
 
 # System Files
 .DS_Store
