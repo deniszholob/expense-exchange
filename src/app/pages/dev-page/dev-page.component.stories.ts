@@ -5,7 +5,7 @@ import { DevPageComponent } from './dev-page.component';
 type ComponentWithCustomControls = DevPageComponent;
 
 export default {
-  title: 'Pages/Dev Page',
+  // title: 'Pages/Dev Page',
   component: DevPageComponent,
   // decorators: [moduleMetadata({imports: []})],
   parameters: {

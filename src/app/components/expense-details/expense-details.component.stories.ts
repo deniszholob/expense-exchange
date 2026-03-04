@@ -8,7 +8,7 @@ import { MOCK_Expense, MOCK_User_Array } from 'src/app/api';
 type ComponentWithCustomControls = ExpenseDetailsComponent; // & {};
 
 const meta: Meta<ComponentWithCustomControls> = {
-  title: 'Components/Expense Details',
+  // title: 'Components/Expense Details',
   component: ExpenseDetailsComponent,
   // decorators: [moduleMetadata({ imports: [] }), applicationConfig({ providers: [ importProvidersFrom() ]})],
   parameters: {

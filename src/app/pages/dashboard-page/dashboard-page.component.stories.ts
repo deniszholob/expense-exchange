@@ -7,7 +7,7 @@ import { DashboardPageComponent } from './dashboard-page.component';
 type ComponentWithCustomControls = DashboardPageComponent; // & {};
 
 const meta: Meta<ComponentWithCustomControls> = {
-  title: 'Pages/Dashboard Page',
+  // title: 'Pages/Dashboard Page',
   component: DashboardPageComponent,
   // decorators: [moduleMetadata({ imports: [] }), applicationConfig({ providers: [ importProvidersFrom() ]})],
   parameters: {

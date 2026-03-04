@@ -1,8 +1,10 @@
+import { withFlattenedAutoTitles } from '@deniszholob/storybook-auto-titles';
 import type { StorybookConfig } from '@storybook/angular';
 
 const storyFiles = '*.@(mdx|stories.@(js|jsx|ts|tsx))';
 const config: StorybookConfig = {
   stories: [`./**/${storyFiles}`, `../src/app/**/${storyFiles}`],
+  experimental_indexers: withFlattenedAutoTitles(),
   addons: [
     '@storybook/addon-essentials',
     '@storybook/addon-a11y',

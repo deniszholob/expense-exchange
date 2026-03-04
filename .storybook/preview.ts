@@ -23,6 +23,7 @@ export const parameters: Parameters = {
     toc: true,
     // Sync this with the config theme manager.ts
     // theme: themes.dark,
+    codePanel: true,
   },
   // Recommended to not use this. See https://storybook.js.org/docs/8.0/essentials/actions#via-storybooktest-fn-spy-function
   // actions: { argTypesRegex: '^on[A-Z].*' },
@@ -78,5 +79,5 @@ export const decorators: SbDecoratorFn[] = [
 export default {
   parameters,
   decorators,
-  tags: ['autodocs'],
+  // tags: ['autodocs'],
 } satisfies Preview;

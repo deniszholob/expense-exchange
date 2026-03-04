@@ -14,7 +14,7 @@ import { MOCK_ExpenseServiceProvider } from 'src/app/api';
 type ComponentWithCustomControls = UsersPageComponent; // & {};
 
 const meta: Meta<ComponentWithCustomControls> = {
-  title: 'Pages/Users Page',
+  // title: 'Pages/Users Page',
   component: UsersPageComponent,
   decorators: [
     moduleMetadata({ imports: [] }),

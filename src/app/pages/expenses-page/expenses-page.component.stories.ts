@@ -25,7 +25,7 @@ const MOCK_RouteParams_DetailPage: MockDetailsPageParamsEnumMap =
   getMockRouteParamsDetailPage();
 
 const meta: Meta<ComponentWithCustomControls> = {
-  title: 'Pages/Expenses Page',
+  // title: 'Pages/Expenses Page',
   component: ExpensesPageComponent,
   decorators: [
     moduleMetadata({ imports: [] }),

@@ -7,7 +7,7 @@ import { PageLayoutComponent } from './page-layout.component';
 type ComponentWithCustomControls = PageLayoutComponent; // & {};
 
 const meta: Meta<ComponentWithCustomControls> = {
-  title: 'Layout/Page Layout',
+  // title: 'Layout/Page Layout',
   component: PageLayoutComponent,
   // decorators: [moduleMetadata({ imports: [] }), applicationConfig({ providers: [ importProvidersFrom() ]})],
   parameters: {

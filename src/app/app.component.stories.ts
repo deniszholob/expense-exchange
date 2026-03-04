@@ -18,7 +18,12 @@ const meta: Meta<ComponentWithCustomControls> = {
   decorators: [
     moduleMetadata({
       imports: [RouterModule],
-      providers: [{ provide: Router, useValue: MOCK_Router }],
+      providers: [
+        {
+          provide: Router,
+          useValue: MOCK_Router,
+        },
+      ],
     }),
     applicationConfig({
       providers: [importProvidersFrom(), MOCK_ExpenseServiceProvider],

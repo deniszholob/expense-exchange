@@ -17,12 +17,17 @@ import { MOCK_Router } from 'src/app/router.mock';
 type ComponentWithCustomControls = HeaderComponent; // & {};
 
 const meta: Meta<ComponentWithCustomControls> = {
-  title: 'Layout/Header',
+  // title: 'Layout/Header',
   component: HeaderComponent,
   decorators: [
     moduleMetadata({
       imports: [RouterModule],
-      providers: [{ provide: Router, useValue: MOCK_Router }],
+      providers: [
+        {
+          provide: Router,
+          useValue: MOCK_Router,
+        },
+      ],
     }),
     applicationConfig({
       providers: [

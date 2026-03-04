@@ -9,7 +9,7 @@ import { MOCK_DetailedExpense_Array } from 'src/app/shared/detailed-expense/deta
 type ComponentWithCustomControls = ExpenseTableComponent; // & {};
 
 const meta: Meta<ComponentWithCustomControls> = {
-  title: 'Components/Expense Table',
+  // title: 'Components/Expense Table',
   component: ExpenseTableComponent,
   // decorators: [moduleMetadata({ imports: [] }), applicationConfig({ providers: [ importProvidersFrom() ]})],
   parameters: {

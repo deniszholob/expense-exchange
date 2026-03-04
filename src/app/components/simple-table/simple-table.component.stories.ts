@@ -9,7 +9,7 @@ import { MOCK_ColDef_Expense } from './simple-table.mock';
 type ComponentWithCustomControls = SimpleTableComponent<Expense>; // & {};
 
 const meta: Meta<ComponentWithCustomControls> = {
-  title: 'Components/Simple Table',
+  // title: 'Components/Simple Table',
   component: SimpleTableComponent,
   // decorators: [moduleMetadata({ imports: [] }), applicationConfig({ providers: [ importProvidersFrom() ]})],
   parameters: {
