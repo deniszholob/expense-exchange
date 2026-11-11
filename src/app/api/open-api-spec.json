@@ -1,0 +1,88 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Expense Exchange",
+    "version": "1.0",
+    "x-logo": { "url": "" }
+  },
+  "paths": {
+    "/expenses": {
+      "get": { "tags": [] },
+      "post": {
+        "tags": [],
+        "operationId": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "deprecated": false,
+            "x-last-modified": 1737669065041
+          }
+        ]
+      },
+      "delete": { "tags": [] },
+      "put": { "tags": [] },
+      "patch": { "tags": [] },
+      "x-last-modified": 1737669014106
+    }
+  },
+  "components": {
+    "securitySchemes": {},
+    "schemas": {
+      "Expense": {
+        "type": "object",
+        "example": {
+          "name": "Hat",
+          "description": "invoice",
+          "amount": 317.77,
+          "datePaid": "2024-02-09T00:09:39.159Z",
+          "forDate": "2024-08-23T22:25:59.399Z",
+          "paidByUserId": "ec516b57-20bf-4b0d-9a8b-b20a0e3280e7",
+          "paidForUserIds": [
+            "2b6c2b27-19d3-4032-af45-43dd441c88f8",
+            "e2ed95dc-7c6e-4a9e-8ea4-8e388515d9e5"
+          ]
+        },
+        "properties": {
+          "name": { "type": "string", "example": ["Hat"] },
+          "description": { "type": "string", "example": ["invoice"] },
+          "amount": { "type": "number", "example": [317.77] },
+          "datePaid": {
+            "type": "string",
+            "example": ["2024-02-09T00:09:39.159Z"]
+          },
+          "forDate": {
+            "type": "string",
+            "example": ["2024-08-23T22:25:59.399Z"]
+          },
+          "paidByUserId": {
+            "type": "string",
+            "example": ["ec516b57-20bf-4b0d-9a8b-b20a0e3280e7"]
+          },
+          "paidForUserIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": ["2b6c2b27-19d3-4032-af45-43dd441c88f8"]
+            }
+          }
+        },
+        "x-last-modified": 1737668746994
+      }
+    },
+    "headers": {},
+    "responses": {},
+    "parameters": {}
+  },
+  "tags": [],
+  "servers": [
+    {
+      "url": " http://localhost:3000",
+      "description": "",
+      "variables": {},
+      "x-last-modified": 1737668658782
+    }
+  ],
+  "security": []
+}
