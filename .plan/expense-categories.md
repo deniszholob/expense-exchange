@@ -1,0 +1,42 @@
+- Expenses
+  - Housing
+    - Rent/Mortgage
+    - HOA
+    - tax
+    - insurance
+    - maintanance
+  - Utilities
+    - Water
+    - Gas
+    - Electric
+    - Sewer
+  - Transportation
+    - payments
+    - fuel
+    - tax
+    - insurance
+    - maintanence
+  - Lifestyle
+    - Food
+    - clothing
+  - Medical
+    - surgery
+    - office visit
+  - Subscriptions
+    - Internet
+    - phone
+    - amazon prime
+    - google 1
+  - Leasure
+    - trips
+    - sports
+    - misc
+- Investments
+  - IRA
+  - Bonds
+  - Savings
+  - Stocks
+  - HSA
+- Income
+  - Paycheck
+  - donation

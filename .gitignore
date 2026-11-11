@@ -6,7 +6,7 @@ dist-storybook
 tmp
 /out-tsc
 
-.plan
+# .plan
 .dev/*
 !.dev/README.md
 

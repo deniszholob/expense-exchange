@@ -1,0 +1,64 @@
+{
+  "expenses": [
+    {
+      "name": "Shoes",
+      "description": "payment",
+      "amount": 655.44,
+      "datePaid": "2024-03-27T10:34:40.608Z",
+      "forDate": "2024-11-25T23:08:49.436Z",
+      "paidByUserId": "a63792e3-3334-44b4-a7c0-75616d5e5f2b",
+      "paidForUserIds": [
+        "57f5ad4a-8975-4a31-94fa-fddceecadbaf",
+        "2f5726aa-021b-408e-a49b-59e708fbe724"
+      ]
+    },
+    {
+      "name": "Pizza",
+      "description": "deposit",
+      "amount": 437.1,
+      "datePaid": "2024-05-14T06:04:22.382Z",
+      "forDate": "2024-12-10T07:04:49.670Z",
+      "paidByUserId": "b16a4c27-00c5-473c-8c15-5139b7287dc8",
+      "paidForUserIds": [
+        "4c6ee12f-8785-4086-b1a0-2efd8d61e46d",
+        "1cfd0ce4-c87c-499f-b116-db019e8c48c8"
+      ]
+    },
+    {
+      "name": "Shirt",
+      "description": "withdrawal",
+      "amount": 559.12,
+      "datePaid": "2024-05-09T08:52:15.066Z",
+      "forDate": "2024-10-22T01:54:46.777Z",
+      "paidByUserId": "ca4056ed-fc0f-40c7-9e70-139a7f1ac0e4",
+      "paidForUserIds": [
+        "2df2a9ee-0367-4d6e-9334-1c696490b894",
+        "5b76cae3-806a-4986-9220-c89a058ae2bb"
+      ]
+    },
+    {
+      "name": "Chicken",
+      "description": "deposit",
+      "amount": 348.33,
+      "datePaid": "2024-02-22T01:19:39.192Z",
+      "forDate": "2024-04-25T15:42:14.548Z",
+      "paidByUserId": "b4b22373-7f9e-4527-ae15-13f20c428d33",
+      "paidForUserIds": [
+        "8892d3c7-ba82-4095-906d-ba437fb86350",
+        "1330fb18-4a1c-4364-9344-03a2f279ac0a"
+      ]
+    },
+    {
+      "name": "Computer",
+      "description": "invoice",
+      "amount": 217.49,
+      "datePaid": "2024-09-07T12:08:45.512Z",
+      "forDate": "2024-08-03T04:42:42.404Z",
+      "paidByUserId": "3b79ac51-faca-471d-874f-b0f62cf20368",
+      "paidForUserIds": [
+        "00ab7218-d93e-4e90-b557-e2d39c3bda75",
+        "06460f79-65f4-4017-b2e8-d01cdacf0be2"
+      ]
+    }
+  ]
+}
