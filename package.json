@@ -12,7 +12,7 @@
   "scripts": {
     "i": "pnpm install",
     "nx:clear-cache": "nx reset",
-    "start": "nx run expense-exchange:serve --port=4200",
+    "start": "nx run expense-exchange:serve --port=4242",
     "storybook": "nx run expense-exchange:storybook",
     "json-server": "json-server --watch json-server/db.json --port 3000",
     "storybook:test": "nx run expense-exchange:test-storybook",
