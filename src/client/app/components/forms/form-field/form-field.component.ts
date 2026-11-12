@@ -1,13 +1,15 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  ElementRef,
   computed,
   contentChild,
   input,
   output,
+  signal,
 } from '@angular/core';
 import { FormField } from '@angular/forms/signals';
-import { LucideX } from '@lucide/angular';
+import { LucideEye, LucideEyeOff, LucideX } from '@lucide/angular';
 
 // #region Constants
 const SELECTABLE_INPUT_TYPES: ReadonlySet<string> = new Set([
@@ -26,7 +28,7 @@ const SELECTABLE_INPUT_TYPES: ReadonlySet<string> = new Set([
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-form-field',
   templateUrl: './form-field.component.html',
-  imports: [LucideX],
+  imports: [LucideEye, LucideEyeOff, LucideX],
   host: {
     class: 'contents',
     '(click)': 'onControlClick($event)',
@@ -40,6 +42,17 @@ export class FormFieldComponent {
   public readonly clearRequested = output<void>();
 
   private readonly $formField = contentChild<FormField<unknown>>(FormField);
+  private readonly $projectedElement =
+    contentChild<ElementRef<HTMLElement>>(ElementRef);
+  protected readonly $passwordVisible = signal(false);
+  protected readonly $passwordInput = computed(() => {
+    const formElement = this.$formField()?.element;
+    const projectedElement = this.$projectedElement()?.nativeElement;
+    const element = formElement ?? projectedElement;
+    if (!(element instanceof HTMLInputElement)) return undefined;
+    if (element.type === 'password' || this.$passwordVisible()) return element;
+    return undefined;
+  });
   protected readonly $hasValue = computed(() => {
     const externalValue = this.$value();
     const fieldValue =
@@ -84,6 +97,14 @@ export class FormFieldComponent {
     if (!state) return;
     state.controlValue.set(emptyFieldValue(state.controlValue()));
     state.markAsDirty();
+  }
+
+  protected togglePasswordVisibility(): void {
+    const input = this.$passwordInput();
+    if (!input) return;
+    const passwordVisible = !this.$passwordVisible();
+    input.type = passwordVisible ? 'text' : 'password';
+    this.$passwordVisible.set(passwordVisible);
   }
 }
 // #endregion
