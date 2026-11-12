@@ -1,6 +1,6 @@
 // #region Imports
 import { autoTitleIndexer } from '@deniszholob/storybook-auto-titles';
-import type { StorybookConfig } from '@storybook/angular';
+import type { StorybookConfig } from '@storybook/angular-vite';
 // #endregion
 
 const storyFiles = '*.@(mdx|stories.@(js|jsx|ts|tsx))';
@@ -11,7 +11,7 @@ const config: StorybookConfig = {
     stripPrefixes: ['src/client/app/'],
   }),
   addons: ['@storybook/addon-a11y', '@storybook/addon-docs'],
-  framework: { name: '@storybook/angular', options: {} },
+  framework: { name: '@storybook/angular-vite', options: {} },
   core: { disableTelemetry: true },
   staticDirs: [{ from: '../src/assets', to: '/assets' }],
 };

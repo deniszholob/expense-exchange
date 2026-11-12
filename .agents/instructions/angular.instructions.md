@@ -76,6 +76,7 @@ Apply to Angular components, directives, pipes, routes, services, templates, and
 ## Stories and file layout
 
 - Add a Storybook story for each reusable component, showing meaningful inputs/states and interactions.
+- Keep the shared `FormFieldComponent` `FormField` story as the canonical stacked form-control catalog. Update it whenever a form-control type or shared field behavior is added or changed.
 - Keep stories representative and use synthetic, non-sensitive data. Do not expand production APIs solely to satisfy Storybook.
 - Keep component files together in a clearly named feature folder, with the primary component, template, optional focused stylesheet, story, and tests adjacent as appropriate.
 - Before scaffolding Angular components or other file families, check `.vscode/ngfg-templates/` and use the repository's configured templates when one applies. Keep component logic in its TypeScript file, markup in its HTML template, and add component CSS only when Tailwind and shared styles are insufficient.

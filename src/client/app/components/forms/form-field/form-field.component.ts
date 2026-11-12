@@ -9,13 +9,28 @@ import {
 import { FormField } from '@angular/forms/signals';
 import { LucideX } from '@lucide/angular';
 
+// #region Constants
+const SELECTABLE_INPUT_TYPES: ReadonlySet<string> = new Set([
+  'email',
+  'number',
+  'password',
+  'search',
+  'tel',
+  'text',
+  'url',
+]);
+// #endregion
+
 // #region Component
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-form-field',
   templateUrl: './form-field.component.html',
   imports: [LucideX],
-  host: { class: 'contents' },
+  host: {
+    class: 'contents',
+    '(click)': 'onControlClick($event)',
+  },
 })
 export class FormFieldComponent {
   public readonly $id = input.required<string>();
@@ -33,6 +48,32 @@ export class FormFieldComponent {
         : this.$formField()?.state().controlValue();
     return hasClearableValue(fieldValue);
   });
+
+  protected onControlClick(event: MouseEvent): void {
+    const target = event.target;
+    if (target instanceof HTMLTextAreaElement) {
+      target.select();
+      return;
+    }
+
+    if (!(target instanceof HTMLInputElement)) return;
+
+    if (SELECTABLE_INPUT_TYPES.has(target.type)) {
+      target.select();
+      return;
+    }
+
+    if (target.type !== 'date' || typeof target.showPicker !== 'function')
+      return;
+
+    const clickX = event.clientX - target.getBoundingClientRect().left;
+    const dateSegmentRegion =
+      Number.parseFloat(getComputedStyle(target).fontSize) * 10;
+    if (target.value.length > 0 && clickX <= dateSegmentRegion) return;
+
+    event.preventDefault();
+    target.showPicker();
+  }
 
   protected clearValue(): void {
     if (this.$value() !== undefined) {

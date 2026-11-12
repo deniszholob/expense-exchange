@@ -5,7 +5,7 @@ import {
   Meta,
   moduleMetadata,
   StoryObj,
-} from '@storybook/angular';
+} from '@storybook/angular-vite';
 
 import { GroupPageComponent } from './group-page.component';
 import { importProvidersFrom } from '@angular/core';

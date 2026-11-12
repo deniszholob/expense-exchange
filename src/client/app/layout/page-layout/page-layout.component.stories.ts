@@ -1,6 +1,6 @@
 // @ref https://storybook.js.org/docs/writing-stories
 // #region Imports
-import { Meta, StoryObj } from '@storybook/angular';
+import { Meta, StoryObj } from '@storybook/angular-vite';
 
 import { PageLayoutComponent } from './page-layout.component';
 // #endregion

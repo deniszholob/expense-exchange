@@ -12,7 +12,6 @@ import { MOCK_GroupMembers } from 'src/client/app/expense-api.mock';
 type ComponentWithCustomControls = ExpenseDetailsComponent; // & {};
 
 const meta: Meta<ComponentWithCustomControls> = {
-  // title: 'Components/Expense Details',
   component: ExpenseDetailsComponent,
   // decorators: [moduleMetadata({ imports: [] }), applicationConfig({ providers: [ importProvidersFrom() ]})],
   parameters: {

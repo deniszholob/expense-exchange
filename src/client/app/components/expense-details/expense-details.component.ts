@@ -22,7 +22,7 @@ import {
   GroupMemberDto,
 } from 'src/client/api/generated/expense-exchange-api.schemas';
 import { FormFieldComponent } from '../forms/form-field/form-field.component';
-import { GroupMemberMultiSelectComponent } from '../group-member-multi-select/group-member-multi-select.component';
+import { MultiSelectComponent } from '../forms/multi-select/multi-select.component';
 // #endregion
 
 // #region Constants
@@ -48,7 +48,7 @@ const NEW_EXPENSE: ExpenseDto = {
     FormField,
     FormFieldComponent,
     LucideCheck,
-    GroupMemberMultiSelectComponent,
+    MultiSelectComponent,
   ],
 })
 export class ExpenseDetailsComponent {

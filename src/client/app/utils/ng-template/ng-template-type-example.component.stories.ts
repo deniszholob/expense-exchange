@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/angular';
+import { Meta, StoryObj } from '@storybook/angular-vite';
 import { NgTemplateTypeExampleComponent } from './ng-template-type-example.component';
 
 type ComponentWithCustomControls = NgTemplateTypeExampleComponent;

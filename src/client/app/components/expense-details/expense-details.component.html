@@ -47,10 +47,7 @@
         </select>
       </app-form-field>
       <app-form-field [$id]="'paidForUserIds'" [$label]="'Shared with'" [$required]="true">
-        <app-group-member-multi-select
-          [$groupMembers]="groupMembers()"
-          [formField]="$form.paidForUserIds"
-        />
+        <app-multi-select [$options]="groupMembers()" [formField]="$form.paidForUserIds" />
         <span class="text-finance-muted text-xs"
           >Use Ctrl or Command to select multiple people.</span
         >

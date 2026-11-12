@@ -5,7 +5,7 @@ import {
   Meta,
   moduleMetadata,
   StoryObj,
-} from '@storybook/angular';
+} from '@storybook/angular-vite';
 
 import { importProvidersFrom } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';

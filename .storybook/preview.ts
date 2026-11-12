@@ -9,7 +9,7 @@ import {
   componentWrapperDecorator,
   Parameters,
   Preview,
-} from '@storybook/angular';
+} from '@storybook/angular-vite';
 import type { DecoratorFunction } from 'storybook/internal/types';
 // #endregion
 

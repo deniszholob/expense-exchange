@@ -3,7 +3,7 @@ import {
   Meta,
   moduleMetadata,
   StoryObj,
-} from '@storybook/angular';
+} from '@storybook/angular-vite';
 import { AppComponent } from './app.component';
 import { Router, RouterModule } from '@angular/router';
 import { MOCK_Router } from './app.routes.mock';

@@ -4,7 +4,7 @@ import {
   Meta,
   moduleMetadata,
   StoryObj,
-} from '@storybook/angular';
+} from '@storybook/angular-vite';
 
 import { ExpensesPageComponent } from './expenses-page.component';
 import { importProvidersFrom } from '@angular/core';

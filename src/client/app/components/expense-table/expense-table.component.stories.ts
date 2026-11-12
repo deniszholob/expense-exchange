@@ -1,6 +1,6 @@
 // @ref https://storybook.js.org/docs/writing-stories
 // #region Imports
-import { Meta, StoryObj } from '@storybook/angular';
+import { Meta, StoryObj } from '@storybook/angular-vite';
 
 import { ExpenseTableComponent } from './expense-table.component';
 import { MOCK_DetailedExpense_Array } from 'src/client/app/shared/detailed-expense/detailed-expense.model.mock';
