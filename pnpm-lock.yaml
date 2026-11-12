@@ -115,6 +115,9 @@ importers:
       '@tailwindcss/postcss':
         specifier: ^4.2.2
         version: 4.3.5
+      '@types/express':
+        specifier: ^4.17.21
+        version: 4.17.21
       '@types/node':
         specifier: ^22.20.1
         version: 22.20.5
@@ -13979,7 +13982,7 @@ snapshots:
     dependencies:
       '@types/http-cache-semantics': 4.2.0
       '@types/keyv': 3.1.4
-      '@types/node': 18.19.15
+      '@types/node': 22.20.5
       '@types/responselike': 1.0.3
 
   '@types/chai@5.2.3':
@@ -14081,7 +14084,7 @@ snapshots:
 
   '@types/keyv@3.1.4':
     dependencies:
-      '@types/node': 18.19.15
+      '@types/node': 22.20.5
 
   '@types/mdx@2.0.11': {}
 
@@ -14098,6 +14101,7 @@ snapshots:
   '@types/node@18.19.15':
     dependencies:
       undici-types: 5.26.5
+    optional: true
 
   '@types/node@22.20.5':
     dependencies:
@@ -14117,7 +14121,7 @@ snapshots:
 
   '@types/responselike@1.0.3':
     dependencies:
-      '@types/node': 18.19.15
+      '@types/node': 22.20.5
 
   '@types/retry@0.12.2': {}
 
@@ -20811,7 +20815,8 @@ snapshots:
       has-symbols: 1.1.0
       which-boxed-primitive: 1.1.1
 
-  undici-types@5.26.5: {}
+  undici-types@5.26.5:
+    optional: true
 
   undici-types@6.21.0: {}
 

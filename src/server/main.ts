@@ -3,7 +3,8 @@ import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { resolve } from 'node:path';
+import { extname, resolve } from 'node:path';
+import type { NextFunction, Request, Response } from 'express';
 
 import { AppModule } from './app.module.js';
 // #endregion
@@ -13,7 +14,30 @@ async function bootstrap(): Promise<void> {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.setGlobalPrefix('api');
   const distributionDirectory = process.env['DIST_DIR'] ?? '.dist';
-  app.useStaticAssets(resolve(distributionDirectory, 'client/browser'));
+  const clientDirectory = resolve(distributionDirectory, 'client/browser');
+  app.useStaticAssets(clientDirectory);
+  app.use((request: Request, response: Response, next: NextFunction): void => {
+    const requestPath = new URL(request.originalUrl, 'http://localhost')
+      .pathname;
+    const isClientNavigation =
+      (request.method === 'GET' || request.method === 'HEAD') &&
+      extname(requestPath) === '' &&
+      requestPath !== '/api' &&
+      !requestPath.startsWith('/api/');
+
+    if (!isClientNavigation) {
+      next();
+      return;
+    }
+
+    response.sendFile(
+      'index.html',
+      { root: clientDirectory },
+      (error: Error): void => {
+        if (error && !response.headersSent) next(error);
+      },
+    );
+  });
 
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Expense Exchange API')
