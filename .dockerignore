@@ -1,0 +1,7 @@
+*
+!.dist/
+!.dist/client/
+!.dist/client/browser/
+!.dist/client/browser/**
+!.dist/server-bundle/
+!.dist/server-bundle/**

@@ -11,6 +11,8 @@ Apply to frontend/backend structure, shared models, API clients, data sources, a
 
 - `src/client/`: Angular browser UI.
 - `src/server/`: NestJS API and server-only adapters.
+- `src/desktop/`: Electron main process and narrow desktop bridge code.
+- `src/util/`: framework-independent shared utilities and domain contracts.
 - Shared domain contracts belong in a location importable by both client and server without pulling browser-only or Node-only dependencies across the boundary.
 - The Docker runtime serves the Angular build and API from one origin where practical. GitHub Pages serves only static frontend assets.
 - Electron initially loads the frontend and connects through the same API/data-source abstractions. Do not add native file APIs to shared domain code.
@@ -28,6 +30,7 @@ Apply to frontend/backend structure, shared models, API clients, data sources, a
 - NestJS controllers/services and shared schemas are the source of truth for API behavior.
 - Generate OpenAPI from the Nest application using Swagger integration. Expose interactive docs at `/api/docs` and a machine-readable spec.
 - Generate the Angular API client from the OpenAPI document as part of the documented build workflow. Treat generated code as output; do not hand-edit it.
+- Keep generated Angular API clients under `src/client/api/generated/` and their maintained guide at `src/client/api/README.md`.
 - Keep a public health endpoint separate from authenticated data routes. It returns only basic health/version information, never user data or secrets.
 - Keep the API base URL configurable so the browser demo can point to a self-hosted service or compatible mock server. Configure CORS narrowly for intended origins.
 

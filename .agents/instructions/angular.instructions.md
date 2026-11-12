@@ -1,5 +1,5 @@
 ---
-applyTo: 'src/app/**,src/client/**'
+applyTo: 'src/client/**'
 description: 'Angular component, signal, template, accessibility, and styling standards'
 ---
 
@@ -9,6 +9,10 @@ Apply to Angular components, directives, pipes, routes, services, templates, and
 
 ## Component architecture
 
+- Use component-driven design: build focused, reusable standalone components with typed APIs and defined states, then compose them into feature components and pages.
+- Components own the interaction logic for the UI they render. Parent components pass typed data/configuration and coordinate higher-level workflows; keep domain rules and data transformations in feature services or pure helpers.
+- Keep page components focused on composing feature components. Do not let page templates become monolithic, and do not duplicate the same UI behavior or domain mapping across components.
+- Before creating a component, inspect adjacent features and shared UI for reusable patterns. If a shared component is introduced, move its callers to the shared implementation and keep wrappers thin.
 - Use standalone components, directives, and pipes. Do not add `standalone: true`; it is the default in the supported Angular versions.
 - Use only APIs available in the Angular version installed in `package.json`; consult official Angular documentation when an API's behavior is uncertain.
 - Prefer lazy-loaded feature routes. Keep components small and focused on one UI responsibility.
@@ -18,6 +22,7 @@ Apply to Angular components, directives, pipes, routes, services, templates, and
 - Avoid circular dependencies. Extract shared types/state/logic into a neutral module rather than using lazy imports to conceal a cycle.
 - Import symbols directly from the owning feature file. Do not add feature barrel files that only re-export other files or create passthrough exports.
 - Do not add component inputs/outputs or runtime behavior solely to simplify a Storybook story. Use story wrappers, decorators, or mocks.
+- Keep the application zoneless: do not add Zone.js as a browser polyfill, use Angular's zoneless change-detection provider, and keep the Vitest TestBed zoneless. Use signals and other Angular change-detection notifications for UI updates.
 
 ## Signals and state
 
@@ -73,4 +78,5 @@ Apply to Angular components, directives, pipes, routes, services, templates, and
 - Add a Storybook story for each reusable component, showing meaningful inputs/states and interactions.
 - Keep stories representative and use synthetic, non-sensitive data. Do not expand production APIs solely to satisfy Storybook.
 - Keep component files together in a clearly named feature folder, with the primary component, template, optional focused stylesheet, story, and tests adjacent as appropriate.
+- Before scaffolding Angular components or other file families, check `.vscode/ngfg-templates/` and use the repository's configured templates when one applies. Keep component logic in its TypeScript file, markup in its HTML template, and add component CSS only when Tailwind and shared styles are insufficient.
 - Keep TypeScript regions consistent with `.agents/instructions/typescript.instructions.md`; do not leave empty regions.

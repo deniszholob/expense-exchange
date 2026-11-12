@@ -1,5 +1,5 @@
 ---
-applyTo: 'src/**/*.html,src/**/*.css,src/**/*.scss,tailwind.config.*,postcss.config.*'
+applyTo: 'src/client/**/*.html,src/client/**/*.css,postcss.config.*'
 description: 'Dark finance design system, Tailwind tokens, and icon use'
 ---
 

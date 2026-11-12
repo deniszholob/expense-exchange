@@ -16,4 +16,6 @@ If you find the cheat sheet or the source code useful, consider:
 
 # Screenshots
 
-![Expense Exchange](./global/assets/screenshots/screenshot_1280x720.png)
+![Expense Exchange desktop overview](src/assets/screenshots/expense-exchange-screenshot-landscape-1280x720.png)
+
+![Expense Exchange mobile overview](src/assets/screenshots/expense-exchange-screenshot-portrait-390x844.png)

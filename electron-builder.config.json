@@ -1,0 +1,26 @@
+{
+  "appId": "com.deniszholob.expense-exchange",
+  "productName": "Expense Exchange",
+  "icon": "src/assets/expense-exchange-icon.png",
+  "electronDist": "node_modules/electron/dist",
+  "npmRebuild": false,
+  "files": [".dist/desktop/**/*", ".dist/client/browser/**/*", "package.json"],
+  "directories": {
+    "output": ".dist/electron"
+  },
+  "artifactName": "expense-exchange-v${version}-${os}-${arch}.${ext}",
+  "linux": {
+    "icon": "src/assets/expense-exchange-icon.png",
+    "category": "Finance",
+    "target": ["AppImage"]
+  },
+  "win": {
+    "icon": "src/assets/icons/desktop/expense-exchange.ico",
+    "target": ["portable"]
+  },
+  "mac": {
+    "icon": "src/assets/icons/desktop/expense-exchange.icns",
+    "target": ["zip"],
+    "identity": null
+  }
+}

@@ -1,3 +1,4 @@
+// #region Imports
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { importProvidersFrom } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -9,8 +10,11 @@ import {
   Parameters,
   Preview,
 } from '@storybook/angular';
+import type { DecoratorFunction } from 'storybook/internal/types';
+// #endregion
+
+// #region Preview
 // import { themes } from '@storybook/theming';
-import { DecoratorFunction } from '@storybook/types';
 
 export const parameters: Parameters = {
   // layout: 'fullscreen', // centered, fullscreen, padded
@@ -81,3 +85,4 @@ export default {
   decorators,
   // tags: ['autodocs'],
 } satisfies Preview;
+// #endregion

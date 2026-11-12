@@ -4,7 +4,7 @@
     "rootDir": ".",
     "sourceMap": true,
     "declaration": false,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "importHelpers": true,
@@ -21,8 +21,9 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": true,
-    "baseUrl": ".",
-    "paths": {},
+    "paths": {
+      "src/*": ["./src/*"]
+    },
     "esModuleInterop": true
   },
   "files": [],
@@ -42,7 +43,7 @@
     }
   ],
   "compileOnSave": false,
-  "exclude": ["node_modules", "tmp"],
+  "exclude": ["node_modules", "tmp", ".dist", ".builds"],
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,

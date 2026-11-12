@@ -1,0 +1,60 @@
+<div class="flex flex-col gap-2 overflow-x-auto">
+  <button class="btn-positive w-full" (click)="onAdd()">Add New</button>
+
+  <table class="table-finance min-w-[760px]">
+    <thead>
+      <tr>
+        <th class="w-32">Actions</th>
+        @for (column of columns(); track $index) {
+          <th>
+            @if (column.sortable) {
+              <button
+                class="text-finance-text flex items-center gap-1 font-semibold hover:text-sky-300 focus:outline-none"
+                (click)="sort(column)"
+              >
+                {{ column.label }}
+
+                @if (sortKey === column.key) {
+                  {{ sortDirection === 'asc' ? '↑' : '↓' }}
+                }
+              </button>
+            } @else {
+              <span>{{ column.label }}</span>
+            }
+          </th>
+        }
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of renderTable(); track $index; let i = $index) {
+        <tr>
+          <td>
+            <div class="flex flex-row gap-2">
+              <button
+                class="btn-warning p-2"
+                [attr.aria-label]="'Edit row ' + (i + 1)"
+                (click)="onEdit(i, row)"
+              >
+                <svg class="size-4" lucidePencil aria-hidden="true"></svg>
+              </button>
+
+              <button
+                class="btn-danger p-2"
+                [attr.aria-label]="'Delete row ' + (i + 1)"
+                (click)="onDelete(i, row)"
+              >
+                <svg class="size-4" lucideTrash aria-hidden="true"></svg>
+              </button>
+            </div>
+          </td>
+
+          @for (cell of row.cells; track $index) {
+            <td>
+              <div [innerHTML]="cell.cellValue"></div>
+            </td>
+          }
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

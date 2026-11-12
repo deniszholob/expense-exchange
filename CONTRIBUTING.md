@@ -4,13 +4,13 @@
 
 ## What you will need before you begin:
 
-1. Ensure [NodeJS](https://nodejs.org/) version 18.19.1 LTS or later is installed on your system.
+1. Ensure [Node.js](https://nodejs.org/) version 22.22.3 or later is installed on your system.
 2. Install [VSCode](https://code.visualstudio.com/) v1.74 or later
 3. Install [pnpm](https://pnpm.io/) `npm install -g pnpm`
 4. Clone the repository using git cli or ui like github desktop/sourcetree/gitkraken etc...
 5. Open the cloned folder using VSCode and **install recommended extensions**
 6. Run `pnpm run i` in the folder that you've just cloned to ensure you have all dependencies that are needed for development.
-7. Run `pnpm run start` to start the dev server for the app
+7. Run `pnpm run dev:client` to start the Angular dev server.
 
 ## Hidden Files in VSCode
 
@@ -25,24 +25,20 @@ You can reference any of the existing components in the storybook instance
 - Run storybook via `pnpm run storybook` command
 - You can then browse the list of components and use the docs to help you use them
 
-## Where to find stuff/Project Structure
+## Repository structure
 
-- This project uses [NX](https://nx.dev/) + [Angular](https://angular.dev/)
-- The [global](./global/) folder contains css stylesheets and images/icons.
-- All source code is in the [src](./src/) folder, most of other files/folders in the top level of the repo are just various configs for different tools (linting, formatting, testing etc...)
-- The **MAIN CODE** is in the [app folder](./src/app/).
-  - Most of the time any of the internal folders like [components](./src/app/components/) will be the place to edit and create new code
-  - Here the [app.component.ts](./src/app/app.component.ts) is the main entry point for the angular app along with the other app.xxx.ts like routes.
-- The [routes]
-- The rest of the [src](./src/) folder contains the main [index.html](./src/index.html) which is where all the angular code gets generated to and is what is hosted. It also contains some basic resources like favicons and metadata for SEO.
+- See [AGENTS.md](AGENTS.md) for the repository map and `.agents/instructions/` for implementation standards.
+- Use `pnpm run dev:client`, `pnpm run dev:server`, `pnpm run dev:storybook`, and `pnpm run dev:json-server` for development. Run `pnpm run build` for all build targets, or choose `pnpm run build:web`, `pnpm run build:desktop`, and `pnpm run build:docker` individually.
+- `pnpm run build:web` refreshes 1280x720 and 390x844 screenshots. See [.builds/README.md](.builds/README.md) for release output locations. Playwright Chromium must be installed (`pnpm run playwright:install`) or available as system Chromium. Docker compilation and bundling happen on the host before the Docker image is assembled.
+- Use `pnpm run build:desktop:linux`, `pnpm run build:desktop:windows`, or `pnpm run build:desktop:macos` to select a desktop target. macOS code signing requires a macOS host.
+- Run `pnpm run dev:client`, `pnpm run dev:server`, `pnpm run dev:storybook`, or `pnpm run dev:json-server` for local development. `pnpm run dev` starts the client.
+- Build output is generated and ignored by Git. Do not edit output files directly.
+
+Executable source and repository configuration must be authored in TypeScript. Do not add `.js`, `.jsx`, `.mjs`, or `.cjs` files; the only JavaScript files are compiler-generated output in ignored build directories. Run `pnpm run check:typescript-only` to check this rule.
 
 ## Writing code
 
-When creating new components, services, utilities, etc...:  
-Make sure to install and use the [Angular Files Generator Extension for VSCode](https://marketplace.visualstudio.com/items?itemName=deniszholob.angular-files-generator) (already enabled if you installed the recommended extensions)  
-This will generate new files conforming to the project style: Depending on type selection; this will generate starter ts, html as well as storybook and jest test files making it easier to develop well documented and tested code.
-
-Make sure all the typescript code is strongly typed everywhere. This makes it not only more robust but also documents the code better, and allows to quickly know what data types are used in any given place.
+Read the applicable guide in `.agents/instructions/` before changing a subsystem. The recommended Angular Files Generator extension is available for scaffolding Angular files.
 
 ## Steps to follow when your work is ready:
 
@@ -57,3 +53,22 @@ When your work is done:
 ## Debug
 
 - If you get an error with precommit hooks (Mac/Linux), see: https://stackoverflow.com/a/72279243
+
+## Docker smoke check
+
+Build the self-hosted image, start it with an isolated temporary data mount, and check both the API and UI:
+
+```sh
+pnpm run build:docker
+docker run --detach --name expense-exchange-validation --publish 127.0.0.1:4310:3000 --mount type=tmpfs,destination=/app/data expense-exchange:0.1.0
+curl --fail --silent --show-error http://127.0.0.1:4310/api/health
+curl --fail --silent --show-error --output /dev/null --write-out 'UI HTTP %{http_code}\n' http://127.0.0.1:4310/
+docker stop expense-exchange-validation
+docker rm expense-exchange-validation
+```
+
+The same check can be run with `pnpm run smoke:docker`; it checks the API health endpoint, UI, shared app icon, Swagger page, and OpenAPI JSON, then removes its validation container. Change the host port if `4310` is already in use.
+
+## Versions and changelog
+
+Use semantic versions in `package.json` and record user-facing changes in [CHANGELOG.md](./CHANGELOG.md). Run `pnpm run version:patch`, `pnpm run version:minor`, or `pnpm run version:major` to update the package version; review and update the changelog as part of preparing a release. Web, Docker, and Electron package outputs include the package name and version.

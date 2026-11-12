@@ -7,6 +7,15 @@ description: 'Strict TypeScript, enum, type-safety, and file-organization standa
 
 Apply to all TypeScript code in the repository, including Angular, NestJS, scripts, tests, and shared code.
 
+## Source language and layout
+
+- Author executable source, tooling, and configuration in TypeScript. Do not add JavaScript source files with `.js`, `.jsx`, `.mjs`, or `.cjs` extensions.
+- Generated JavaScript may exist only inside ignored build output such as `.dist/` or `.builds/`; never use generated output as editable source.
+- Keep application code in `src/client/`, `src/server/`, `src/desktop/`, or `src/util/`, grouped by domain. Keep TypeScript repository tools under `tools/`.
+- Keep client styles under `src/client/`. Put static assets, screenshots, and shared brand icons under `src/assets/`.
+- Keep each repository tool in its own `tools/<tool-name>/` folder, with the primary file named `<tool-name>.script.ts` and configuration named `<tool-name>.script.config.ts` when settings are needed.
+- A matching executable `<tool-name>.script.sh` may be used as a terminal convenience wrapper. Keep it limited to locating the repository root and invoking the TypeScript script; tool logic belongs in TypeScript.
+
 ## Type safety
 
 - Keep `strict` compiler options enabled. Fix type errors at the source instead of weakening compiler settings.

@@ -1,0 +1,15 @@
+<div class="flex w-full flex-col gap-2">
+  <label class="text-finance-muted text-sm font-medium" [for]="formField().id">{{
+    formField().label
+  }}</label>
+  <ng-content></ng-content>
+  <div class="text-sm text-rose-300">
+    @let errors = formField().formControl?.errors;
+
+    @if (errors) {
+      @for (error of errors | keyvalue; track $index) {
+        <div>{{ error.key }}: {{ error.value | json }}</div>
+      }
+    }
+  </div>
+</div>

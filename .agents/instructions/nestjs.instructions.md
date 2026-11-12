@@ -64,3 +64,12 @@ Apply to NestJS modules, controllers, providers, API schemas, persistence adapte
 - Keep development defaults safe and non-sensitive. Do not use real data or credentials in defaults.
 - Implement graceful shutdown for server resources. Keep health status accurate during startup/shutdown and dependency failures.
 - Use structured logging with request correlation where available, but redact sensitive fields and avoid logging full request/response bodies.
+
+## Serving the Angular application
+
+There are two supported NestJS/Express integration points for static files:
+
+- `ServeStaticModule.forRoot()` in a Nest module expresses static hosting as module configuration. `rootPath` is fixed when the module is initialized, and `exclude` can keep API routes out of the static handler. This is a good fit when the directory is stable relative to the compiled module and the application uses the module's conventional routing setup.
+- `app.useStaticAssets()` in `main.ts` configures the Express adapter during bootstrap. It is Express-specific, but can use runtime configuration such as `DIST_DIR`, making the selected distribution path explicit and easy to coordinate with other bootstrap paths such as Swagger's bundled UI assets.
+
+Keep static serving in one place rather than registering both handlers. Prefer the bootstrap approach when deployment output directories are configurable at runtime; prefer `ServeStaticModule` when the path is a stable module-level setting and the application benefits from keeping static hosting in Nest module configuration. In either case, keep API routes excluded from the SPA/static fallback and verify paths against the compiled bundle layout, not only the source tree.

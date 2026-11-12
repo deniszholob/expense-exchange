@@ -1,0 +1,69 @@
+<app-page-layout [title]="'Settings'">
+  <div class="container-fixed">
+    <app-form-field
+      [formField]="{
+        id: 'currentUser',
+        label: 'Current User',
+      }"
+    >
+      <select
+        id="currentUser"
+        [ngModel]="appService.$currentUser()"
+        (ngModelChange)="this.onChange($event)"
+        name="currentUser"
+      >
+        <option [ngValue]="undefined" disabled>Choose your profile</option>
+        @for (user of appService.$users(); track user.id) {
+          <option [ngValue]="user">
+            {{ user.name }}
+          </option>
+        }
+      </select>
+    </app-form-field>
+
+    <app-form-field
+      [formField]="{
+        id: 'dataSource',
+        label: 'Data Source',
+      }"
+    >
+      <!-- Radio selection: Localhost, Remote Api (enter url), Local File (choose file) -->
+      <div class="flex flex-col gap-4">
+        @for (src of DATA_SOURCE_INFO_OPTIONS; track $index) {
+          <div class="flex flex-row gap-2">
+            <input
+              id="{{ src.id }}"
+              [(ngModel)]="appService.dataSource"
+              type="radio"
+              name="dataSource"
+              value="{{ src.id }}"
+            />
+            <label for="{{ src.id }}">{{ src.display }}</label>
+          </div>
+        }
+
+        @if (appService.dataSource === DataSource.RemoteApi) {
+          <app-form-field
+            [formField]="{
+              id: 'remoteApi',
+              label: 'Remote Api',
+            }"
+          >
+            <input
+              id="dataSource"
+              [(ngModel)]="appService.dataSourcePath[DataSource.RemoteApi]"
+              type="text"
+              name="dataSource"
+            />
+          </app-form-field>
+        }
+      </div>
+    </app-form-field>
+  </div>
+
+  <!-- <pre>
+    currentUser: {{ appService.$currentUser() }}
+    dataSource: {{ appService.dataSource }}
+    dataSourcePath: {{ appService.dataSourcePath }}
+  </pre> -->
+</app-page-layout>

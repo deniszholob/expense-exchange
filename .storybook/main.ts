@@ -1,25 +1,20 @@
-import { withFlattenedAutoTitles } from '@deniszholob/storybook-auto-titles';
+// #region Imports
+import { autoTitleIndexer } from '@deniszholob/storybook-auto-titles';
 import type { StorybookConfig } from '@storybook/angular';
+// #endregion
 
 const storyFiles = '*.@(mdx|stories.@(js|jsx|ts|tsx))';
+// #region Configuration
 const config: StorybookConfig = {
-  stories: [`./**/${storyFiles}`, `../src/app/**/${storyFiles}`],
-  experimental_indexers: withFlattenedAutoTitles(),
-  addons: [
-    '@storybook/addon-essentials',
-    '@storybook/addon-a11y',
-    '@storybook/addon-interactions',
-    'storybook-addon-angular-router',
-  ],
+  stories: [`./**/${storyFiles}`, `../src/client/app/**/${storyFiles}`],
+  experimental_indexers: autoTitleIndexer({
+    stripPrefixes: ['src/client/app/'],
+  }),
+  addons: ['@storybook/addon-a11y', '@storybook/addon-docs'],
   framework: { name: '@storybook/angular', options: {} },
   core: { disableTelemetry: true },
-  staticDirs: [{ from: '../global/assets', to: '/assets' }], //👈 Configures the static asset folder in Storybook for icons, images, etc
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  env: (config: any) => ({ ...config, NODE_ENV: 'development' }), //👈 Solves the "DefinePluginConflicting values for 'process.env.NODE_ENV' storybook" warning
+  staticDirs: [{ from: '../src/assets', to: '/assets' }],
 };
 
 export default config;
-
-// To customize your webpack configuration you can use the webpackFinal field.
-// Check https://storybook.js.org/docs/react/builders/webpack#extending-storybooks-webpack-config
-// and https://nx.dev/packages/storybook/documents/custom-builder-configs
+// #endregion

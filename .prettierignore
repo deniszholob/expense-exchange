@@ -1,10 +1,8 @@
 # Add files here to ignore them from prettier formatting
-/dist
-/coverage
+.dist
+.builds
+.coverage
 .angular
-.nx/cache
 .vscode
 package-lock.json
 pnpm-lock.yaml
-
-/.nx/workspace-data

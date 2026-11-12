@@ -1,0 +1,92 @@
+<app-page-layout [title]="'Users'">
+  <div class="container-fixed space-y-6">
+    <section class="space-y-3" aria-labelledby="add-user-heading">
+      <h2 class="text-lg font-semibold" id="add-user-heading">Add user</h2>
+      <div class="flex flex-wrap gap-3">
+        <label class="sr-only" for="new-user-name">User name</label>
+        <input
+          class="border-finance-border bg-finance-surface text-finance-text min-w-64 rounded-md border px-3 py-2"
+          id="new-user-name"
+          [value]="$newUserName()"
+          (input)="onNewUserNameInput($event)"
+          maxlength="100"
+          autocomplete="off"
+        />
+        <button
+          class="bg-finance-positive text-finance-canvas rounded-md px-4 py-2 font-medium"
+          [disabled]="!$newUserName().trim()"
+          (click)="createUser()"
+          type="button"
+        >
+          Add user
+        </button>
+      </div>
+    </section>
+
+    @if ($error(); as error) {
+      <p class="text-finance-negative" role="alert">{{ error }}</p>
+    }
+
+    <section class="space-y-3" aria-labelledby="users-heading">
+      <h2 class="text-lg font-semibold" id="users-heading">Users</h2>
+      @if ($users().length === 0) {
+        <p class="text-finance-muted">No users yet. Add a user to get started.</p>
+      } @else {
+        <ul class="divide-finance-border border-finance-border divide-y rounded-md border">
+          @for (user of $users(); track user.id) {
+            <li class="flex flex-wrap items-center justify-between gap-3 p-4">
+              @if ($editingUserId() === user.id) {
+                <label class="sr-only" [for]="'edit-user-' + user.id"> Edit {{ user.name }} </label>
+                <input
+                  class="border-finance-border bg-finance-surface text-finance-text min-w-64 rounded-md border px-3 py-2"
+                  [id]="'edit-user-' + user.id"
+                  [value]="$editingUserName()"
+                  (input)="onEditingUserNameInput($event)"
+                  maxlength="100"
+                  autocomplete="off"
+                />
+                <div class="flex gap-2">
+                  <button
+                    class="bg-finance-positive text-finance-canvas rounded-md px-3 py-2 font-medium"
+                    [disabled]="!$editingUserName().trim()"
+                    (click)="saveUser()"
+                    type="button"
+                  >
+                    Save
+                  </button>
+                  <button
+                    class="border-finance-border rounded-md border px-3 py-2"
+                    (click)="cancelEditing()"
+                    type="button"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              } @else {
+                <span>{{ user.name }}</span>
+                <div class="flex gap-2">
+                  <button
+                    class="border-finance-border rounded-md border px-3 py-2"
+                    [attr.aria-label]="'Edit ' + user.name"
+                    (click)="startEditing(user.id, user.name)"
+                    type="button"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    class="border-finance-border text-finance-negative rounded-md border px-3 py-2"
+                    [attr.aria-label]="'Delete ' + user.name"
+                    (click)="deleteUser(user.id)"
+                    type="button"
+                  >
+                    Delete
+                  </button>
+                </div>
+              }
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  </div>
+</app-page-layout>

@@ -1,14 +1,17 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 
-# compiled output
-dist
-dist-storybook
+# compiled and packaged output
+.dist/
+.builds/*
+!.builds/README.md
+# Ignore build output left by earlier versions of the repository.
+dist/
+dist-storybook/
 tmp
 /out-tsc
 
-# .plan
-.dev/*
-!.dev/README.md
+# Local development scratch files
+.dev/
 
 # dependencies
 node_modules
@@ -32,7 +35,6 @@ node_modules
 # misc
 /.sass-cache
 /connect.lock
-/coverage
 /libpeerconnection.log
 npm-debug.log
 yarn-error.log
@@ -43,9 +45,19 @@ testem.log
 .DS_Store
 Thumbs.db
 
-# ng/nx
+# Angular
 .angular
-.nx/cache
-.nx/workspace-data
 migrations.json
 storybook-migration-summary.md
+
+# Runtime configuration and user data
+.env
+.env.*
+!.env.example
+data/
+*.db.json
+*.backup.json
+
+# Test reports
+playwright-report/
+test-results/

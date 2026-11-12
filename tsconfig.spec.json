@@ -1,16 +1,16 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "outDir": "./dist/out-tsc",
+    "outDir": "./.dist/out-tsc/test",
     "module": "commonjs",
     "target": "es2022",
-    "types": ["jest", "node"]
+    "types": ["vitest/globals", "node"]
   },
-  "files": ["src/test-setup.ts"],
+  "files": ["src/client/test-setup.ts"],
   "include": [
-    "jest.config.ts",
-    "src/**/*.test.ts",
-    "src/**/*.spec.ts",
+    "vitest.config.ts",
+    "src/client/**/*.test.ts",
+    "src/client/**/*.spec.ts",
     "src/**/*.d.ts"
   ]
 }

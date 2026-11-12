@@ -12,6 +12,7 @@ Expense Exchange is a finance app intended to run as a self-hosted Angular + Nes
 ## Project architecture
 
 - Use Angular CLI for the frontend and Nest CLI for the backend. Do not use or add Nx dependencies, configuration, or commands.
+- Build the Angular UI from focused standalone components composed into features and pages. See `.agents/instructions/angular.instructions.md`.
 - Keep shared domain contracts independent from UI, HTTP transport, and persistence. See `.agents/instructions/architecture.instructions.md`.
 - Keep Local File, Web Storage, and Remote API as selectable client data sources behind a stable boundary.
 - Docker is the primary deployment: one Expense Exchange container serves the frontend and API. The GitHub Pages build is frontend-only. See `.agents/instructions/security-deployment.instructions.md`.
@@ -20,19 +21,16 @@ Expense Exchange is a finance app intended to run as a self-hosted Angular + Nes
 ## Development standards
 
 - Use pnpm. Follow the versions and scripts declared in `package.json`.
-- Use strict TypeScript. Avoid `any`; prefer explicit domain types and small, focused functions.
-- Keep ESLint and Prettier clean. Use the repository scripts rather than ad-hoc tool versions.
-- Use Vitest for unit tests, Playwright for E2E, and Storybook for component development. Do not reintroduce Jest or Cypress.
-- Follow Angular, NestJS, styling, and test guidance in `.agents/instructions/`.
-- Do not manually edit generated API clients or generated OpenAPI artifacts. Update the source API/models and run the documented generator.
-- Do not modify build output, generated bundles, runtime JSON data, or user data as source code.
+- Follow `.agents/instructions/` for TypeScript, Angular, NestJS, architecture, security, styling, Electron, and testing rules.
+- Use ESLint, Prettier, Vitest, Playwright, and Storybook through the repository scripts in `package.json`.
+- Keep generated Angular API clients in `src/client/api/generated/`; do not edit generated files. Keep their guide at `src/client/api/README.md`. Update Nest source APIs/models and run the generator rather than modifying generated files; keep hand-authored client API code with the relevant shared client code.
+- Treat `.dist/` and `.builds/` as generated output; do not modify bundles or packages as source code.
 
 ## Scope and data safety
 
 - Preserve existing user-visible Expense Exchange behavior. Keep changes within the requested feature or maintenance scope.
-- JSON is the initial backend persistence adapter. Keep persistence behind repository interfaces so a database can be added without rewriting controllers or frontend code.
-- Never commit secrets, credentials, tokens, production configuration, or real user/expense data. Use synthetic fixtures and safe placeholders only. Keep runtime data outside Git and Docker build context.
-- Never send messages, publish deployments, or push images unless explicitly requested.
+- Follow `.agents/instructions/architecture.instructions.md` for data and persistence boundaries and `.agents/instructions/security-deployment.instructions.md` for secrets and deployment safeguards.
+- Never perform external actions such as sending messages or publishing deployments unless explicitly requested.
 
 ## Before finishing a code task
 

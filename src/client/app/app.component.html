@@ -1,0 +1,36 @@
+<app-header></app-header>
+
+<hr />
+
+<router-outlet></router-outlet>
+
+<!-- Spacer, expands to fill in the remaining space between elements above and below thus pushing footer down -->
+<div class="flex flex-1"></div>
+
+<hr />
+
+<footer class="bg-finance-surface">
+  <div class="container-fixed flex-row justify-between py-4">
+    <div class="">
+      Design by
+      <a class="link" target="_blank" rel="noopener" href="http://deniszholob.com/">Denis Zholob</a>
+    </div>
+    <span
+      class="group border-finance-border text-finance-muted hover:text-finance-text relative inline-flex cursor-help items-center rounded border px-2 py-1 text-sm outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+      tabindex="0"
+      aria-describedby="app-build-tooltip"
+    >
+      v{{ APP_BUILD_VERSION }}
+      <span
+        class="border-finance-border bg-finance-raised text-finance-text pointer-events-none invisible absolute right-0 bottom-full z-50 mb-2 w-max max-w-[calc(100vw-2rem)] rounded border px-3 py-2 text-left text-xs opacity-0 shadow-lg transition-opacity group-hover:visible group-hover:opacity-100 group-focus-visible:visible group-focus-visible:opacity-100"
+        id="app-build-tooltip"
+        role="tooltip"
+      >
+        <span class="block">Version {{ APP_BUILD_VERSION }}</span>
+        <span class="block whitespace-nowrap"
+          >Build date: {{ APP_BUILD_DATE | date: "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" : 'UTC' }}</span
+        >
+      </span>
+    </span>
+  </div>
+</footer>
