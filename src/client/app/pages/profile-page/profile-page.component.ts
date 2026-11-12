@@ -47,10 +47,12 @@ export class ProfilePageComponent {
   protected readonly DataSource = DataSource;
   protected readonly $dataSource = this.appService.$dataSource;
   private readonly $profileFields = linkedSignal(() => ({
+    name: this.appService.$currentUser()?.name ?? '',
     username: this.appService.$currentUser()?.username ?? '',
     password: '',
   }));
   protected readonly $form = form(this.$profileFields, (path) => {
+    maxLength(path.name, 100);
     required(path.username);
     minLength(path.username, 3);
     maxLength(path.username, 64);
@@ -60,10 +62,12 @@ export class ProfilePageComponent {
 
   protected async saveProfile(): Promise<void> {
     if (this.$form().invalid()) return;
+    const name = this.$profileFields().name.trim();
     const username = this.$profileFields().username.trim();
     if (!username) return;
     try {
       await this.appService.updateProfile(
+        name,
         username,
         this.$profileFields().password,
       );

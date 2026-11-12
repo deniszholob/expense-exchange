@@ -217,7 +217,7 @@ export class AuthController {
   @Post('profile')
   @ApiBody({ type: ProfileUpdateDto })
   @ApiOperation({
-    summary: 'Update the signed-in username and optionally password',
+    summary: 'Update the signed-in display name, username, or password',
   })
   @ApiOkResponse({ type: AuthUserDto })
   public async updateProfile(
@@ -229,6 +229,7 @@ export class AuthController {
     );
     const input = z
       .object({
+        name: z.string().trim().max(100).optional(),
         username: z.string().trim().min(3).max(64),
         password: z.string().max(200).optional(),
       })
@@ -244,6 +245,7 @@ export class AuthController {
       );
     return this.auth.updateProfile(
       user.id,
+      input.data.name,
       input.data.username,
       input.data.password ?? '',
     );

@@ -21,6 +21,14 @@
         </div>
       } @else {
         <div class="border-finance-border border-t"></div>
+        <app-form-field [$id]="'profile-name'" [$label]="'Display name'">
+          <input
+            id="profile-name"
+            [formField]="$form.name"
+            autocomplete="name"
+            placeholder="Uses username when blank"
+          />
+        </app-form-field>
         <app-form-field [$id]="'profile-username'" [$label]="'Username'" [$required]="true"
           ><input id="profile-username" [formField]="$form.username" autocomplete="username"
         /></app-form-field>

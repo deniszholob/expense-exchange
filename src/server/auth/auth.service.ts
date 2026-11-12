@@ -199,6 +199,7 @@ export class AuthService {
 
   public updateProfile(
     userId: string,
+    name: string | undefined,
     username: string,
     password: string,
   ): Promise<AuthUser> {
@@ -213,6 +214,7 @@ export class AuthService {
       )
         throw new ConflictException('Username is already in use');
       account.username = normalized;
+      if (name !== undefined) account.name = name.trim() || normalized;
       if (password.length > 0)
         account.passwordHash = await hashPassword(password);
       return publicUser(account);

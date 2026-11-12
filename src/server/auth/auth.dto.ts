@@ -28,6 +28,7 @@ export class AuthResponseDto {
   @ApiProperty({ type: AuthUserDto }) public user!: AuthUserDto;
 }
 export class ProfileUpdateDto {
+  @ApiProperty({ required: false }) public name?: string;
   @ApiProperty() public username!: string;
   @ApiProperty({ required: false }) public password?: string;
 }

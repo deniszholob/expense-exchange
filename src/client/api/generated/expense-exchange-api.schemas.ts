@@ -100,6 +100,7 @@ export interface LogoutResponseDto {
 }
 
 export interface ProfileUpdateDto {
+  name?: string;
   username: string;
   password?: string;
 }

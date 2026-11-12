@@ -488,7 +488,7 @@ export class AuthService {
     });
   }
   /**
-   * @summary Update the signed-in username and optionally password
+   * @summary Update the signed-in display name, username, or password
    */
   authControllerUpdateProfile<TData = AuthUserDto>(
     profileUpdateDto: ProfileUpdateDto,

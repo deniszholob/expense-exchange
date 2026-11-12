@@ -159,11 +159,13 @@ export class AppService {
   }
 
   public async updateProfile(
+    name: string,
     username: string,
     password: string,
   ): Promise<void> {
     const user = await firstValueFrom(
       this.authApi.authControllerUpdateProfile({
+        name: name.trim(),
         username,
         password: password || undefined,
       }),
