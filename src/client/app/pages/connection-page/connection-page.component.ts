@@ -21,7 +21,11 @@ import {
   DATA_SOURCE_INFO_OPTIONS,
   DataSource,
 } from 'src/client/app/shared/data-source.enum';
-import { saveConfiguredRemoteApiUrl } from 'src/client/app/shared/remote-api-config';
+import {
+  getDefaultRemoteApiUrl,
+  getRemoteApiUrlHistory,
+  saveConfiguredRemoteApiUrl,
+} from 'src/client/app/shared/remote-api-config';
 import { RemoteApiHealthProbeService } from 'src/client/app/shared/remote-api-health-probe.service';
 import { FormFieldComponent } from '../../components/forms/form-field/form-field.component';
 import { PAGE_ROUTES } from '../../app.info';
@@ -42,6 +46,12 @@ export class ConnectionPageComponent {
   protected readonly $draftDataSource = signal(this.appService.$dataSource());
   protected readonly $remoteApiUrl = signal(
     this.appService.dataSourcePath[DataSource.RemoteApi],
+  );
+  protected readonly $defaultRemoteApiUrl = getDefaultRemoteApiUrl();
+  protected readonly $remoteApiUrlHistory = signal(
+    getRemoteApiUrlHistory(
+      this.appService.dataSourcePath[DataSource.RemoteApi],
+    ),
   );
   protected readonly $selectionDirty = signal(false);
   protected readonly $draftApiHealth = signal<
@@ -101,9 +111,15 @@ export class ConnectionPageComponent {
 
   protected checkRemoteApiAgain(): void {
     this.clearRemoteStatusCheck();
-    const url = this.appService.dataSourcePath[DataSource.RemoteApi];
-    saveConfiguredRemoteApiUrl(url);
+    this.persistRemoteApiUrl();
     void this.appService.connectToRemoteApi();
+  }
+
+  protected selectRecentApiUrl(url: string): void {
+    this.$remoteApiUrl.set(url);
+    this.$selectionDirty.set(true);
+    this.$message.set(undefined);
+    this.scheduleRemoteStatusCheck(url);
   }
 
   private scheduleRemoteStatusCheck(url: string): void {
@@ -135,10 +151,9 @@ export class ConnectionPageComponent {
     this.clearRemoteStatusCheck();
     const dataSource = this.$draftDataSource();
     this.appService.selectDataSource(dataSource);
-    this.appService.dataSourcePath[DataSource.RemoteApi] = this.$remoteApiUrl();
     this.$selectionDirty.set(false);
     if (dataSource === DataSource.RemoteApi) {
-      saveConfiguredRemoteApiUrl(this.$remoteApiUrl());
+      this.persistRemoteApiUrl();
       await this.appService.connectToRemoteApi();
       this.$draftApiHealth.set(
         this.appService.$apiHealthy() ? 'healthy' : 'unavailable',
@@ -170,6 +185,13 @@ export class ConnectionPageComponent {
       window.clearTimeout(this.remoteStatusCheckTimer);
       this.remoteStatusCheckTimer = undefined;
     }
+  }
+
+  private persistRemoteApiUrl(): void {
+    const url = this.$remoteApiUrl().trim();
+    this.appService.dataSourcePath[DataSource.RemoteApi] = url;
+    saveConfiguredRemoteApiUrl(url);
+    this.$remoteApiUrlHistory.set(getRemoteApiUrlHistory());
   }
 
   protected async submitAdminSetup(event: Event): Promise<void> {

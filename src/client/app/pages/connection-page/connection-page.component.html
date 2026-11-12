@@ -35,52 +35,78 @@
     </fieldset>
 
     @if ($draftDataSource() === DataSource.RemoteApi) {
-      <div class="border-finance-border max-w-2xl border-t pt-5">
-        <app-form-field [$id]="'remoteApi'" [$label]="'Remote API server URL'">
-          <input
-            id="remoteApi"
-            [value]="$remoteApiUrl()"
-            (input)="updateApiUrl($event)"
-            placeholder="https://your-server.example"
-            type="url"
-          />
-        </app-form-field>
-        <p class="text-finance-muted mt-2 text-xs">
-          Enter the server address. Leave empty to use this app’s default API address.
-        </p>
-        @if ($selectionDirty()) {
-          @if ($draftApiHealth() === 'checking') {
-            <p class="text-finance-muted mt-2 flex items-center gap-2 text-sm" role="status">
-              <span class="size-2 animate-pulse rounded-full bg-amber-400"></span>
-              Checking API health…
-            </p>
-          } @else if ($draftApiHealth() === 'healthy') {
-            <p class="text-finance-positive mt-2 flex items-center gap-2 text-sm" role="status">
-              <span class="size-2 rounded-full bg-emerald-400"></span> API is reachable.
-            </p>
-          } @else if ($draftApiHealth() === 'unavailable') {
-            <p class="text-finance-negative mt-2 flex items-center gap-2 text-sm" role="alert">
-              <span class="size-2 rounded-full bg-rose-400"></span>
-              {{ $draftApiHealthError() ?? 'Unable to reach the selected API.' }}
-            </p>
+      <div class="border-finance-border grid grid-cols-1 gap-4 border-t pt-5 md:grid-cols-2">
+        <div class="min-w-0">
+          <app-form-field [$id]="'remoteApi'" [$label]="'Remote API server URL'">
+            <input
+              id="remoteApi"
+              [value]="$remoteApiUrl()"
+              [placeholder]="$defaultRemoteApiUrl"
+              (input)="updateApiUrl($event)"
+              type="url"
+            />
+          </app-form-field>
+          <p class="text-finance-muted mt-2 text-xs">
+            Enter the server address. Leave empty to use this app’s default API address.
+          </p>
+          @if ($selectionDirty()) {
+            @if ($draftApiHealth() === 'checking') {
+              <p class="text-finance-muted mt-2 flex items-center gap-2 text-sm" role="status">
+                <span class="size-2 animate-pulse rounded-full bg-amber-400"></span>
+                Checking API health…
+              </p>
+            } @else if ($draftApiHealth() === 'healthy') {
+              <p class="text-finance-positive mt-2 flex items-center gap-2 text-sm" role="status">
+                <span class="size-2 rounded-full bg-emerald-400"></span> API is reachable.
+              </p>
+            } @else if ($draftApiHealth() === 'unavailable') {
+              <p class="text-finance-negative mt-2 flex items-center gap-2 text-sm" role="alert">
+                <span class="size-2 rounded-full bg-rose-400"></span>
+                {{ $draftApiHealthError() ?? 'Unable to reach the selected API.' }}
+              </p>
+            }
+          } @else if (appService.$dataSource() === DataSource.RemoteApi) {
+            @if (!$authStatusReady()) {
+              <p class="text-finance-muted mt-2 flex items-center gap-2 text-sm" role="status">
+                <span class="size-2 animate-pulse rounded-full bg-amber-400"></span>
+                Checking API health…
+              </p>
+            } @else if ($apiHealthy()) {
+              <p class="text-finance-positive mt-2 flex items-center gap-2 text-sm" role="status">
+                <span class="size-2 rounded-full bg-emerald-400"></span> API is reachable.
+              </p>
+            } @else {
+              <p class="text-finance-negative mt-2 flex items-center gap-2 text-sm" role="alert">
+                <span class="size-2 rounded-full bg-rose-400"></span>
+                {{ $authError() ?? 'Unable to reach the selected API.' }}
+              </p>
+            }
           }
-        } @else if (appService.$dataSource() === DataSource.RemoteApi) {
-          @if (!$authStatusReady()) {
-            <p class="text-finance-muted mt-2 flex items-center gap-2 text-sm" role="status">
-              <span class="size-2 animate-pulse rounded-full bg-amber-400"></span>
-              Checking API health…
-            </p>
-          } @else if ($apiHealthy()) {
-            <p class="text-finance-positive mt-2 flex items-center gap-2 text-sm" role="status">
-              <span class="size-2 rounded-full bg-emerald-400"></span> API is reachable.
-            </p>
+        </div>
+        <aside
+          class="rounded-control border-finance-border bg-finance-canvas/40 min-w-0 border p-4"
+        >
+          <h3 class="text-sm font-medium">Previous server URLs</h3>
+          @if ($remoteApiUrlHistory().length === 0) {
+            <p class="text-finance-muted mt-3 text-sm">Saved URLs will appear here.</p>
           } @else {
-            <p class="text-finance-negative mt-2 flex items-center gap-2 text-sm" role="alert">
-              <span class="size-2 rounded-full bg-rose-400"></span>
-              {{ $authError() ?? 'Unable to reach the selected API.' }}
-            </p>
+            <ul class="mt-3 flex flex-col gap-2">
+              @for (url of $remoteApiUrlHistory(); track url) {
+                <li>
+                  <button
+                    class="rounded-control border-finance-border bg-finance-surface hover:bg-finance-raised w-full truncate border px-3 py-2 text-left text-sm transition-colors"
+                    [attr.title]="url"
+                    [attr.aria-label]="'Use server URL ' + url"
+                    (click)="selectRecentApiUrl(url)"
+                    type="button"
+                  >
+                    {{ url }}
+                  </button>
+                </li>
+              }
+            </ul>
           }
-        }
+        </aside>
       </div>
     } @else {
       <div class="border-finance-border flex flex-col gap-3 border-t pt-5 sm:flex-row sm:items-end">
