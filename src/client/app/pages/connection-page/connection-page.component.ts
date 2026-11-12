@@ -27,10 +27,6 @@ import { FormFieldComponent } from '../../components/forms/form-field/form-field
 import { PAGE_ROUTES } from '../../app.info';
 // #endregion
 
-// #region Constants
-const DATA_SOURCE_STORAGE_KEY = 'expense-exchange.data-source';
-// #endregion
-
 // #region Component
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -140,7 +136,6 @@ export class ConnectionPageComponent {
     const dataSource = this.$draftDataSource();
     this.appService.selectDataSource(dataSource);
     this.appService.dataSourcePath[DataSource.RemoteApi] = this.$remoteApiUrl();
-    window.localStorage.setItem(DATA_SOURCE_STORAGE_KEY, dataSource);
     this.$selectionDirty.set(false);
     if (dataSource === DataSource.RemoteApi) {
       saveConfiguredRemoteApiUrl(this.$remoteApiUrl());
@@ -152,10 +147,17 @@ export class ConnectionPageComponent {
       this.$message.set(
         this.appService.$authError() ?? 'Remote API selection saved.',
       );
+      if (!this.$setupRequired()) {
+        const destination = this.appService.$currentUser()
+          ? PAGE_ROUTES.DASHBOARD_PAGE_ROOT
+          : PAGE_ROUTES.LOGIN_PAGE_ROOT;
+        await this.router.navigate(['/', destination]);
+      }
       return;
     }
     this.$draftApiHealth.set('idle');
     this.$message.set('Local data source selected for this browser.');
+    await this.router.navigate(['/', PAGE_ROUTES.DASHBOARD_PAGE_ROOT]);
   }
 
   public constructor() {

@@ -1,16 +1,23 @@
-import { isDevMode } from '@angular/core';
+// #region Imports
+import { inject, isDevMode } from '@angular/core';
 import type { RedirectFunction, Route } from '@angular/router';
-
 import { PAGE_ROUTES, ROUTE_KEYWORDS } from './app.info';
+import { AppService } from './app.service';
 import { AdminGuard } from './guards/admin.guard';
 import { AuthGuard } from './guards/auth.guard';
 import { UserGuard } from './guards/user.guard';
-import { readLastPageUrl } from './shared/last-page';
+import { DataSource } from './shared/data-source.enum';
+// #endregion
 
+// #region Routes
 const DEV_ROUTE: Route[] = [];
-const redirectToLastPage: RedirectFunction = () => {
-  const lastPage = readLastPageUrl();
-  return lastPage ?? `/${PAGE_ROUTES.CONNECTION_PAGE_ROOT}`;
+const redirectToStartupPage: RedirectFunction = () => {
+  const appService = inject(AppService);
+  if (!appService.$dataSourceConfigured())
+    return `/${PAGE_ROUTES.CONNECTION_PAGE_ROOT}`;
+  if (appService.$dataSource() === DataSource.Local)
+    return `/${PAGE_ROUTES.DASHBOARD_PAGE_ROOT}`;
+  return `/${PAGE_ROUTES.LOGIN_PAGE_ROOT}`;
 };
 // https://angular.dev/api/core/isDevMode?tab=description
 if (isDevMode()) {
@@ -24,7 +31,7 @@ if (isDevMode()) {
 }
 
 export const appRoutes: Route[] = [
-  { path: '', redirectTo: redirectToLastPage, pathMatch: 'full' },
+  { path: '', redirectTo: redirectToStartupPage, pathMatch: 'full' },
   // { path: HOME_PAGE_ROOT, component: ViewPages.HomePageComponent },
   // { path: 'home', redirectTo: HOME_PAGE_ROOT, pathMatch: 'full' },
   // ======================================================================== //
@@ -104,3 +111,4 @@ export const appRoutes: Route[] = [
   // { path: '**', redirectTo: '', pathMatch: 'full' },
   //   { path: '**', component: ViewPages.NotFoundComponent },
 ];
+// #endregion

@@ -29,6 +29,10 @@ import { UserRole } from '../../util/user-role.enum';
 import { getHttpErrorMessage } from './shared/http-error-message';
 // #endregion
 
+// #region Constants
+const DATA_SOURCE_STORAGE_KEY = 'expense-exchange.data-source';
+// #endregion
+
 // #region Service
 @Injectable({ providedIn: 'root' })
 export class AppService {
@@ -94,6 +98,7 @@ export class AppService {
   );
 
   public readonly $dataSource = signal(readDataSource());
+  public readonly $dataSourceConfigured = signal(isDataSourceConfigured());
   public dataSourcePath: Record<DataSource, string> = {
     [DataSource.Local]: DATA_SOURCE_INFO[DataSource.Local].path,
     [DataSource.RemoteApi]: getConfiguredRemoteApiUrl(),
@@ -294,6 +299,12 @@ export class AppService {
     this.remoteConnectionCheckId++;
     const previousSource = this.$dataSource();
     this.$dataSource.set(source);
+    this.$dataSourceConfigured.set(true);
+    try {
+      window.localStorage.setItem(DATA_SOURCE_STORAGE_KEY, source);
+    } catch {
+      // Continue with the selected source for this session if storage is unavailable.
+    }
     this.$authError.set(undefined);
     this.$apiHealthy.set(undefined);
     this.$authSetupRequired.set(false);
@@ -325,7 +336,11 @@ export class AppService {
   }
 
   private async loadAuthenticationState(): Promise<void> {
-    if (this.$dataSource() === DataSource.Local) return;
+    if (
+      !this.$dataSourceConfigured() ||
+      this.$dataSource() === DataSource.Local
+    )
+      return;
     await this.connectToRemoteApi();
   }
 
@@ -431,12 +446,23 @@ function readLocalStore(): LocalStore {
 
 function readDataSource(): DataSource {
   try {
-    return window.localStorage.getItem('expense-exchange.data-source') ===
+    return window.localStorage.getItem(DATA_SOURCE_STORAGE_KEY) ===
       DataSource.Local
       ? DataSource.Local
       : DataSource.RemoteApi;
   } catch {
     return DataSource.RemoteApi;
+  }
+}
+
+function isDataSourceConfigured(): boolean {
+  try {
+    const storedSource = window.localStorage.getItem(DATA_SOURCE_STORAGE_KEY);
+    return (
+      storedSource === DataSource.Local || storedSource === DataSource.RemoteApi
+    );
+  } catch {
+    return false;
   }
 }
 

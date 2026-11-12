@@ -6,6 +6,11 @@
         Switch to Remote API in Data to sign in to a server.
       </p>
     </section>
+  } @else if (!$authStatusReady()) {
+    <section class="surface-card mx-auto w-full max-w-md p-5" role="status">
+      <h2 class="text-lg font-semibold">Connecting to API</h2>
+      <p class="text-finance-muted mt-2 text-sm">Checking server health and account setup…</p>
+    </section>
   } @else {
     @if ($setupRequired()) {
       <section class="surface-card mx-auto w-full max-w-md p-5 sm:p-7">
