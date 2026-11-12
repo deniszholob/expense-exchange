@@ -1,6 +1,11 @@
 // #region Imports
 import { CommonModule, DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  signal,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
@@ -13,6 +18,7 @@ import { ExpensesService } from 'src/client/api/generated/expenses/expenses.serv
 import { ROUTE_KEYWORDS } from 'src/client/app/app.info';
 import { ExpenseDetailsComponent } from 'src/client/app/components/expense-details/expense-details.component';
 import { ExpenseTableComponent } from 'src/client/app/components/expense-table/expense-table.component';
+import { DateRangeSelectorComponent } from 'src/client/app/components/date-range-selector/date-range-selector.component';
 import {
   DetailsPageDirective,
   DetailsPageState,
@@ -20,6 +26,12 @@ import {
 } from 'src/client/app/layout';
 import { AppService } from 'src/client/app/app.service';
 import { DataSource } from 'src/client/app/shared/data-source.enum';
+import { DateRangePreset } from 'src/client/app/shared/date-range/date-range-preset.enum';
+import {
+  createDateRangeForPreset,
+  getEarliestDate,
+  isDateWithinRange,
+} from 'src/client/app/shared/date-range/date-range.util';
 // #endregion
 
 // #region Implementation
@@ -34,12 +46,24 @@ import { DataSource } from 'src/client/app/shared/data-source.enum';
     CommonModule,
     ExpenseTableComponent,
     ExpenseDetailsComponent,
+    DateRangeSelectorComponent,
     PageLayoutComponent,
   ],
   providers: [DatePipe],
 })
 export class ExpensesPageComponent extends DetailsPageDirective {
   protected readonly $expenses = this.appService.$detailedExpenses;
+  protected readonly $dateRange = signal(
+    createDateRangeForPreset(DateRangePreset.AllTime),
+  );
+  protected readonly $earliestExpenseDate = computed(() =>
+    getEarliestDate(this.$expenses().map((expense) => expense.datePaid)),
+  );
+  protected readonly $filteredExpenses = computed(() =>
+    this.$expenses().filter((expense) =>
+      isDateWithinRange(expense.datePaid, this.$dateRange()),
+    ),
+  );
   private readonly $routeId = toSignal(
     this.activatedRoute.params.pipe(
       map((params) =>

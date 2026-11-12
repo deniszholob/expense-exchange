@@ -21,27 +21,155 @@
 
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
       <article class="stat-card">
-        <span class="eyebrow">TRACKED SPENDING</span>
-        <strong class="text-finance-negative text-3xl font-semibold tracking-tight tabular-nums">{{
-          $trackedSpending() | currency
-        }}</strong>
-        <span class="text-finance-muted text-xs">Across all recorded expenses</span>
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <span class="eyebrow">NET CASH FLOW · {{ $rangeLabel() | uppercase }}</span>
+          <div class="flex gap-1" role="group" aria-label="Spending view">
+            <button
+              class="btn-secondary min-h-8 px-2 py-1 text-xs"
+              [class.btn-primary]="$spendingScope() === DashboardSpendingScope.Group"
+              [attr.aria-pressed]="$spendingScope() === DashboardSpendingScope.Group"
+              (click)="selectSpendingScope(DashboardSpendingScope.Group)"
+              type="button"
+            >
+              Group
+            </button>
+            <button
+              class="btn-secondary min-h-8 px-2 py-1 text-xs"
+              [class.btn-primary]="$spendingScope() === DashboardSpendingScope.Personal"
+              [attr.aria-pressed]="$spendingScope() === DashboardSpendingScope.Personal"
+              [disabled]="!$personalSpendingAvailable()"
+              [attr.title]="
+                $personalSpendingAvailable()
+                  ? 'Show your expense shares'
+                  : 'Personal spending is available when signed in as a group member'
+              "
+              (click)="selectSpendingScope(DashboardSpendingScope.Personal)"
+              type="button"
+            >
+              My share
+            </button>
+          </div>
+        </div>
+        <strong class="text-finance-negative text-3xl font-semibold tracking-tight tabular-nums">
+          −{{ $trackedSpending() | currency }}
+        </strong>
+        <span class="text-finance-muted text-xs">{{ $spendingDescription() }}</span>
+        <div class="mt-2" role="img" aria-label="Income compared with expenses">
+          <div class="bg-finance-raised flex h-2 overflow-hidden rounded-full" aria-hidden="true">
+            <span
+              class="bg-finance-positive block h-full transition-[width]"
+              [style.width.%]="$incomeBarWidth()"
+            ></span>
+            <span
+              class="bg-finance-negative block h-full transition-[width]"
+              [style.width.%]="$expenseBarWidth()"
+            ></span>
+          </div>
+          <div class="text-finance-muted mt-2 flex justify-between gap-3 text-xs tabular-nums">
+            <span class="text-finance-positive">Income {{ $trackedIncome() | currency }}</span>
+            <span class="text-finance-negative">Expenses −{{ $trackedSpending() | currency }}</span>
+          </div>
+        </div>
       </article>
       <article class="stat-card">
         <span class="eyebrow">EXPENSES</span>
-        <strong class="text-3xl font-semibold tracking-tight tabular-nums">{{
-          $expenseCount()
-        }}</strong>
-        <span class="text-finance-muted text-xs">Transactions in your ledger</span>
+        <strong class="text-3xl font-semibold tracking-tight tabular-nums">
+          {{ $expenseCount() }}
+        </strong>
+        <span class="text-finance-muted text-xs">Transactions paid in selected range</span>
       </article>
       <article class="stat-card">
         <span class="eyebrow">PEOPLE</span>
-        <strong class="text-3xl font-semibold tracking-tight tabular-nums">{{
-          $groupMembers().length
-        }}</strong>
+        <strong class="text-3xl font-semibold tracking-tight tabular-nums">
+          {{ $groupMembers().length }}
+        </strong>
         <span class="text-finance-muted text-xs">Profiles sharing expenses</span>
       </article>
     </div>
+
+    <section class="surface-card overflow-hidden" aria-labelledby="monthly-balance-heading">
+      <div class="px-5 pt-4 sm:px-6">
+        <h2 class="font-semibold" id="monthly-balance-heading">Group balance</h2>
+        <p class="text-finance-muted mt-1 text-xs">
+          See who paid for each person and how the group balances out.
+        </p>
+      </div>
+      <app-date-range-selector
+        class="border-finance-border block border-b px-5 py-4 sm:px-6"
+        [($range)]="$dateRange"
+        [$idPrefix]="'dashboard-balance'"
+        [$earliestExpenseDate]="$earliestExpenseDate()"
+      />
+      @if ($rangeSummary().expenseCount === 0) {
+        <p class="text-finance-muted px-5 py-8 text-center text-sm sm:px-6">
+          No expenses match this date range.
+        </p>
+      } @else {
+        <div class="grid gap-6 p-5 sm:p-6 lg:grid-cols-2">
+          <div>
+            <h3 class="text-sm font-semibold">Who owes whom</h3>
+            @if ($rangeSummary().obligations.length === 0) {
+              <p class="text-finance-muted mt-3 text-sm">
+                Everyone is settled for {{ $rangeLabel() }}.
+              </p>
+            } @else {
+              <ul class="divide-finance-border mt-2 divide-y">
+                @for (obligation of $rangeSummary().obligations; track $index) {
+                  <li class="flex items-center justify-between gap-3 py-3">
+                    <span class="text-sm">
+                      <strong class="font-medium">{{ obligation.debtor.name }}</strong>
+                      owes
+                      <strong class="font-medium">{{ obligation.creditor.name }}</strong>
+                    </span>
+                    <strong
+                      class="shrink-0 text-sm tabular-nums"
+                      [class.text-finance-positive]="obligation.creditor.id === $currentUser()?.id"
+                      [class.text-finance-negative]="obligation.debtor.id === $currentUser()?.id"
+                    >
+                      @if (obligation.creditor.id === $currentUser()?.id) {
+                        +{{ obligation.amount | currency }}
+                      } @else if (obligation.debtor.id === $currentUser()?.id) {
+                        −{{ obligation.amount | currency }}
+                      } @else {
+                        {{ obligation.amount | currency }}
+                      }
+                    </strong>
+                  </li>
+                }
+              </ul>
+            }
+          </div>
+          <div>
+            <h3 class="text-sm font-semibold">Who paid for whom</h3>
+            <div class="mt-2 overflow-x-auto">
+              <table class="w-full text-left text-sm">
+                <thead class="text-finance-muted text-xs uppercase">
+                  <tr>
+                    <th class="py-2 pr-3 font-medium">Paid by</th>
+                    <th class="py-2 pr-3 font-medium">Paid for</th>
+                    <th class="py-2 text-right font-medium">Share</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-finance-border divide-y">
+                  @for (
+                    share of $rangeSummary().paidForShares;
+                    track share.paidBy.id + share.paidFor.id
+                  ) {
+                    <tr>
+                      <td class="py-2 pr-3">{{ share.paidBy.name }}</td>
+                      <td class="py-2 pr-3">{{ share.paidFor.name }}</td>
+                      <td class="text-finance-negative py-2 text-right font-medium tabular-nums">
+                        −{{ share.amount | currency }}
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      }
+    </section>
 
     <section class="surface-card overflow-hidden">
       <div
@@ -75,9 +203,9 @@
                   </p>
                 </div>
               </div>
-              <strong class="text-finance-negative text-sm font-semibold tabular-nums">{{
-                -expense.amount | currency
-              }}</strong>
+              <strong class="text-finance-negative text-sm font-semibold tabular-nums">
+                {{ -expense.amount | currency }}
+              </strong>
             </li>
           }
         </ul>

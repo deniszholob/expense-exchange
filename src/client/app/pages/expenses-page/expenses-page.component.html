@@ -13,12 +13,20 @@
     }
 
     @case (DetailsPageState.NO_PARAMS) {
-      <app-expense-table
-        [expenses]="$expenses()"
-        (add)="this.onAddExpense()"
-        (edit)="this.onEditExpense($event)"
-        (delete)="this.onDeleteExpense($event)"
-      ></app-expense-table>
+      <div class="flex flex-col gap-4">
+        <app-date-range-selector
+          class="surface-card p-5"
+          [($range)]="$dateRange"
+          [$idPrefix]="'expenses-list'"
+          [$earliestExpenseDate]="$earliestExpenseDate()"
+        />
+        <app-expense-table
+          [expenses]="$filteredExpenses()"
+          (add)="this.onAddExpense()"
+          (edit)="this.onEditExpense($event)"
+          (delete)="this.onDeleteExpense($event)"
+        ></app-expense-table>
+      </div>
     }
 
     @case (DetailsPageState.LOADED_PARAM_DATA) {
