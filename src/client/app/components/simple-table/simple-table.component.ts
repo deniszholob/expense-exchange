@@ -1,6 +1,7 @@
 // #region Imports
 import { CommonModule } from '@angular/common';
 import {
+  ChangeDetectionStrategy,
   Component,
   computed,
   input,
@@ -9,8 +10,12 @@ import {
   OutputEmitterRef,
   Signal,
 } from '@angular/core';
-import { DomSanitizer } from '@angular/platform-browser';
-import { LucidePencil, LucideTrash } from '@lucide/angular';
+import {
+  LucidePencil,
+  LucidePlus,
+  LucideReceipt,
+  LucideTrash,
+} from '@lucide/angular';
 
 import {
   ColDef,
@@ -29,9 +34,10 @@ export type TableAction<TData> = {
 };
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-simple-table',
   templateUrl: './simple-table.component.html',
-  imports: [CommonModule, LucidePencil, LucideTrash],
+  imports: [CommonModule, LucidePencil, LucidePlus, LucideReceipt, LucideTrash],
 })
 export class SimpleTableComponent<TData extends TableBaseData> {
   public readonly data: InputSignal<TData[]> = input.required<TData[]>();
@@ -44,8 +50,6 @@ export class SimpleTableComponent<TData extends TableBaseData> {
   public deleteRowEmitter: OutputEmitterRef<TableAction<TData>> =
     output<TableAction<TData>>();
   public addRowEmitter: OutputEmitterRef<void> = output<void>();
-
-  public constructor(private domSanitizer: DomSanitizer) {}
 
   protected renderTable: Signal<RenderTableRow<TData>[]> = computed(
     (): RenderTableRow<TData>[] => {
@@ -83,9 +87,8 @@ export class SimpleTableComponent<TData extends TableBaseData> {
     const renderTableCell: RenderTableCell<TData> = {
       ...col,
       rawValue,
-      cellValue: this.domSanitizer.bypassSecurityTrustHtml(
-        formattedValue ?? String(rawValue),
-      ),
+      tooltip: col.tooltip?.(row),
+      cellValue: formattedValue ?? String(rawValue),
     };
 
     return renderTableCell;

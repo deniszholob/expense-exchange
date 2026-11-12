@@ -1,6 +1,5 @@
 export enum DataSource {
-  LocalFile = 'LocalFile',
-  WebStorage = 'WebStorage',
+  Local = 'Local',
   RemoteApi = 'RemoteApi',
 }
 
@@ -23,15 +22,10 @@ export interface DataSourceInfo {
 }
 
 export const DATA_SOURCE_INFO: Record<DataSource, DataSourceInfo> = {
-  [DataSource.LocalFile]: {
-    id: DataSource.LocalFile,
-    display: 'Local File',
-    path: '',
-  },
-  [DataSource.WebStorage]: {
-    id: DataSource.WebStorage,
-    display: 'Web Storage',
-    path: 'data',
+  [DataSource.Local]: {
+    id: DataSource.Local,
+    display: 'Local',
+    path: 'browser',
   },
   [DataSource.RemoteApi]: {
     id: DataSource.RemoteApi,

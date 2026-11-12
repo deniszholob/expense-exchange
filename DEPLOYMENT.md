@@ -42,6 +42,20 @@ available at `http://<server-ip>:3001/api`, with interactive documentation at
 `http://<server-ip>:3001/api/docs` and a health check at
 `http://<server-ip>:3001/api/health`.
 
+On first use, open the app's sign-in page and create the administrator
+account. Administrators can add regular user accounts. Passwords are stored as
+hashes, and the session signing key and account records are kept in `/app/data`
+alongside the expense JSON; keep the data volume mounted when updating the
+container. A separately hosted browser demo uses cross-site session cookies,
+so its API must use HTTPS and list the exact demo origin in `CORS_ORIGINS`.
+
+The Angular dev server uses `http://localhost:3000` as its default Remote API
+server URL. The bundled Docker UI uses its own origin by default. A separately
+hosted browser demo can be pointed at a reachable API server in Settings; that
+server must allow the demo origin through `CORS_ORIGINS`, a comma-separated list
+of exact browser origins. By default, Nest allows the two local Angular dev
+origins (`http://localhost:4242` and `http://127.0.0.1:4242`).
+
 To run an explicit container command, use:
 
 ```bash
@@ -53,8 +67,9 @@ docker run --detach \
 ```
 
 Use a different host port if `3001` is already in use. Keep `/app/data`
-mounted to persistent storage; it contains the JSON repository file. The
-current repository adapter is intended for a single application instance.
+mounted to persistent storage; it contains the JSON repository and account
+files plus the session signing key. The current repository adapter is intended
+for a single application instance.
 
 ## Transfer the image to another host
 

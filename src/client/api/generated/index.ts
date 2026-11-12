@@ -1,16 +1,18 @@
+export * from './auth/auth.service';
 export * from './expenses/expenses.service';
+export * from './group-members/group-members.service';
 export * from './health/health.service';
-export * from './users/users.service';
 export type {
   OrvalHttpResourceOptions,
   OrvalHttpResourceRequestExtension,
   ResolvedResourceState,
   ResourceState,
-} from './expenses/expenses.resource';
+} from './auth/auth.resource';
 export {
   applyOrvalRequestExtension,
   toResourceState,
-} from './expenses/expenses.resource';
+} from './auth/auth.resource';
+export * from './auth/auth.resource';
 export * from './expenses/expenses.resource';
+export * from './group-members/group-members.resource';
 export * from './health/health.resource';
-export * from './users/users.resource';

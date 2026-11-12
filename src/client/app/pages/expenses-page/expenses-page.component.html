@@ -1,42 +1,46 @@
-<app-page-layout [title]="'Expenses'">
-  <div class="container-fixed">
-    @switch ($pageState()) {
-      @case (DetailsPageState.LOADING) {
-        <div class="text-center">Loading expenses...</div>
-      }
-
-      @case (DetailsPageState.NO_PARAMS) {
-        <app-expense-table
-          [expenses]="$expenses()"
-          (add)="this.onAddExpense()"
-          (edit)="this.onEditExpense($event)"
-          (delete)="this.onDeleteExpense($event)"
-        ></app-expense-table>
-      }
-
-      @case (DetailsPageState.LOADED_PARAM_DATA) {
-        <app-expense-details
-          [expense]="$expense()"
-          [currentUser]="this.appService.$currentUser()"
-          [users]="this.appService.$users()"
-          (save)="this.onSaveExpense($event)"
-        ></app-expense-details>
-      }
-      @case (DetailsPageState.ERROR) {
-        <div class="text-center text-red-500">
-          <ul>
-            @for (error of $errors(); track $index) {
-              <li>{{ error }}</li>
-            }
-          </ul>
-        </div>
-      }
+<app-page-layout>
+  @switch ($pageState()) {
+    @case (DetailsPageState.LOADING) {
+      <div
+        class="surface-card text-finance-muted flex min-h-48 items-center justify-center gap-3"
+        role="status"
+      >
+        <span
+          class="size-5 animate-spin rounded-full border-2 border-sky-400/30 border-t-sky-300"
+        ></span>
+        Loading expenses…
+      </div>
     }
 
-    <!-- <pre>
-  expense: {{ expense$ | async | json }}
-  expenses: {{ expenses$ | async | json }}
-  users: {{ users$ | async | json }}
-</pre> -->
-  </div></app-page-layout
->
+    @case (DetailsPageState.NO_PARAMS) {
+      <app-expense-table
+        [expenses]="$expenses()"
+        (add)="this.onAddExpense()"
+        (edit)="this.onEditExpense($event)"
+        (delete)="this.onDeleteExpense($event)"
+      ></app-expense-table>
+    }
+
+    @case (DetailsPageState.LOADED_PARAM_DATA) {
+      <app-expense-details
+        [expense]="$expense()"
+        [currentUser]="this.appService.$currentUser()"
+        [groupMembers]="this.appService.$groupMembers()"
+        (save)="this.onSaveExpense($event)"
+        (cancelRequested)="this.onCancelExpense()"
+      ></app-expense-details>
+    }
+    @case (DetailsPageState.ERROR) {
+      <div
+        class="rounded-card border border-rose-400/30 bg-rose-500/10 p-5 text-rose-200"
+        role="alert"
+      >
+        <ul class="list-inside list-disc">
+          @for (error of $errors(); track $index) {
+            <li>{{ error }}</li>
+          }
+        </ul>
+      </div>
+    }
+  }
+</app-page-layout>

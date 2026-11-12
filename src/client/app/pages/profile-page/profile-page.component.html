@@ -1,0 +1,57 @@
+<app-page-layout>
+  @if ($currentUser(); as currentUser) {
+    <section class="surface-card mx-auto flex w-full max-w-xl flex-col gap-5 p-5 sm:p-7">
+      <div class="flex items-center gap-3">
+        <span
+          class="profile-monogram size-11 text-base"
+          [class.profile-monogram-admin]="currentUser.role === UserRole.Admin"
+          >{{ currentUser.name | userMonogram }}</span
+        >
+        <div>
+          <p class="font-semibold">{{ currentUser.name }}</p>
+        </div>
+      </div>
+      @if ($dataSource() === DataSource.Local) {
+        <div class="border-finance-border border-t pt-4">
+          <h2 class="font-semibold">Local profile</h2>
+          <p class="text-finance-muted mt-2 text-sm">
+            You are signed in locally as {{ currentUser.name }}. Local mode does not use account
+            credentials.
+          </p>
+        </div>
+      } @else {
+        <div class="border-finance-border border-t"></div>
+        <app-form-field [$id]="'profile-username'" [$label]="'Username'" [$required]="true"
+          ><input id="profile-username" [formField]="$form.username" autocomplete="username"
+        /></app-form-field>
+        <app-form-field [$id]="'profile-password'" [$label]="'New password'"
+          ><input
+            id="profile-password"
+            [formField]="$form.password"
+            type="password"
+            autocomplete="new-password"
+            placeholder="Leave blank to keep current password"
+        /></app-form-field>
+        @if ($error(); as error) {
+          <p class="text-finance-negative text-sm" role="alert">{{ error }}</p>
+        }
+        @if ($saved()) {
+          <p class="text-finance-positive text-sm" role="status">Profile updated.</p>
+        }
+        <div class="flex flex-wrap gap-2">
+          <button class="btn-primary" (click)="saveProfile()" type="button">Save changes</button>
+          <button class="btn-danger" (click)="signOut()" type="button">
+            <svg class="size-4" lucideLogOut aria-hidden="true"></svg>Sign out
+          </button>
+        </div>
+      }
+    </section>
+  } @else {
+    <section class="surface-card mx-auto w-full max-w-xl p-5">
+      <h2 class="text-lg font-semibold">Local data has no sign-in</h2>
+      <p class="text-finance-muted mt-2 text-sm">
+        Choose Remote API in Data to sign in to a server account.
+      </p>
+    </section>
+  }
+</app-page-layout>

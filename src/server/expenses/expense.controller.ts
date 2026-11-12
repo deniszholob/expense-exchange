@@ -8,6 +8,7 @@ import {
   Param,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiCreatedResponse,
@@ -18,6 +19,11 @@ import {
 import { z } from 'zod';
 import { CreateExpenseDto, ExpenseDto } from './expense.dto.js';
 import { ExpenseService } from './expense.service.js';
+import { AuthGuard } from '../auth/auth.guard.js';
+import { AuthService } from '../auth/auth.service.js';
+import { GroupMemberGuard } from '../auth/group-member.guard.js';
+import { GroupMemberService } from '../groups/group-member.service.js';
+import { UserRole } from '../../util/user-role.enum.js';
 // #endregion
 
 // #region Validation
@@ -35,8 +41,13 @@ const CreateExpenseSchema = z.object({
 // #region Controller
 @ApiTags('expenses')
 @Controller()
+@UseGuards(AuthGuard, GroupMemberGuard)
 export class ExpenseController {
-  public constructor(private readonly service: ExpenseService) {}
+  public constructor(
+    private readonly service: ExpenseService,
+    private readonly groupMembers: GroupMemberService,
+    private readonly auth: AuthService,
+  ) {}
 
   @Get('expenses')
   @ApiOperation({ summary: 'List expenses' })
@@ -56,8 +67,7 @@ export class ExpenseController {
   @ApiOperation({ summary: 'Create an expense' })
   @ApiCreatedResponse({ type: ExpenseDto })
   public createExpense(@Body() body: CreateExpenseDto): Promise<ExpenseDto> {
-    const input = validateCreateExpense(body);
-    return this.service.createExpense(input);
+    return this.createValidatedExpense(body);
   }
 
   @Put('expenses/:id')
@@ -67,8 +77,7 @@ export class ExpenseController {
     @Param('id') id: string,
     @Body() body: CreateExpenseDto,
   ): Promise<ExpenseDto> {
-    const input = validateCreateExpense(body);
-    return this.service.updateExpense(id, input);
+    return this.updateValidatedExpense(id, body);
   }
 
   @Delete('expenses/:id')
@@ -76,6 +85,47 @@ export class ExpenseController {
   @ApiOkResponse({ type: ExpenseDto })
   public deleteExpense(@Param('id') id: string): Promise<ExpenseDto> {
     return this.service.deleteExpense(id);
+  }
+
+  private async createValidatedExpense(
+    body: CreateExpenseDto,
+  ): Promise<ExpenseDto> {
+    const input = validateCreateExpense(body);
+    await this.validateGroupParticipants(input);
+    return this.service.createExpense(input);
+  }
+
+  private async updateValidatedExpense(
+    id: string,
+    body: CreateExpenseDto,
+  ): Promise<ExpenseDto> {
+    const input = validateCreateExpense(body);
+    await this.validateGroupParticipants(input);
+    return this.service.updateExpense(id, input);
+  }
+
+  private async validateGroupParticipants(
+    input: CreateExpenseDto,
+  ): Promise<void> {
+    const [members, accounts] = await Promise.all([
+      this.groupMembers.getMembers(),
+      this.auth.listAccounts(),
+    ]);
+    const adminIds = new Set(
+      accounts
+        .filter((account) => account.role === UserRole.Admin)
+        .map((account) => account.id),
+    );
+    const memberIds = new Set(
+      members
+        .filter((member) => !adminIds.has(member.id))
+        .map((member) => member.id),
+    );
+    const participantIds = [input.paidByUserId, ...input.paidForUserIds];
+    if (participantIds.some((id) => !memberIds.has(id)))
+      throw new BadRequestException(
+        'Expenses can only include current group members',
+      );
   }
 }
 // #endregion

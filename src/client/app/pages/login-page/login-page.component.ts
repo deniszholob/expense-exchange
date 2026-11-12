@@ -1,0 +1,93 @@
+// #region Imports
+import { CommonModule } from '@angular/common';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  signal,
+} from '@angular/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import {
+  FormField,
+  form,
+  maxLength,
+  minLength,
+  required,
+} from '@angular/forms/signals';
+import { PageLayoutComponent } from 'src/client/app/layout';
+import { AppService } from 'src/client/app/app.service';
+import { PAGE_ROUTES } from 'src/client/app/app.info';
+import { DataSource } from 'src/client/app/shared/data-source.enum';
+import { FormFieldComponent } from '../../components/forms/form-field/form-field.component';
+import { AuthAccountSelectorComponent } from '../../components/auth-account-selector/auth-account-selector.component';
+// #endregion
+
+// #region Component
+@Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: 'app-login-page',
+  templateUrl: './login-page.component.html',
+  imports: [
+    CommonModule,
+    PageLayoutComponent,
+    FormField,
+    FormFieldComponent,
+    AuthAccountSelectorComponent,
+    RouterLink,
+  ],
+})
+export class LoginPageComponent {
+  private readonly appService = inject(AppService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  protected readonly $setupRequired = this.appService.$authSetupRequired;
+  protected readonly $loginAccounts = this.appService.$loginAccounts;
+  protected readonly $credentials = signal({
+    username: '',
+    password: '',
+  });
+  protected readonly $form = form(this.$credentials, (path) => {
+    required(path.username);
+    minLength(path.username, 3);
+    maxLength(path.username, 64);
+    required(path.password);
+    minLength(path.password, 10);
+    maxLength(path.password, 200);
+  });
+  protected readonly $loading = signal(false);
+  protected readonly $error = this.appService.$authError;
+  protected readonly $localMode = this.appService.$dataSource;
+  protected readonly DataSource = DataSource;
+
+  protected async submit(event: Event): Promise<void> {
+    event.preventDefault();
+    if (this.$form().invalid()) return;
+    this.$loading.set(true);
+    try {
+      await this.appService.signIn(
+        this.$credentials().username,
+        this.$credentials().password,
+      );
+      const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+      await this.router.navigateByUrl(
+        isSafeReturnUrl(returnUrl)
+          ? returnUrl
+          : `/${PAGE_ROUTES.DASHBOARD_PAGE_ROOT}`,
+      );
+    } catch {
+      // The service exposes a safe user-facing authentication error.
+    } finally {
+      this.$loading.set(false);
+      this.$credentials.update((value) => ({ ...value, password: '' }));
+    }
+  }
+
+  protected selectLoginAccount(username: string): void {
+    this.$credentials.update((credentials) => ({ ...credentials, username }));
+  }
+}
+
+function isSafeReturnUrl(value: string | null): value is string {
+  return value !== null && value.startsWith('/') && !value.startsWith('//');
+}
+// #endregion

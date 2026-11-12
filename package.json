@@ -15,7 +15,7 @@
   "scripts": {
     "i": "pnpm install",
     "dev:client": "ng serve client --port=4242",
-    "dev:server": "nest start --watch",
+    "dev:server": "nest start --watch --entryFile server/main",
     "dev:storybook": "ng run client:storybook",
     "dev:json-server": "json-server --watch json-server/db.json --port 3002",
     "dev:desktop": "pnpm run build:desktop:renderer && pnpm run build:desktop:compile && electron .",

@@ -1,0 +1,32 @@
+// #region Imports
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import type { Request } from 'express';
+import { AuthService, type AuthUser } from './auth.service.js';
+// #endregion
+
+// #region Guard
+export interface AuthenticatedRequest extends Request {
+  authUser: AuthUser;
+}
+
+@Injectable()
+export class AuthGuard implements CanActivate {
+  public constructor(private readonly auth: AuthService) {}
+
+  public async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
+    const token = readCookie(request, 'expense_exchange_session');
+    request.authUser = await this.auth.authenticate(token);
+    return true;
+  }
+}
+
+function readCookie(request: Request, name: string): string | undefined {
+  const header = request.headers.cookie;
+  const part = header
+    ?.split(';')
+    .map((item) => item.trim())
+    .find((item) => item.startsWith(`${name}=`));
+  return part?.slice(name.length + 1);
+}
+// #endregion

@@ -1,4 +1,5 @@
-import { provideHttpClient } from '@angular/common/http';
+// #region Imports
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import {
   ApplicationConfig,
   importProvidersFrom,
@@ -7,14 +8,23 @@ import {
 import { BrowserModule } from '@angular/platform-browser';
 import { provideRouter, TitleStrategy } from '@angular/router';
 
+import { provideExpenseExchangeBaseUrl } from '../api/generated/expense-exchange-api.base-url';
 import { appRoutes } from './app.routes';
 import { AppTitleService } from './core';
+import { remoteApiBaseUrlInterceptor } from './shared/remote-api-config';
+// #endregion
 
-// console.log(appRoutes);
+// #region Configuration
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZonelessChangeDetection(),
-    provideHttpClient(),
+    provideHttpClient(
+      withInterceptors([
+        (request, next) => next(request.clone({ withCredentials: true })),
+        remoteApiBaseUrlInterceptor,
+      ]),
+    ),
+    provideExpenseExchangeBaseUrl(''),
     provideRouter(
       appRoutes,
       // withEnabledBlockingInitialNavigation(),
@@ -31,3 +41,4 @@ export const appConfig: ApplicationConfig = {
     { provide: TitleStrategy, useClass: AppTitleService },
   ],
 };
+// #endregion

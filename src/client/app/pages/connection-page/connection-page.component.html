@@ -1,0 +1,172 @@
+<app-page-layout>
+  <section class="surface-card mx-auto flex w-full flex-col gap-5 p-5 sm:p-6">
+    <div>
+      <h2 class="text-lg font-semibold">Choose a data source</h2>
+      <p class="text-finance-muted mt-1 text-sm">
+        Local data stays in this browser. Remote API connects to your self-hosted server.
+      </p>
+    </div>
+    <fieldset class="grid grid-cols-1 gap-3 md:grid-cols-2">
+      <legend class="sr-only">Choose data source</legend>
+      @for (source of DATA_SOURCE_INFO_OPTIONS; track source.id) {
+        <label
+          class="rounded-control border-finance-border bg-finance-canvas/40 hover:border-finance-border-strong hover:bg-finance-raised flex cursor-pointer items-start gap-3 border p-4"
+          [class.border-sky-400]="$draftDataSource() === source.id"
+          [class.bg-finance-accent-soft]="$draftDataSource() === source.id"
+        >
+          <input
+            class="mt-0.5"
+            [checked]="$draftDataSource() === source.id"
+            [value]="source.id"
+            (change)="selectSource($event)"
+            type="radio"
+            name="dataSource"
+          />
+          <span
+            ><span class="text-finance-text block text-sm font-medium">{{ source.display }}</span>
+            <span class="text-finance-muted mt-1 block text-xs leading-relaxed">{{
+              source.id === DataSource.Local
+                ? 'Work with this browser’s local storage and JSON files.'
+                : 'Connect to the self-hosted Expense Exchange API.'
+            }}</span>
+          </span>
+        </label>
+      }
+    </fieldset>
+
+    @if ($draftDataSource() === DataSource.RemoteApi) {
+      <div class="border-finance-border max-w-2xl border-t pt-5">
+        <app-form-field [$id]="'remoteApi'" [$label]="'Remote API server URL'">
+          <input
+            id="remoteApi"
+            [value]="$remoteApiUrl()"
+            (input)="updateApiUrl($event)"
+            placeholder="https://your-server.example"
+            type="url"
+          />
+        </app-form-field>
+        <p class="text-finance-muted mt-2 text-xs">
+          Enter the server address. Leave empty to use this app’s default API address.
+        </p>
+        @if ($selectionDirty()) {
+          @if ($draftApiHealth() === 'checking') {
+            <p class="text-finance-muted mt-2 flex items-center gap-2 text-sm" role="status">
+              <span class="size-2 animate-pulse rounded-full bg-amber-400"></span>
+              Checking API health…
+            </p>
+          } @else if ($draftApiHealth() === 'healthy') {
+            <p class="text-finance-positive mt-2 flex items-center gap-2 text-sm" role="status">
+              <span class="size-2 rounded-full bg-emerald-400"></span> API is reachable.
+            </p>
+          } @else if ($draftApiHealth() === 'unavailable') {
+            <p class="text-finance-negative mt-2 flex items-center gap-2 text-sm" role="alert">
+              <span class="size-2 rounded-full bg-rose-400"></span>
+              {{ $draftApiHealthError() ?? 'Unable to reach the selected API.' }}
+            </p>
+          }
+        } @else if (appService.$dataSource() === DataSource.RemoteApi) {
+          @if (!$authStatusReady()) {
+            <p class="text-finance-muted mt-2 flex items-center gap-2 text-sm" role="status">
+              <span class="size-2 animate-pulse rounded-full bg-amber-400"></span>
+              Checking API health…
+            </p>
+          } @else if ($apiHealthy()) {
+            <p class="text-finance-positive mt-2 flex items-center gap-2 text-sm" role="status">
+              <span class="size-2 rounded-full bg-emerald-400"></span> API is reachable.
+            </p>
+          } @else {
+            <p class="text-finance-negative mt-2 flex items-center gap-2 text-sm" role="alert">
+              <span class="size-2 rounded-full bg-rose-400"></span>
+              {{ $authError() ?? 'Unable to reach the selected API.' }}
+            </p>
+          }
+        }
+      </div>
+    } @else {
+      <div class="border-finance-border flex flex-col gap-3 border-t pt-5 sm:flex-row sm:items-end">
+        <div class="flex-1">
+          <label class="text-finance-muted mb-2 block text-sm" for="local-file"
+            >Load local data file</label
+          ><input
+            id="local-file"
+            (change)="importFile($event)"
+            type="file"
+            accept="application/json,.json"
+          />
+        </div>
+        <button class="btn-secondary" (click)="exportFile()" type="button">Save file</button>
+        <button class="btn-danger" (click)="clearLocalData()" type="button">
+          Clear local data
+        </button>
+      </div>
+    }
+    <div class="border-finance-border flex justify-end border-t pt-4">
+      <button class="btn-primary" (click)="saveSelection()" type="button">
+        Save data selection
+      </button>
+    </div>
+    @if ($message(); as message) {
+      <p class="text-finance-muted text-sm" role="status">{{ message }}</p>
+    }
+  </section>
+
+  @if (
+    appService.$dataSource() === DataSource.RemoteApi &&
+    $draftDataSource() === DataSource.RemoteApi &&
+    !$selectionDirty() &&
+    (!$authStatusReady() || !$apiHealthy() || $setupRequired())
+  ) {
+    <section
+      class="surface-card mx-auto mt-5 flex w-full flex-col gap-4 p-5 sm:p-6"
+      aria-labelledby="data-auth-heading"
+    >
+      @if (!$authStatusReady()) {
+        <h2 class="text-lg font-semibold" id="data-auth-heading">Connecting to API</h2>
+        <p class="text-finance-muted mt-1 text-sm">Checking server health and account setup…</p>
+      } @else if (!$apiHealthy()) {
+        <h2 class="text-lg font-semibold" id="data-auth-heading">API unavailable</h2>
+        <p class="text-finance-negative text-sm" role="alert">
+          {{ $authError() ?? 'The selected server did not respond to its health check.' }}
+        </p>
+        <button class="btn-secondary self-start" (click)="checkRemoteApiAgain()" type="button">
+          Check connection again
+        </button>
+      } @else if ($setupRequired()) {
+        <h2 class="text-lg font-semibold" id="data-auth-heading">Set up your administrator</h2>
+        <p class="text-finance-muted mt-1 mb-4 text-sm">
+          Create the first account for this server. Display name is optional.
+        </p>
+        <form
+          class="mx-auto grid w-full max-w-4xl grid-cols-1 gap-5 md:grid-cols-2"
+          (submit)="submitAdminSetup($event)"
+        >
+          <app-form-field [$id]="'admin-name'" [$label]="'Display name'"
+            ><input id="admin-name" [formField]="$authForm.name" autocomplete="name"
+          /></app-form-field>
+          <app-form-field [$id]="'admin-username'" [$label]="'Username'" [$required]="true"
+            ><input id="admin-username" [formField]="$authForm.username" autocomplete="username"
+          /></app-form-field>
+          <app-form-field [$id]="'admin-password'" [$label]="'Password'" [$required]="true"
+            ><input
+              id="admin-password"
+              [formField]="$authForm.password"
+              type="password"
+              autocomplete="new-password"
+          /></app-form-field>
+          @if ($authFormError(); as error) {
+            <p class="text-finance-negative text-sm md:col-span-2 md:row-start-3" role="alert">
+              {{ error }}
+            </p>
+          }
+          <button
+            class="btn-primary min-h-10 md:col-start-2 md:row-start-2 md:h-10 md:w-full md:self-end"
+            [disabled]="$authLoading()"
+            type="submit"
+          >
+            {{ $authLoading() ? 'Please wait…' : 'Create administrator' }}
+          </button>
+        </form>
+      }
+    </section>
+  }
+</app-page-layout>

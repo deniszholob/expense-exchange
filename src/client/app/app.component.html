@@ -1,36 +1,35 @@
-<app-header></app-header>
-
-<hr />
-
-<router-outlet></router-outlet>
-
-<!-- Spacer, expands to fill in the remaining space between elements above and below thus pushing footer down -->
-<div class="flex flex-1"></div>
-
-<hr />
-
-<footer class="bg-finance-surface">
-  <div class="container-fixed flex-row justify-between py-4">
-    <div class="">
-      Design by
-      <a class="link" target="_blank" rel="noopener" href="http://deniszholob.com/">Denis Zholob</a>
-    </div>
-    <span
-      class="group border-finance-border text-finance-muted hover:text-finance-text relative inline-flex cursor-help items-center rounded border px-2 py-1 text-sm outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
-      tabindex="0"
-      aria-describedby="app-build-tooltip"
+<div class="flex h-dvh min-h-0 flex-col overflow-hidden">
+  <app-header class="shrink-0"></app-header>
+  <main class="min-h-0 flex-1 overflow-y-auto py-8 sm:py-10">
+    <router-outlet></router-outlet>
+  </main>
+  <footer class="border-finance-border bg-finance-surface/80 shrink-0 border-t">
+    <div
+      class="mx-auto flex w-full max-w-screen-2xl items-center justify-between px-4 py-1 sm:px-6 lg:px-8"
     >
-      v{{ APP_BUILD_VERSION }}
-      <span
-        class="border-finance-border bg-finance-raised text-finance-text pointer-events-none invisible absolute right-0 bottom-full z-50 mb-2 w-max max-w-[calc(100vw-2rem)] rounded border px-3 py-2 text-left text-xs opacity-0 shadow-lg transition-opacity group-hover:visible group-hover:opacity-100 group-focus-visible:visible group-focus-visible:opacity-100"
-        id="app-build-tooltip"
-        role="tooltip"
-      >
-        <span class="block">Version {{ APP_BUILD_VERSION }}</span>
-        <span class="block whitespace-nowrap"
-          >Build date: {{ APP_BUILD_DATE | date: "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" : 'UTC' }}</span
+      <p class="text-finance-muted text-xs">
+        Made by
+        <a class="link" target="_blank" rel="noopener" href="https://deniszholob.com/"
+          >deniszholob.com</a
         >
+      </p>
+      <span
+        class="group rounded-control border-finance-border text-finance-muted hover:border-finance-border-strong hover:text-finance-text relative inline-flex cursor-help items-center border px-2 py-0.5 text-[0.65rem] font-medium transition-colors outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+        tabindex="0"
+        aria-describedby="app-build-tooltip"
+      >
+        v{{ APP_BUILD_VERSION }}
+        <span
+          class="rounded-control border-finance-border bg-finance-raised text-finance-text pointer-events-none invisible absolute right-0 bottom-full z-50 mb-2 w-max max-w-[calc(100vw-2rem)] border px-3 py-2 text-left text-xs opacity-0 shadow-xl transition-opacity group-hover:visible group-hover:opacity-100 group-focus-visible:visible group-focus-visible:opacity-100"
+          id="app-build-tooltip"
+          role="tooltip"
+        >
+          <span class="block">Version {{ APP_BUILD_VERSION }}</span>
+          <span class="block whitespace-nowrap"
+            >Build date: {{ APP_BUILD_DATE | date: "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" : 'UTC' }}</span
+          >
+        </span>
       </span>
-    </span>
-  </div>
-</footer>
+    </div>
+  </footer>
+</div>

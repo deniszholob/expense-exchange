@@ -1,5 +1,5 @@
 // #region Imports
-import { Directive, Input, TemplateRef } from '@angular/core';
+import { Directive, inject, input, TemplateRef } from '@angular/core';
 // #endregion
 
 // #region Implementation
@@ -36,7 +36,7 @@ import { Directive, Input, TemplateRef } from '@angular/core';
     <h1>MyImplicitContext Example</h1>
     <ng-template
       #MyImplicitContextTemplate="ngTemplateType"
-      [ngTemplateType]="MyImplicitContext"
+      [$ngTemplateType]="MyImplicitContext"
       let-value
     >
       {{ value }}
@@ -56,7 +56,7 @@ import { Directive, Input, TemplateRef } from '@angular/core';
     <h1>MyContext Example</h1>
     <ng-template
       #MyContextTemplate="ngTemplateType"
-      [ngTemplateType]="MyContext"
+      [$ngTemplateType]="MyContext"
       let-value
       let-myVar="myVar"
     >
@@ -79,10 +79,8 @@ import { Directive, Input, TemplateRef } from '@angular/core';
   standalone: true,
 })
 export class NgTemplateTypedDirective<T extends NgTemplateContext> {
-  @Input()
-  public ngTemplateType!: T;
-
-  public constructor(public template: TemplateRef<T>) {}
+  public readonly $ngTemplateType = input.required<T>();
+  public readonly template = inject(TemplateRef<T>);
 
   public static ngTemplateContextGuard<T extends NgTemplateContext>(
     directive: NgTemplateTypedDirective<T>,

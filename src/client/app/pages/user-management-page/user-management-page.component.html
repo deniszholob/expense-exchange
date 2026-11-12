@@ -1,0 +1,198 @@
+<app-page-layout>
+  @if (appService.$dataSource() === DataSource.Local) {
+    <section class="surface-card mx-auto flex w-full flex-col gap-5 p-5 sm:p-6">
+      <div>
+        <h2 class="text-lg font-semibold">Users</h2>
+        <p class="text-finance-muted mt-1 text-sm">
+          Manage the local people list. Add group members separately from the Group tab.
+        </p>
+      </div>
+      <form class="flex max-w-xl items-end gap-3" (submit)="addLocalUser($event)">
+        <app-form-field
+          class="min-w-0 flex-1"
+          [$id]="'local-user-name'"
+          [$label]="'Name'"
+          [$required]="true"
+          ><input id="local-user-name" [formField]="$localUserForm.name" autocomplete="off"
+        /></app-form-field>
+        <button class="btn-primary mb-0.5 shrink-0" type="submit">
+          <svg class="size-4" lucideUserRoundPlus aria-hidden="true"></svg>Add user
+        </button>
+      </form>
+      @if ($error(); as error) {
+        <p class="text-finance-negative text-sm" role="alert">{{ error }}</p>
+      }
+      @if ($localUsers().length === 0) {
+        <p class="text-finance-muted text-sm">
+          No users yet. Add a user to make them available for group membership.
+        </p>
+      } @else {
+        <ul class="divide-finance-border divide-y">
+          @for (user of $localUsers(); track user.id) {
+            <li class="flex items-center justify-between gap-3 py-3 first:pt-0 last:pb-0">
+              @if ($editingLocalId() === user.id) {
+                <form
+                  class="flex w-full flex-wrap items-end gap-3"
+                  (submit)="saveLocalUser(user.id, $event)"
+                >
+                  <app-form-field
+                    class="min-w-56 flex-1"
+                    [$id]="'edit-local-user-' + user.id"
+                    [$label]="'Name'"
+                    [$required]="true"
+                    ><input [id]="'edit-local-user-' + user.id" [formField]="$localUserForm.name"
+                  /></app-form-field>
+                  <button class="btn-primary" type="submit">Save</button
+                  ><button class="btn-secondary" (click)="cancelLocalEditing()" type="button">
+                    Cancel
+                  </button>
+                </form>
+              } @else {
+                <span class="font-medium">{{ user.name }}</span>
+                <div class="flex gap-2">
+                  <button
+                    class="btn-icon border-finance-border text-finance-muted hover:bg-finance-raised rounded-control border"
+                    [attr.aria-label]="'Edit ' + user.name"
+                    (click)="startEditingLocalUser(user.id, user.name)"
+                    type="button"
+                  >
+                    <svg class="size-4" lucidePencil aria-hidden="true"></svg>
+                  </button>
+                  <button
+                    class="btn-icon btn-danger"
+                    [attr.aria-label]="'Delete ' + user.name"
+                    (click)="deleteLocalUser(user.id)"
+                    type="button"
+                  >
+                    <svg class="size-4" lucideTrash2 aria-hidden="true"></svg>
+                  </button>
+                </div>
+              }
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  } @else {
+    <div
+      class="grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(18rem,0.7fr)_minmax(0,1.3fr)]"
+    >
+      <section
+        class="surface-card flex flex-col gap-4 p-5 sm:p-6"
+        aria-labelledby="add-account-heading"
+      >
+        <div>
+          <h2 class="text-lg font-semibold" id="add-account-heading">Create an account</h2>
+          <p class="text-finance-muted mt-1 text-sm">
+            Accounts can sign in and be added to the group separately.
+          </p>
+        </div>
+        <form class="flex flex-col gap-4" (submit)="addAccount($event)">
+          <app-form-field [$id]="'account-name'" [$label]="'Display name'"
+            ><input id="account-name" [formField]="$form.name" autocomplete="name"
+          /></app-form-field>
+          <app-form-field [$id]="'account-username'" [$label]="'Username'" [$required]="true"
+            ><input id="account-username" [formField]="$form.username" autocomplete="off"
+          /></app-form-field>
+          <app-form-field
+            [$id]="'account-password'"
+            [$label]="'Initial password'"
+            [$required]="true"
+            ><input
+              id="account-password"
+              [formField]="$form.password"
+              type="password"
+              autocomplete="new-password"
+          /></app-form-field>
+          @if ($accountFormError(); as error) {
+            <p class="text-finance-negative text-sm" role="alert">{{ error }}</p>
+          }
+          <button class="btn-primary" [disabled]="$accountSaving()" type="submit">
+            @if (!$accountSaving()) {
+              <svg class="size-4" lucideUserRoundPlus aria-hidden="true"></svg>
+            }
+            {{ $accountSaving() ? 'Creating account…' : 'Create account' }}
+          </button>
+        </form>
+      </section>
+      <section
+        class="surface-card flex flex-col gap-4 p-5 sm:p-6"
+        aria-labelledby="accounts-heading"
+      >
+        <h2 class="text-lg font-semibold" id="accounts-heading">Server accounts</h2>
+        @if ($error(); as error) {
+          <p class="text-finance-negative text-sm" role="alert">{{ error }}</p>
+        }
+        @if ($accounts().length === 0) {
+          <p class="text-finance-muted text-sm">No accounts are available.</p>
+        }
+        <ul class="divide-finance-border divide-y">
+          @for (account of $accounts(); track account.id) {
+            <li class="flex items-center justify-between gap-3 py-3 first:pt-0 last:pb-0">
+              @if ($editingId() === account.id) {
+                <form
+                  class="grid w-full gap-3 sm:grid-cols-2"
+                  (submit)="saveAccount(account.id, $event)"
+                >
+                  <app-form-field [$id]="'edit-name-' + account.id" [$label]="'Display name'"
+                    ><input [id]="'edit-name-' + account.id" [formField]="$editForm.name"
+                  /></app-form-field>
+                  <app-form-field
+                    [$id]="'edit-username-' + account.id"
+                    [$label]="'Username'"
+                    [$required]="true"
+                    ><input
+                      [id]="'edit-username-' + account.id"
+                      [formField]="$editForm.username"
+                      autocomplete="off"
+                  /></app-form-field>
+                  <app-form-field [$id]="'edit-password-' + account.id" [$label]="'New password'"
+                    ><input
+                      [id]="'edit-password-' + account.id"
+                      [formField]="$editForm.password"
+                      type="password"
+                      autocomplete="new-password"
+                      placeholder="Leave blank to keep current password"
+                  /></app-form-field>
+                  <div class="flex items-end gap-2">
+                    <button class="btn-primary" type="submit">Save account</button
+                    ><button class="btn-secondary" (click)="cancelEditing()" type="button">
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              } @else {
+                <div>
+                  <p class="font-medium">{{ account.name || account.username }}</p>
+                  <p class="text-finance-muted text-xs">
+                    {{ account.username }} · {{ account.role }}
+                  </p>
+                </div>
+                @if (account.role !== UserRole.Admin) {
+                  <div class="flex gap-2">
+                    <button
+                      class="btn-icon border-finance-border text-finance-muted hover:bg-finance-raised rounded-control border"
+                      [attr.aria-label]="'Edit account ' + account.username"
+                      (click)="startEditing(account)"
+                      type="button"
+                    >
+                      <svg class="size-4" lucidePencil aria-hidden="true"></svg>
+                    </button>
+                    <button
+                      class="btn-icon btn-danger"
+                      [attr.aria-label]="'Delete account ' + account.username"
+                      (click)="deleteAccount(account.id)"
+                      type="button"
+                    >
+                      <svg class="size-4" lucideTrash2 aria-hidden="true"></svg>
+                    </button>
+                  </div>
+                }
+              }
+            </li>
+          }
+        </ul>
+      </section>
+    </div>
+  }
+</app-page-layout>

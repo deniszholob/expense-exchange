@@ -1,117 +1,83 @@
-<div class="m-auto flex max-w-[600px] flex-col gap-4">
-  <form
-    class="border-finance-border bg-finance-surface rounded-xl border p-6 shadow-lg shadow-black/10 sm:p-8"
-    [formGroup]="formGroup"
-  >
-    <div class="flex flex-col gap-5">
-      <div class="grid w-full grid-cols-1 gap-5 sm:grid-cols-2">
-        <app-form-field
-          [formField]="{
-            id: 'name',
-            label: 'Name',
-            formControl: formGroup.get('name'),
-          }"
-        >
-          <input id="name" name="name" type="text" formControlName="name" />
-        </app-form-field>
-
-        <app-form-field
-          [formField]="{
-            id: 'amount',
-            label: 'Amount',
-            formControl: formGroup.get('amount'),
-          }"
-        >
-          <input id="amount" name="amount" type="number" formControlName="amount" />
-        </app-form-field>
-      </div>
-
-      <div class="grid w-full grid-cols-1 gap-5 sm:grid-cols-2">
-        <app-form-field
-          [formField]="{
-            id: 'datePaid',
-            label: 'Date Paid',
-            formControl: formGroup.get('datePaid'),
-          }"
-        >
-          <input id="datePaid" name="datePaid" type="date" formControlName="datePaid" />
-        </app-form-field>
-
-        <app-form-field
-          [formField]="{
-            id: 'forDate',
-            label: 'For Date',
-            formControl: formGroup.get('forDate'),
-          }"
-        >
-          <input id="forDate" name="forDate" type="date" formControlName="forDate" />
-        </app-form-field>
-      </div>
-
-      <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
-        <app-form-field
-          [formField]="{
-            id: 'paidByUserId',
-            label: 'Paid By',
-            formControl: formGroup.get('paidByUserId'),
-          }"
-        >
-          <select id="paidByUserId" name="paidByUserId" formControlName="paidByUserId">
-            @for (user of users(); track $index) {
-              <option [ngValue]="user.id">
-                {{ user.name }}
-              </option>
-            }
-          </select>
-        </app-form-field>
-
-        <app-form-field
-          [formField]="{
-            id: 'paidForUserIds',
-            label: 'Paid For',
-            formControl: formGroup.get('paidForUserIds'),
-          }"
-        >
-          <select
-            id="paidForUserIds"
-            [compareWith]="userComparatorBool"
-            size="3"
-            multiple
-            name="paidForUserIds"
-            formControlName="paidForUserIds"
+<div class="mx-auto w-full max-w-3xl">
+  <form class="surface-card flex flex-col gap-6 p-5 sm:p-7" (submit)="onSaveExpense($event)">
+    <div class="border-finance-border border-b pb-5">
+      <h2 class="text-xl font-semibold">
+        {{ expense()?.id ? 'Update expense' : 'Add an expense' }}
+      </h2>
+      <p class="text-finance-muted mt-1 text-sm">
+        Record the payment and choose who should share it.
+      </p>
+    </div>
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+      <app-form-field [$id]="'amount'" [$label]="'Amount (USD)'" [$required]="true">
+        <div class="relative">
+          <span
+            class="text-finance-muted pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-sm"
+            >$</span
           >
-            @for (user of users(); track $index) {
-              <option [ngValue]="user.id">
-                {{ user.name }}
-              </option>
-            }
-          </select>
-        </app-form-field>
-      </div>
-      <app-form-field
-        [formField]="{
-          id: 'description',
-          label: 'Description',
-          formControl: formGroup.get('description'),
-        }"
-      >
+          <input
+            class="pl-7 text-right font-medium tabular-nums"
+            id="amount"
+            [formField]="$form.amount"
+            type="number"
+            step="0.01"
+          />
+        </div>
+      </app-form-field>
+      <app-form-field [$id]="'name'" [$label]="'Expense name'" [$required]="true">
+        <input
+          id="name"
+          [formField]="$form.name"
+          type="text"
+          placeholder="e.g. Groceries"
+          autocomplete="off"
+        />
+      </app-form-field>
+      <app-form-field [$id]="'datePaid'" [$label]="'Date paid'" [$required]="true"
+        ><input id="datePaid" [formField]="$form.datePaid" type="date"
+      /></app-form-field>
+      <app-form-field [$id]="'forDate'" [$label]="'Expense date'" [$required]="true"
+        ><input id="forDate" [formField]="$form.forDate" type="date"
+      /></app-form-field>
+      <app-form-field [$id]="'paidByUserId'" [$label]="'Paid by'" [$required]="true">
+        <select id="paidByUserId" [formField]="$form.paidByUserId">
+          @for (user of groupMembers(); track user.id) {
+            <option [value]="user.id">{{ user.name }}</option>
+          }
+        </select>
+      </app-form-field>
+      <app-form-field [$id]="'paidForUserIds'" [$label]="'Shared with'" [$required]="true">
+        <app-group-member-multi-select
+          [$groupMembers]="groupMembers()"
+          [formField]="$form.paidForUserIds"
+        />
+        <span class="text-finance-muted text-xs"
+          >Use Ctrl or Command to select multiple people.</span
+        >
+      </app-form-field>
+      <app-form-field class="sm:col-span-2" [$id]="'description'" [$label]="'Note'">
         <textarea
           id="description"
-          name="description"
+          [formField]="$form.description"
           rows="3"
-          formControlName="description"
+          placeholder="Add a useful detail (optional)"
         ></textarea>
       </app-form-field>
     </div>
+    <div
+      class="border-finance-border flex flex-col-reverse gap-3 border-t pt-5 sm:flex-row sm:justify-end"
+    >
+      <button
+        class="rounded-control border-finance-border text-finance-muted hover:bg-finance-raised hover:text-finance-text border px-5"
+        (click)="onCancel()"
+        type="button"
+      >
+        Cancel
+      </button>
+      <button class="btn-primary sm:min-w-44" type="submit">
+        <svg class="size-4" lucideCheck aria-hidden="true"></svg
+        >{{ expense()?.id ? 'Save changes' : 'Add expense' }}
+      </button>
+    </div>
   </form>
-
-  <button class="btn-positive w-full" (click)="onSaveExpense()" type="button">
-    {{ expense()?.id ? 'Update Expense' : 'Add New Expense' }}
-  </button>
 </div>
-<!-- 
-<hr />
-
-<pre>
-  {{ this.formGroup.value | json }}
-</pre> -->

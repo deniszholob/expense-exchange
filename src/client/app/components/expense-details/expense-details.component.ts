@@ -2,26 +2,30 @@
 import { CommonModule } from '@angular/common';
 import {
   Component,
-  effect,
+  ChangeDetectionStrategy,
   input,
   InputSignal,
+  linkedSignal,
   output,
   OutputEmitterRef,
 } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormField,
+  form,
+  min,
+  minLength,
+  required,
+} from '@angular/forms/signals';
+import { LucideCheck } from '@lucide/angular';
 import {
   ExpenseDto,
-  UserDto,
+  GroupMemberDto,
 } from 'src/client/api/generated/expense-exchange-api.schemas';
-import { userComparatorBool } from 'src/client/app/shared/user.util';
-
 import { FormFieldComponent } from '../forms/form-field/form-field.component';
-import { multiSelectFieldValidator } from '../forms/validators/multi-select-field.validator';
-import { singleSelectFieldValidator } from '../forms/validators/single-select-field.validator';
+import { GroupMemberMultiSelectComponent } from '../group-member-multi-select/group-member-multi-select.component';
 // #endregion
 
-// #region Implementation
-
+// #region Constants
 const NEW_EXPENSE: ExpenseDto = {
   id: '',
   name: '',
@@ -32,98 +36,65 @@ const NEW_EXPENSE: ExpenseDto = {
   paidByUserId: '',
   paidForUserIds: [],
 };
+// #endregion
 
-const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
-
+// #region Component
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-expense-details',
   templateUrl: './expense-details.component.html',
-  // styles: [':host{display:contents}'], // Makes component host as if it was not there, can offer less css headaches. Use @HostBinding class approach for easier overrides.
-  // host: { class: 'contents' },
-  imports: [CommonModule, ReactiveFormsModule, FormFieldComponent],
+  imports: [
+    CommonModule,
+    FormField,
+    FormFieldComponent,
+    LucideCheck,
+    GroupMemberMultiSelectComponent,
+  ],
 })
 export class ExpenseDetailsComponent {
-  protected readonly userComparatorBool = userComparatorBool;
-
-  public readonly currentUser: InputSignal<UserDto | undefined> =
-    input<UserDto>();
-  public readonly users: InputSignal<UserDto[]> = input.required<UserDto[]>();
+  public readonly currentUser: InputSignal<GroupMemberDto | undefined> =
+    input<GroupMemberDto>();
+  public readonly groupMembers: InputSignal<GroupMemberDto[]> =
+    input.required<GroupMemberDto[]>();
   public readonly expense: InputSignal<ExpenseDto | undefined> =
     input<ExpenseDto>();
   public readonly save: OutputEmitterRef<ExpenseDto> = output<ExpenseDto>();
+  public readonly cancelRequested: OutputEmitterRef<void> = output<void>();
 
-  protected formGroup = this.formBuilder.group({
-    id: [''],
-    name: ['', [Validators.required, Validators.minLength(3)]],
-    description: [''],
-    amount: [0, [Validators.required, Validators.min(1)]],
-    datePaid: ['', [Validators.required, Validators.pattern(DATE_REGEX)]],
-    forDate: ['', [Validators.required, Validators.pattern(DATE_REGEX)]],
-    paidByUserId: ['', [Validators.required, Validators.minLength(1)]],
-    paidForUserIds: [
-      [] as string[],
-      [Validators.required, Validators.minLength(1)],
-    ],
+  private readonly $expenseData = linkedSignal(() => {
+    const groupMembers = this.groupMembers();
+    const expense = this.expense();
+    if (expense)
+      return { ...expense, paidForUserIds: [...expense.paidForUserIds] };
+    const date = new Date().toISOString().slice(0, 10);
+    return {
+      ...NEW_EXPENSE,
+      datePaid: date,
+      forDate: date,
+      paidByUserId: (this.currentUser() ?? groupMembers[0])?.id ?? '',
+      paidForUserIds: groupMembers.map((member) => member.id),
+    };
+  });
+  protected readonly $form = form(this.$expenseData, (path) => {
+    required(path.name);
+    minLength(path.name, 3);
+    required(path.amount);
+    min(path.amount, 0.01);
+    required(path.datePaid);
+    required(path.forDate);
+    required(path.paidByUserId);
+    required(path.paidForUserIds);
+    minLength(path.paidForUserIds, 1);
   });
 
-  public constructor(private formBuilder: FormBuilder) {
-    effect((): void => {
-      const users: UserDto[] = this.users();
-      const expense: ExpenseDto | undefined = this.expense();
-
-      let patchExpense: Partial<ExpenseDto> | undefined = expense;
-      if (!patchExpense) {
-        const date: string | undefined =
-          new Date(Date.now()).toISOString().split('T').at(0) ?? undefined;
-        patchExpense = {
-          ...NEW_EXPENSE,
-          id: undefined,
-          datePaid: date,
-          forDate: date,
-          paidByUserId: (this.currentUser() ?? users.at(0))?.id,
-          paidForUserIds: [...users.map((user: UserDto): string => user.id)],
-        };
-      }
-
-      this.formGroup = this.formBuilder.group({
-        id: [''],
-        name: ['', [Validators.required, Validators.minLength(3)]],
-        description: [''],
-        amount: [0, [Validators.required, Validators.min(1)]],
-        datePaid: ['', [Validators.required, Validators.pattern(DATE_REGEX)]],
-        forDate: ['', [Validators.required, Validators.pattern(DATE_REGEX)]],
-        paidByUserId: [
-          '',
-          [
-            Validators.required,
-            Validators.minLength(1),
-            singleSelectFieldValidator(this.users().map((user) => user.id)),
-          ],
-        ],
-        paidForUserIds: [
-          [] as string[],
-          [
-            Validators.required,
-            Validators.minLength(1),
-            multiSelectFieldValidator(this.users().map((user) => user.id)),
-          ],
-        ],
-      });
-
-      this.formGroup.patchValue(patchExpense);
-    });
+  protected onSaveExpense(event: Event): void {
+    event.preventDefault();
+    if (this.$form().invalid()) return;
+    this.save.emit(this.$expenseData());
   }
 
-  protected onSaveExpense(): void {
-    if (!this.formGroup.valid) {
-      console.warn('Invalid form data:', this.formGroup.value);
-      alert('Invalid form data');
-      return;
-    }
-
-    const expenseData: ExpenseDto = this.formGroup.value as ExpenseDto;
-    this.save.emit(expenseData);
+  protected onCancel(): void {
+    this.cancelRequested.emit();
   }
 }
-
 // #endregion

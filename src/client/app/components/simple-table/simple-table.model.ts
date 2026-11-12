@@ -1,7 +1,3 @@
-// #region Imports
-import { SafeHtml } from '@angular/platform-browser';
-// #endregion
-
 // #region Implementation
 
 export type SortDirection = 'asc' | 'desc' | undefined;
@@ -23,11 +19,13 @@ export interface RenderTableRow<TData> extends TableBaseData {
 
 export interface RenderTableCell<TData> extends ColDefBase<TData> {
   rawValue: TData[keyof TData];
-  cellValue: SafeHtml;
+  cellValue: string;
+  tooltip?: string;
 }
 
 export interface ColDef<TData> extends ColDefBase<TData> {
   cellFormatter?: CellFormatterFn<TData, keyof TData>;
+  tooltip?: (row: TData) => string;
 }
 
 export interface CellFormatterFn<

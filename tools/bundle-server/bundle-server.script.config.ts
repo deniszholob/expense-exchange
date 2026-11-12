@@ -1,7 +1,7 @@
 // #region Configuration
 export const BUNDLE_SERVER_SCRIPT_CONFIG = {
   outputDirectory: '.dist/server-bundle',
-  entryPoint: '.dist/server/main.js',
+  entryPoint: '.dist/server/server/main.js',
   externalPackages: [
     '@fastify/static',
     '@nestjs/microservices',

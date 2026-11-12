@@ -1,6 +1,6 @@
 // #region Imports
 import { CommonModule, DatePipe } from '@angular/common';
-import { Component, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
@@ -19,11 +19,13 @@ import {
   PageLayoutComponent,
 } from 'src/client/app/layout';
 import { AppService } from 'src/client/app/app.service';
+import { DataSource } from 'src/client/app/shared/data-source.enum';
 // #endregion
 
 // #region Implementation
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-expenses-page',
   templateUrl: './expenses-page.component.html',
   // styles: [':host{display:contents}'], // Makes component host as if it was not there, can offer less css headaches. Use @HostBinding class approach for easier overrides.
@@ -50,15 +52,36 @@ export class ExpensesPageComponent extends DetailsPageDirective {
     const id = this.$routeId();
     return id && id !== ROUTE_KEYWORDS.NEW_ITEM ? id : undefined;
   });
-  private readonly expenseResource = expenseControllerGetExpenseResource(
-    this.$resourceId,
+  private readonly $remoteResourceId = computed(() =>
+    this.appService.$dataSource() === DataSource.RemoteApi &&
+    this.appService.$currentUser()
+      ? this.$resourceId()
+      : undefined,
   );
-  protected readonly $expense = this.expenseResource.value;
+  private readonly expenseResource = expenseControllerGetExpenseResource(
+    this.$remoteResourceId,
+  );
+  protected readonly $expense = computed(() => {
+    if (this.appService.$dataSource() === DataSource.Local) {
+      const id = this.$resourceId();
+      return id
+        ? this.appService
+            .exportLocalStore()
+            .expenses.find((item) => item.id === id)
+        : undefined;
+    }
+    return this.expenseResource.value();
+  });
   protected readonly $pageState = computed(() => {
     const id = this.$routeId();
     if (!id) return DetailsPageState.NO_PARAMS;
     if (id === ROUTE_KEYWORDS.NEW_ITEM)
       return DetailsPageState.LOADED_PARAM_DATA;
+    if (this.appService.$dataSource() === DataSource.Local) {
+      return this.$expense()
+        ? DetailsPageState.LOADED_PARAM_DATA
+        : DetailsPageState.ERROR;
+    }
     if (this.expenseResource.error()) return DetailsPageState.ERROR;
     if (this.expenseResource.isLoading() || !this.expenseResource.hasValue()) {
       return DetailsPageState.LOADING;
@@ -85,6 +108,10 @@ export class ExpensesPageComponent extends DetailsPageDirective {
     });
   }
 
+  protected onCancelExpense(): void {
+    this.router.navigate(['..'], { relativeTo: this.activatedRoute });
+  }
+
   protected onEditExpense(expenseId: string): void {
     this.router.navigate([expenseId], { relativeTo: this.activatedRoute });
   }
@@ -102,6 +129,10 @@ export class ExpensesPageComponent extends DetailsPageDirective {
   }
 
   private deleteExpense(expenseId: string): void {
+    if (this.appService.$dataSource() === DataSource.Local) {
+      this.appService.removeLocalExpense(expenseId);
+      return;
+    }
     this.expenseApi
       .expenseControllerDeleteExpense<ExpenseDto>(expenseId)
       .subscribe({
@@ -115,6 +146,14 @@ export class ExpensesPageComponent extends DetailsPageDirective {
   }
 
   private saveNewExpense(expense: ExpenseDto): void {
+    if (this.appService.$dataSource() === DataSource.Local) {
+      this.appService.upsertLocalExpense({
+        ...expense,
+        id: crypto.randomUUID(),
+      });
+      this.router.navigate(['..'], { relativeTo: this.activatedRoute });
+      return;
+    }
     this.expenseApi
       .expenseControllerCreateExpense<ExpenseDto>(toCreateExpense(expense))
       .subscribe({
@@ -129,6 +168,11 @@ export class ExpensesPageComponent extends DetailsPageDirective {
   }
 
   private saveExistingExpense(expense: ExpenseDto): void {
+    if (this.appService.$dataSource() === DataSource.Local) {
+      this.appService.upsertLocalExpense(expense);
+      this.router.navigate(['..'], { relativeTo: this.activatedRoute });
+      return;
+    }
     this.expenseApi
       .expenseControllerUpdateExpense<ExpenseDto>(
         expense.id,

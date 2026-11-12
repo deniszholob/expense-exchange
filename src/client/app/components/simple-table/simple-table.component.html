@@ -1,60 +1,98 @@
-<div class="flex flex-col gap-2 overflow-x-auto">
-  <button class="btn-positive w-full" (click)="onAdd()">Add New</button>
+<div class="flex flex-col gap-4">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <h2 class="text-lg font-semibold">Expense ledger</h2>
+      <p class="text-finance-muted mt-1 text-sm">
+        {{ data().length }} recorded {{ data().length === 1 ? 'expense' : 'expenses' }}
+      </p>
+    </div>
+    <button class="btn-primary" (click)="onAdd()" type="button">
+      <svg class="size-4" lucidePlus aria-hidden="true"></svg> Add expense
+    </button>
+  </div>
 
-  <table class="table-finance min-w-[760px]">
-    <thead>
-      <tr>
-        <th class="w-32">Actions</th>
-        @for (column of columns(); track $index) {
-          <th>
-            @if (column.sortable) {
-              <button
-                class="text-finance-text flex items-center gap-1 font-semibold hover:text-sky-300 focus:outline-none"
-                (click)="sort(column)"
-              >
-                {{ column.label }}
-
-                @if (sortKey === column.key) {
-                  {{ sortDirection === 'asc' ? '↑' : '↓' }}
+  @if (data().length === 0) {
+    <div class="empty-state">
+      <span
+        class="bg-finance-accent-soft rounded-card grid size-12 place-items-center text-sky-300"
+      >
+        <svg class="size-5" lucideReceipt aria-hidden="true"></svg>
+      </span>
+      <h3 class="mt-2 font-semibold">No expenses recorded</h3>
+      <p class="text-finance-muted max-w-sm text-sm">
+        Add the first expense to start keeping a shared record of what was paid and for whom.
+      </p>
+      <button class="btn-primary mt-3" (click)="onAdd()" type="button">
+        <svg class="size-4" lucidePlus aria-hidden="true"></svg> Add your first expense
+      </button>
+    </div>
+  } @else {
+    <div class="surface-card overflow-x-auto">
+      <table class="table-finance w-full min-w-[760px] table-fixed">
+        <thead>
+          <tr>
+            @for (column of columns(); track $index) {
+              <th [class.text-right]="column.key === 'amount'">
+                @if (column.sortable) {
+                  <button
+                    class="text-finance-muted hover:text-finance-text -ml-3 text-xs font-semibold tracking-wide uppercase"
+                    (click)="sort(column)"
+                    type="button"
+                  >
+                    {{ column.label }}
+                    @if (sortKey === column.key) {
+                      <span class="text-sky-300">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
+                    }
+                  </button>
+                } @else {
+                  <span>{{ column.label }}</span>
                 }
-              </button>
-            } @else {
-              <span>{{ column.label }}</span>
+              </th>
             }
-          </th>
-        }
-      </tr>
-    </thead>
-    <tbody>
-      @for (row of renderTable(); track $index; let i = $index) {
-        <tr>
-          <td>
-            <div class="flex flex-row gap-2">
-              <button
-                class="btn-warning p-2"
-                [attr.aria-label]="'Edit row ' + (i + 1)"
-                (click)="onEdit(i, row)"
-              >
-                <svg class="size-4" lucidePencil aria-hidden="true"></svg>
-              </button>
-
-              <button
-                class="btn-danger p-2"
-                [attr.aria-label]="'Delete row ' + (i + 1)"
-                (click)="onDelete(i, row)"
-              >
-                <svg class="size-4" lucideTrash aria-hidden="true"></svg>
-              </button>
-            </div>
-          </td>
-
-          @for (cell of row.cells; track $index) {
-            <td>
-              <div [innerHTML]="cell.cellValue"></div>
-            </td>
+            <th class="w-28 text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of renderTable(); track row.id; let i = $index) {
+            <tr>
+              @for (cell of row.cells; track $index) {
+                <td
+                  class="whitespace-nowrap"
+                  [attr.title]="cell.tooltip || null"
+                  [class.text-right]="cell.key === 'amount'"
+                  [class.text-finance-negative]="cell.key === 'amount'"
+                  [class.font-semibold]="cell.key === 'amount'"
+                  [class.tabular-nums]="
+                    cell.key === 'amount' || cell.key === 'forDate' || cell.key === 'datePaid'
+                  "
+                >
+                  <div>{{ cell.cellValue }}</div>
+                </td>
+              }
+              <td>
+                <div class="flex justify-end gap-1">
+                  <button
+                    class="btn-icon rounded-control text-finance-muted hover:bg-finance-raised hover:text-sky-300"
+                    [attr.aria-label]="'Edit row ' + (i + 1)"
+                    (click)="onEdit(i, row)"
+                    type="button"
+                  >
+                    <svg class="size-4" lucidePencil aria-hidden="true"></svg>
+                  </button>
+                  <button
+                    class="btn-icon rounded-control text-finance-muted hover:bg-rose-500/10 hover:text-rose-300"
+                    [attr.aria-label]="'Delete row ' + (i + 1)"
+                    (click)="onDelete(i, row)"
+                    type="button"
+                  >
+                    <svg class="size-4" lucideTrash aria-hidden="true"></svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
           }
-        </tr>
-      }
-    </tbody>
-  </table>
+        </tbody>
+      </table>
+    </div>
+  }
 </div>

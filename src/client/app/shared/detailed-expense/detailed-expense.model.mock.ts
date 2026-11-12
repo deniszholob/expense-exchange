@@ -1,15 +1,18 @@
 // import { faker } from '@faker-js/faker';
 
 import { MOCK_Expense } from 'src/client/app/expense-api.mock';
-import { MOCK_User, MOCK_User_Array } from 'src/client/app/expense-api.mock';
+import {
+  MOCK_GroupMember,
+  MOCK_GroupMembers,
+} from 'src/client/app/expense-api.mock';
 
 import { DetailedExpense } from './detailed-expense.model';
 
 // ===== Simple Mock ====== //
 export const MOCK_DetailedExpense: DetailedExpense = {
   ...MOCK_Expense,
-  paidByUser: MOCK_User,
-  paidForUsers: MOCK_User_Array,
+  paidByUser: MOCK_GroupMember,
+  paidForUsers: MOCK_GroupMembers,
 };
 
 export const MOCK_DetailedExpense_Array: DetailedExpense[] = [

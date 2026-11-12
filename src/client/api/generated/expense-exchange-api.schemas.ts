@@ -26,11 +26,80 @@ export interface CreateExpenseDto {
   paidForUserIds: string[];
 }
 
-export interface UserDto {
+export interface GroupMemberDto {
   id: string;
   name: string;
+  username?: string;
 }
 
-export interface CreateUserDto {
+export interface AddGroupMemberDto {
+  accountId: string;
+}
+
+export interface AuthStatusDto {
+  setupRequired: boolean;
+}
+
+export type LoginAccountDtoRole =
+  (typeof LoginAccountDtoRole)[keyof typeof LoginAccountDtoRole];
+
+export const LoginAccountDtoRole = {
+  Admin: 'Admin',
+  User: 'User',
+} as const;
+
+export interface LoginAccountDto {
+  username: string;
+  role: LoginAccountDtoRole;
+}
+
+export type AuthUserDtoRole =
+  (typeof AuthUserDtoRole)[keyof typeof AuthUserDtoRole];
+
+export const AuthUserDtoRole = {
+  Admin: 'Admin',
+  User: 'User',
+} as const;
+
+export interface AuthUserDto {
+  id: string;
   name: string;
+  username: string;
+  role: AuthUserDtoRole;
+}
+
+export interface CreateAuthAccountDto {
+  username: string;
+  password: string;
+  name?: string;
+}
+
+export interface UpdateAuthAccountDto {
+  name?: string;
+  username?: string;
+  password?: string;
+}
+
+export interface AdminSetupDto {
+  username: string;
+  password: string;
+  name?: string;
+}
+
+export interface AuthResponseDto {
+  user: AuthUserDto;
+}
+
+export interface CredentialsDto {
+  username: string;
+  password: string;
+}
+
+export interface LogoutResponseDto {
+  success: boolean;
+}
+
+export interface ProfileUpdateDto {
+  username: string;
+  password?: string;
 }

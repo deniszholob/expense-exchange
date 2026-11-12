@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 import {
   NgTemplateContext,
@@ -16,12 +16,13 @@ interface MyContext extends NgTemplateContext {
 type MyImplicitContext = NgTemplateContextImplicit<string>;
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-template-type-example',
   template: `
     <h1>MyImplicitContext Example</h1>
     <ng-template
       #MyImplicitContextTemplate="ngTemplateType"
-      [ngTemplateType]="MyImplicitContext"
+      [$ngTemplateType]="MyImplicitContext"
       let-value
     >
       {{ value }}
@@ -38,7 +39,7 @@ type MyImplicitContext = NgTemplateContextImplicit<string>;
     <h1>MyContext Example</h1>
     <ng-template
       #MyContextTemplate="ngTemplateType"
-      [ngTemplateType]="MyContext"
+      [$ngTemplateType]="MyContext"
       let-value
       let-myVar="myVar"
     >
@@ -54,7 +55,6 @@ type MyImplicitContext = NgTemplateContextImplicit<string>;
     >
     </ng-container>
   `,
-  standalone: true,
   styles: [':host{display:contents}'],
   imports: [CommonModule, NgTemplateTypedDirective],
 })

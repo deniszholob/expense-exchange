@@ -1,16 +1,17 @@
 import { isDevMode } from '@angular/core';
-import { Route } from '@angular/router';
+import type { RedirectFunction, Route } from '@angular/router';
 
 import { PAGE_ROUTES, ROUTE_KEYWORDS } from './app.info';
+import { AdminGuard } from './guards/admin.guard';
 import { AuthGuard } from './guards/auth.guard';
-import {
-  DashboardPageComponent,
-  ExpensesPageComponent,
-  SettingsPageComponent,
-  UsersPageComponent,
-} from './pages';
+import { UserGuard } from './guards/user.guard';
+import { readLastPageUrl } from './shared/last-page';
 
 const DEV_ROUTE: Route[] = [];
+const redirectToLastPage: RedirectFunction = () => {
+  const lastPage = readLastPageUrl();
+  return lastPage ?? `/${PAGE_ROUTES.CONNECTION_PAGE_ROOT}`;
+};
 // https://angular.dev/api/core/isDevMode?tab=description
 if (isDevMode()) {
   DEV_ROUTE.push({
@@ -23,27 +24,80 @@ if (isDevMode()) {
 }
 
 export const appRoutes: Route[] = [
-  { path: '', redirectTo: PAGE_ROUTES.DASHBOARD_PAGE_ROOT, pathMatch: 'full' },
+  { path: '', redirectTo: redirectToLastPage, pathMatch: 'full' },
   // { path: HOME_PAGE_ROOT, component: ViewPages.HomePageComponent },
   // { path: 'home', redirectTo: HOME_PAGE_ROOT, pathMatch: 'full' },
   // ======================================================================== //
-  { path: PAGE_ROUTES.SETTINGS_PAGE_ROOT, component: SettingsPageComponent },
   {
-    path: PAGE_ROUTES.DASHBOARD_PAGE_ROOT,
-    component: DashboardPageComponent,
+    path: PAGE_ROUTES.LOGIN_PAGE_ROOT,
+    loadComponent: () =>
+      import('./pages/login-page/login-page.component').then(
+        (module) => module.LoginPageComponent,
+      ),
+  },
+  {
+    path: PAGE_ROUTES.PROFILE_PAGE_ROOT,
+    loadComponent: () =>
+      import('./pages/profile-page/profile-page.component').then(
+        (module) => module.ProfilePageComponent,
+      ),
     canActivate: [AuthGuard],
   },
-  { path: PAGE_ROUTES.USERS_PAGE_ROOT, component: UsersPageComponent },
+  {
+    path: PAGE_ROUTES.CONNECTION_PAGE_ROOT,
+    loadComponent: () =>
+      import('./pages/connection-page/connection-page.component').then(
+        (module) => module.ConnectionPageComponent,
+      ),
+  },
+  {
+    path: PAGE_ROUTES.SETTINGS_PAGE_ROOT,
+    redirectTo: PAGE_ROUTES.CONNECTION_PAGE_ROOT,
+    pathMatch: 'full',
+  },
+  {
+    path: PAGE_ROUTES.DASHBOARD_PAGE_ROOT,
+    loadComponent: () =>
+      import('./pages/dashboard-page/dashboard-page.component').then(
+        (module) => module.DashboardPageComponent,
+      ),
+    canActivate: [AuthGuard, UserGuard],
+  },
+  {
+    path: PAGE_ROUTES.GROUP_PAGE_ROOT,
+    loadComponent: () =>
+      import('./pages/group-page/group-page.component').then(
+        (module) => module.GroupPageComponent,
+      ),
+    canActivate: [AuthGuard, UserGuard],
+  },
+  {
+    path: PAGE_ROUTES.USER_MANAGEMENT_PAGE_ROOT,
+    loadComponent: () =>
+      import('./pages/user-management-page/user-management-page.component').then(
+        (module) => module.UserManagementPageComponent,
+      ),
+    canActivate: [AuthGuard, AdminGuard],
+  },
   {
     path: PAGE_ROUTES.EXPENSES_PAGE_ROOT,
     children: [
-      { path: ROUTE_KEYWORDS.ROOT, component: ExpensesPageComponent },
+      {
+        path: ROUTE_KEYWORDS.ROOT,
+        loadComponent: () =>
+          import('./pages/expenses-page/expenses-page.component').then(
+            (module) => module.ExpensesPageComponent,
+          ),
+      },
       {
         path: ROUTE_KEYWORDS.DETAIL_ITEM,
-        component: ExpensesPageComponent,
+        loadComponent: () =>
+          import('./pages/expenses-page/expenses-page.component').then(
+            (module) => module.ExpensesPageComponent,
+          ),
       },
     ],
-    canActivate: [AuthGuard],
+    canActivate: [AuthGuard, UserGuard],
   },
   ...DEV_ROUTE,
   // ======================================================================== //

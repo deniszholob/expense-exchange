@@ -1,15 +1,12 @@
 <div class="flex w-full flex-col gap-2">
-  <label class="text-finance-muted text-sm font-medium" [for]="formField().id">{{
-    formField().label
-  }}</label>
-  <ng-content></ng-content>
-  <div class="text-sm text-rose-300">
-    @let errors = formField().formControl?.errors;
-
-    @if (errors) {
-      @for (error of errors | keyvalue; track $index) {
-        <div>{{ error.key }}: {{ error.value | json }}</div>
-      }
+  <label class="text-finance-text text-sm font-medium" [for]="$id()">
+    {{ $label() }}
+    @if ($required()) {
+      <span class="text-finance-negative" aria-hidden="true">*</span>
     }
-  </div>
+    @if ($required()) {
+      <span class="sr-only"> (required)</span>
+    }
+  </label>
+  <ng-content></ng-content>
 </div>

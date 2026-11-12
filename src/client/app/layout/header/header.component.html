@@ -1,41 +1,84 @@
-<div class="bg-finance-canvas">
-  <header class="container-fixed gap-01">
-    <div class="flex flex-row items-baseline justify-between">
-      <h1 class="pt-4 text-2xl">Expense Exchange</h1>
+<header
+  class="border-finance-border bg-finance-canvas/90 border-b shadow-lg shadow-black/10 backdrop-blur-xl"
+>
+  <div class="container-fixed gap-0 py-2 sm:py-3">
+    <div class="flex min-h-10 items-center gap-2">
+      <a
+        class="text-finance-text flex shrink-0 items-center no-underline"
+        [routerLink]="['/', PAGE_ROUTES.CONNECTION_PAGE_ROOT]"
+        aria-label="Expense Exchange home"
+      >
+        <img
+          class="rounded-control size-9 object-cover"
+          ngSrc="/assets/expense-exchange-icon.png"
+          width="36"
+          height="36"
+          alt=""
+        />
+      </a>
 
-      <div>
-        @if (appService.$currentUser(); as currentUser) {
-          <ul>
-            <li>
-              <a
-                class="link text-lg no-underline"
-                [routerLink]="['/', PAGE_ROUTES.SETTINGS_PAGE_ROOT]"
-              >
-                {{ currentUser.name }}
-              </a>
-            </li>
-          </ul>
-        } @else {
-          <a class="link text-lg no-underline" [routerLink]="['/', PAGE_ROUTES.SETTINGS_PAGE_ROOT]">
-            Login
+      <nav class="flex min-w-0 flex-1 flex-wrap items-center gap-1" aria-label="Main navigation">
+        @for (link of $links(); track link.id) {
+          <a
+            class="rounded-control text-finance-muted hover:bg-finance-raised hover:text-finance-text inline-flex items-center gap-2 px-3 py-2 text-sm font-medium no-underline transition-colors"
+            [class.ml-auto]="link.id === 'data'"
+            routerLink="/{{ link.id }}"
+            routerLinkActive="bg-finance-accent-soft text-sky-300"
+          >
+            @switch (link.id) {
+              @case ('dash') {
+                <svg class="size-4" lucideChartNoAxesCombined aria-hidden="true"></svg>
+              }
+              @case ('expenses') {
+                <svg class="size-4" lucideReceipt aria-hidden="true"></svg>
+              }
+              @case ('users') {
+                <svg class="size-4" lucideUsersRound aria-hidden="true"></svg>
+              }
+              @case ('group') {
+                <svg class="size-4" lucideUsersRound aria-hidden="true"></svg>
+              }
+              @case ('data') {
+                <svg class="size-4" lucideDatabase aria-hidden="true"></svg>
+              }
+              @case ('dev') {
+                <svg class="size-4" lucideCode2 aria-hidden="true"></svg>
+              }
+            }
+            {{ link.displayAs }}
+            @if (link.note) {
+              <small> ({{ link.note }})</small>
+            }
           </a>
         }
-      </div>
-    </div>
+      </nav>
 
-    <nav class="flex flex-row flex-wrap items-end">
-      @for (link of $links(); track link.id) {
+      @if (appService.$currentUser(); as currentUser) {
         <a
-          class="link border border-b-2 border-transparent px-2 py-1 text-lg no-underline hover:border-b-blue-500"
-          routerLink="/{{ link.id }}"
-          routerLinkActive="font-bold text-blue-500"
+          class="rounded-control border-finance-border bg-finance-surface text-finance-text hover:border-finance-border-strong hover:bg-finance-raised inline-flex shrink-0 items-center gap-2 border px-2 py-1.5 text-sm font-medium no-underline transition-colors"
+          [routerLink]="['/', PAGE_ROUTES.PROFILE_PAGE_ROOT]"
+          [attr.aria-label]="'Profile: ' + currentUser.name"
         >
-          {{ link.displayAs }}
-          @if (link.note) {
-            <small> ({{ link.note }})</small>
-          }
+          <span
+            class="profile-monogram"
+            [class.profile-monogram-admin]="currentUser.role === UserRole.Admin"
+            >{{ currentUser.name | userMonogram }}</span
+          >
+          <span class="hidden sm:inline">{{ currentUser.name }}</span>
+        </a>
+      } @else if (
+        appService.$dataSource() === DataSource.RemoteApi &&
+        appService.$authStatusReady() &&
+        appService.$apiHealthy() &&
+        !appService.$authSetupRequired()
+      ) {
+        <a
+          class="rounded-control inline-flex min-h-10 shrink-0 items-center justify-center bg-sky-600 px-4 py-2 text-sm font-semibold text-white no-underline transition-colors hover:bg-sky-500"
+          routerLink="/login"
+        >
+          Sign in
         </a>
       }
-    </nav>
-  </header>
-</div>
+    </div>
+  </div>
+</header>

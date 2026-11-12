@@ -1,5 +1,87 @@
-<app-page-layout [title]="'Dashboard'">
-  <div class="container-fixed">
-    <pre>dash </pre>
+<app-page-layout>
+  <div class="flex flex-col gap-6">
+    <div
+      class="rounded-card from-finance-accent-soft to-finance-surface flex flex-wrap items-center justify-between gap-4 border border-sky-400/15 bg-gradient-to-r p-5 sm:p-7"
+    >
+      <div>
+        <h2 class="text-xl font-semibold tracking-tight sm:text-2xl">
+          A clearer view of shared spending.
+        </h2>
+        <p class="text-finance-muted mt-2 text-sm">
+          Track expenses and keep everyone on the same page.
+        </p>
+      </div>
+      <a
+        class="btn-primary inline-flex min-h-10 items-center justify-center gap-2 px-4 py-2 text-sm no-underline"
+        routerLink="/expenses/new"
+      >
+        <svg class="size-4" lucidePlus aria-hidden="true"></svg> Add expense
+      </a>
+    </div>
+
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <article class="stat-card">
+        <span class="eyebrow">TRACKED SPENDING</span>
+        <strong class="text-finance-negative text-3xl font-semibold tracking-tight tabular-nums">{{
+          $trackedSpending() | currency
+        }}</strong>
+        <span class="text-finance-muted text-xs">Across all recorded expenses</span>
+      </article>
+      <article class="stat-card">
+        <span class="eyebrow">EXPENSES</span>
+        <strong class="text-3xl font-semibold tracking-tight tabular-nums">{{
+          $expenseCount()
+        }}</strong>
+        <span class="text-finance-muted text-xs">Transactions in your ledger</span>
+      </article>
+      <article class="stat-card">
+        <span class="eyebrow">PEOPLE</span>
+        <strong class="text-3xl font-semibold tracking-tight tabular-nums">{{
+          $groupMembers().length
+        }}</strong>
+        <span class="text-finance-muted text-xs">Profiles sharing expenses</span>
+      </article>
+    </div>
+
+    <section class="surface-card overflow-hidden">
+      <div
+        class="border-finance-border flex items-center justify-between gap-4 border-b px-5 py-4 sm:px-6"
+      >
+        <div>
+          <h2 class="font-semibold">Recent activity</h2>
+          <p class="text-finance-muted mt-1 text-xs">The latest expenses added to your ledger</p>
+        </div>
+        <a class="link text-sm no-underline" routerLink="/expenses">View all</a>
+      </div>
+      @if ($recentExpenses().length === 0) {
+        <div class="text-finance-muted px-5 py-10 text-center text-sm">
+          Your recent expenses will appear here.
+        </div>
+      } @else {
+        <ul class="divide-finance-border divide-y">
+          @for (expense of $recentExpenses(); track expense.id) {
+            <li class="flex flex-wrap items-center justify-between gap-3 px-5 py-4 sm:px-6">
+              <div class="flex min-w-0 items-center gap-3">
+                <span
+                  class="bg-finance-raised rounded-card grid size-10 shrink-0 place-items-center text-sky-300"
+                >
+                  <svg class="size-4" lucideReceipt aria-hidden="true"></svg>
+                </span>
+                <div class="min-w-0">
+                  <p class="truncate text-sm font-medium">{{ expense.name }}</p>
+                  <p class="text-finance-muted mt-1 text-xs">
+                    Paid by {{ expense.paidByUser.name }} ·
+                    {{ expense.datePaid | date: 'mediumDate' }}
+                  </p>
+                </div>
+              </div>
+              <strong class="text-finance-negative text-sm font-semibold tabular-nums">{{
+                -expense.amount | currency
+              }}</strong>
+            </li>
+          }
+        </ul>
+      }
+    </section>
   </div>
 </app-page-layout>

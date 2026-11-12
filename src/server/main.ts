@@ -1,5 +1,5 @@
 // #region Imports
-import { Logger } from '@nestjs/common';
+import { ForbiddenException, Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -13,6 +13,43 @@ import { AppModule } from './app.module.js';
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.setGlobalPrefix('api');
+  const configuredCorsOrigins = process.env['CORS_ORIGINS'];
+  const corsOrigins =
+    configuredCorsOrigins === undefined
+      ? ['http://localhost:4242', 'http://127.0.0.1:4242']
+      : configuredCorsOrigins
+          .split(',')
+          .map((origin) => origin.trim())
+          .filter((origin) => origin.length > 0);
+  if (corsOrigins.length > 0)
+    app.enableCors({ origin: corsOrigins, credentials: true });
+  app.use((request: Request, _response: Response, next: NextFunction): void => {
+    const isMutation = ['POST', 'PUT', 'PATCH', 'DELETE'].includes(
+      request.method,
+    );
+    const fetchSite = request.headers['sec-fetch-site'];
+    const origin = request.headers.origin;
+    let sameHostOrigin = false;
+    if (origin) {
+      try {
+        sameHostOrigin = new URL(origin).hostname === request.hostname;
+      } catch {
+        sameHostOrigin = false;
+      }
+    }
+    const untrustedOrigin =
+      Boolean(origin) && !sameHostOrigin && !corsOrigins.includes(origin ?? '');
+    if (
+      isMutation &&
+      request.originalUrl.startsWith('/api/') &&
+      (untrustedOrigin ||
+        (fetchSite === 'cross-site' && !corsOrigins.includes(origin ?? '')))
+    ) {
+      next(new ForbiddenException('Request origin is not allowed'));
+      return;
+    }
+    next();
+  });
   const distributionDirectory = process.env['DIST_DIR'] ?? '.dist';
   const clientDirectory = resolve(distributionDirectory, 'client/browser');
   app.useStaticAssets(clientDirectory);

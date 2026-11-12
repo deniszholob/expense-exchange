@@ -9,7 +9,10 @@ import {
 } from '@nestjs/common';
 import { z } from 'zod';
 import type { CreateExpenseDto, ExpenseDto } from './expense.dto.js';
-import type { CreateUserDto, UserDto } from '../users/user.dto.js';
+import type {
+  GroupMemberDto,
+  GroupMemberProfileDto,
+} from '../groups/group-member.dto.js';
 import { INITIAL_EXPENSE_STORE } from './expense.seed.js';
 // #endregion
 
@@ -35,13 +38,16 @@ const StoreSchema = z.object({
 export type ExpenseStore = z.infer<typeof StoreSchema>;
 
 export abstract class ExpenseRepository {
-  public abstract getUsers(): Promise<UserDto[]>;
-  public abstract createUser(input: CreateUserDto): Promise<UserDto>;
-  public abstract updateUser(
+  public abstract getGroupMembers(): Promise<GroupMemberDto[]>;
+  public abstract createGroupMember(
+    input: GroupMemberProfileDto,
+    id?: string,
+  ): Promise<GroupMemberDto>;
+  public abstract updateGroupMember(
     id: string,
-    input: CreateUserDto,
-  ): Promise<UserDto>;
-  public abstract deleteUser(id: string): Promise<UserDto>;
+    input: GroupMemberProfileDto,
+  ): Promise<GroupMemberDto>;
+  public abstract deleteGroupMember(id: string): Promise<GroupMemberDto>;
   public abstract getExpenses(): Promise<ExpenseDto[]>;
   public abstract getExpense(id: string): Promise<ExpenseDto>;
   public abstract createExpense(input: CreateExpenseDto): Promise<ExpenseDto>;
@@ -60,29 +66,35 @@ export class JsonExpenseRepository extends ExpenseRepository {
   private readonly dataFile = join(this.dataDirectory, 'expenses.json');
   private writeQueue: Promise<void> = Promise.resolve();
 
-  public async getUsers(): Promise<UserDto[]> {
+  public async getGroupMembers(): Promise<GroupMemberDto[]> {
     return (await this.readStore()).users;
   }
 
-  public async createUser(input: CreateUserDto): Promise<UserDto> {
+  public async createGroupMember(
+    input: GroupMemberProfileDto,
+    id?: string,
+  ): Promise<GroupMemberDto> {
     return this.updateStore((store) => {
-      const user: UserDto = { ...input, id: randomUUID() };
+      const user: GroupMemberDto = { ...input, id: id ?? randomUUID() };
       store.users.push(user);
       return user;
     });
   }
 
-  public async updateUser(id: string, input: CreateUserDto): Promise<UserDto> {
+  public async updateGroupMember(
+    id: string,
+    input: GroupMemberProfileDto,
+  ): Promise<GroupMemberDto> {
     return this.updateStore((store) => {
       const index = store.users.findIndex((item) => item.id === id);
       if (index < 0) throw new NotFoundException('User not found');
-      const user: UserDto = { ...input, id };
+      const user: GroupMemberDto = { ...input, id };
       store.users[index] = user;
       return user;
     });
   }
 
-  public async deleteUser(id: string): Promise<UserDto> {
+  public async deleteGroupMember(id: string): Promise<GroupMemberDto> {
     return this.updateStore((store) => {
       const index = store.users.findIndex((item) => item.id === id);
       if (index < 0) throw new NotFoundException('User not found');

@@ -4,7 +4,7 @@ import { Meta, StoryObj } from '@storybook/angular';
 
 import { ExpenseDetailsComponent } from './expense-details.component';
 import { MOCK_Expense } from 'src/client/app/expense-api.mock';
-import { MOCK_User_Array } from 'src/client/app/expense-api.mock';
+import { MOCK_GroupMembers } from 'src/client/app/expense-api.mock';
 // #endregion
 
 // #region Implementation
@@ -30,7 +30,7 @@ const meta: Meta<ComponentWithCustomControls> = {
     // someControl: { control: { disable: true } }
   },
   args: {
-    users: MOCK_User_Array,
+    groupMembers: MOCK_GroupMembers,
     expense: MOCK_Expense,
   },
 };

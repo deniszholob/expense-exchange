@@ -1,0 +1,85 @@
+<app-page-layout>
+  <section class="surface-card flex flex-col gap-5 p-5 sm:p-6" aria-labelledby="group-heading">
+    <div class="flex items-center justify-between gap-3">
+      <h2 class="text-lg font-semibold" id="group-heading">Group members</h2>
+      <span
+        class="border-finance-border bg-finance-raised text-finance-muted rounded-full border px-3 py-1 text-xs font-medium"
+        >{{ $groupMembers().length }}</span
+      >
+    </div>
+
+    <div class="border-finance-border border-b pb-5">
+      <form class="flex flex-col items-end gap-3 sm:flex-row" (submit)="addMember($event)">
+        <div class="w-full min-w-0 flex-1">
+          <app-form-field
+            [$id]="'group-member-account'"
+            [$label]="'Add a group member'"
+            [$required]="true"
+          >
+            <select id="group-member-account" [formField]="$form.accountId">
+              @if (appService.$dataSource() === DataSource.Local) {
+                <option value="">Select a user</option>
+                @for (user of $availableLocalUsers(); track user.id) {
+                  <option [value]="user.id">{{ user.name }}</option>
+                }
+              } @else {
+                <option value="">Select an account</option>
+                @for (account of $availableAccounts(); track account.id) {
+                  <option [value]="account.id">{{ account.name }} ({{ account.username }})</option>
+                }
+              }
+            </select>
+          </app-form-field>
+        </div>
+        <button
+          class="btn-primary w-full sm:w-auto"
+          [disabled]="
+            appService.$dataSource() === DataSource.Local
+              ? $availableLocalUsers().length === 0
+              : $availableAccounts().length === 0
+          "
+          type="submit"
+        >
+          Add to group
+        </button>
+      </form>
+    </div>
+
+    @if ($error(); as error) {
+      <p class="text-finance-negative text-sm" role="alert">{{ error }}</p>
+    }
+    @if ($groupMemberRows().length === 0) {
+      <div class="empty-state border-dashed shadow-none">
+        <svg class="text-finance-muted size-6" lucideUsersRound aria-hidden="true"></svg>
+        <p class="font-medium">No group members yet</p>
+        <p class="text-finance-muted text-sm">Add people to start recording shared expenses.</p>
+      </div>
+    } @else {
+      <ul class="divide-finance-border divide-y">
+        @for (member of $groupMemberRows(); track member.id) {
+          <li class="flex items-center justify-between gap-3 py-3 first:pt-0 last:pb-0">
+            <div class="flex min-w-0 items-center gap-3">
+              <span class="profile-monogram size-10 shrink-0 text-sm" aria-hidden="true">
+                {{ member.displayName | userMonogram }}
+              </span>
+              <div class="min-w-0">
+                <p class="truncate font-medium">{{ member.displayName }}</p>
+                @if (member.username) {
+                  <p class="text-finance-muted truncate text-xs">@{{ member.username }}</p>
+                }
+              </div>
+            </div>
+            <button
+              class="btn-icon btn-danger shrink-0"
+              [attr.aria-label]="'Remove ' + member.displayName + ' from group'"
+              (click)="removeMember(member.id)"
+              type="button"
+            >
+              <svg class="size-4" lucideTrash2 aria-hidden="true"></svg>
+            </button>
+          </li>
+        }
+      </ul>
+    }
+  </section>
+</app-page-layout>

@@ -1,0 +1,52 @@
+<app-page-layout>
+  @if ($localMode() === DataSource.Local) {
+    <section class="surface-card mx-auto w-full max-w-md p-5">
+      <h2 class="text-lg font-semibold">Local data does not use accounts</h2>
+      <p class="text-finance-muted mt-2 text-sm">
+        Switch to Remote API in Data to sign in to a server.
+      </p>
+    </section>
+  } @else {
+    @if ($setupRequired()) {
+      <section class="surface-card mx-auto w-full max-w-md p-5 sm:p-7">
+        <h2 class="text-lg font-semibold">Administrator setup required</h2>
+        <p class="text-finance-muted mt-2 text-sm">
+          Finish connecting the server and create its first administrator in Data settings.
+        </p>
+        <a class="btn-primary mt-4 inline-flex no-underline" routerLink="/data">
+          Open Data settings
+        </a>
+      </section>
+    } @else {
+      <section class="surface-card mx-auto w-full max-w-md p-5 sm:p-7">
+        <div class="mb-6">
+          <h2 class="text-xl font-semibold">Sign in to Expense Exchange</h2>
+          <p class="text-finance-muted mt-2 text-sm">Use your server account to continue.</p>
+        </div>
+        <form class="flex flex-col gap-4" (submit)="submit($event)">
+          <app-auth-account-selector
+            [$accounts]="$loginAccounts()"
+            [$selectedUsername]="$credentials().username"
+            (selected)="selectLoginAccount($event)"
+          />
+          <app-form-field [$id]="'username'" [$label]="'Username'" [$required]="true"
+            ><input id="username" [formField]="$form.username" autocomplete="username"
+          /></app-form-field>
+          <app-form-field [$id]="'password'" [$label]="'Password'" [$required]="true"
+            ><input
+              id="password"
+              [formField]="$form.password"
+              type="password"
+              autocomplete="current-password"
+          /></app-form-field>
+          @if ($error(); as error) {
+            <p class="text-finance-negative text-sm" role="alert">{{ error }}</p>
+          }
+          <button class="btn-primary mt-1 w-full" [disabled]="$loading()" type="submit">
+            {{ $loading() ? 'Please wait…' : 'Sign in' }}
+          </button>
+        </form>
+      </section>
+    }
+  }
+</app-page-layout>

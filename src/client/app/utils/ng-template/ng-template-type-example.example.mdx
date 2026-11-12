@@ -17,7 +17,7 @@ Example usage of `NgTemplateTypedDirective` on `ng-template`
     <h1>MyImplicitContext Example</h1>
     <ng-template
       #MyImplicitContextTemplate="ngTemplateType"
-      [ngTemplateType]="MyImplicitContext"
+      [$ngTemplateType]="MyImplicitContext"
       let-value
     >
       {{ value }}
@@ -40,7 +40,7 @@ language="html"
     <h1>MyContext Example</h1>
     <ng-template
       #MyContextTemplate="ngTemplateType"
-      [ngTemplateType]="MyContext"
+      [$ngTemplateType]="MyContext"
       let-value
       let-myVar="myVar"
     >
