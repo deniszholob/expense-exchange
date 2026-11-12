@@ -3,12 +3,17 @@ import { moduleMetadata } from '@storybook/angular-vite';
 import type { Meta, StoryObj } from '@storybook/angular-vite';
 import { FormFieldComponent } from './form-field.component';
 import { MultiSelectComponent } from '../multi-select/multi-select.component';
+import { SegmentedControlComponent } from '../segmented-control/segmented-control.component';
 // #endregion
 
 // #region Stories
 const meta: Meta<FormFieldComponent> = {
   component: FormFieldComponent,
-  decorators: [moduleMetadata({ imports: [MultiSelectComponent] })],
+  decorators: [
+    moduleMetadata({
+      imports: [MultiSelectComponent, SegmentedControlComponent],
+    }),
+  ],
   parameters: {
     docs: {
       description: {
@@ -29,6 +34,11 @@ export const FormField: StoryObj<FormFieldComponent> = {
         { id: 'bob', name: 'Bob' },
       ],
       selectedOptions: ['alice'],
+      scopeOptions: [
+        { value: 'Group', label: 'Group' },
+        { value: 'MyShare', label: 'My share' },
+      ],
+      selectedScope: 'Group',
     },
     template: `
       <div class="mx-auto flex w-full max-w-xl flex-col gap-5 p-5">
@@ -55,6 +65,9 @@ export const FormField: StoryObj<FormFieldComponent> = {
         </app-form-field>
         <app-form-field [$id]="'shared-with'" [$label]="'Shared with'" [$required]="true" [$value]="['alice']">
           <app-multi-select [$options]="multiSelectOptions" [(value)]="selectedOptions" />
+        </app-form-field>
+        <app-form-field [$id]="'transaction-scope'" [$label]="'Transaction scope'" [$value]="selectedScope" [$clearable]="false">
+          <app-segmented-control [$options]="scopeOptions" [$label]="'Transaction scope'" [(value)]="selectedScope" />
         </app-form-field>
         <app-form-field [$id]="'notifications'" [$label]="'Notifications'" [$value]="true">
           <label class="text-finance-text flex items-center gap-2 text-sm">

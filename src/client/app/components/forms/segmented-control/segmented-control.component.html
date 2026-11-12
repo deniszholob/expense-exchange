@@ -1,0 +1,27 @@
+<div
+  class="bg-finance-raised border-finance-border rounded-control max-w-full gap-1 border p-1"
+  [class.flex]="$stretch()"
+  [class.inline-flex]="!$stretch()"
+  [class.w-full]="$stretch()"
+  [class.w-fit]="!$stretch()"
+  [attr.aria-label]="$label()"
+  role="group"
+>
+  @for (option of $options(); track option.value) {
+    <button
+      class="rounded-control min-h-8 px-3 py-1.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:outline-none"
+      [class.flex-1]="$stretch()"
+      [class.text-center]="$stretch()"
+      [class.bg-sky-400/15]="value() === option.value"
+      [class.text-sky-200]="value() === option.value"
+      [class.text-finance-muted]="value() !== option.value"
+      [class.hover:bg-finance-hover]="value() !== option.value"
+      [disabled]="option.disabled ?? false"
+      [attr.aria-pressed]="value() === option.value"
+      (click)="value.set(option.value)"
+      type="button"
+    >
+      {{ option.label }}
+    </button>
+  }
+</div>

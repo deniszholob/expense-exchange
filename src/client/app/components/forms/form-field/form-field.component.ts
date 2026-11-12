@@ -38,6 +38,7 @@ export class FormFieldComponent {
   public readonly $id = input.required<string>();
   public readonly $label = input.required<string>();
   public readonly $required = input(false);
+  public readonly $clearable = input(true);
   public readonly $value = input<unknown>();
   public readonly clearRequested = output<void>();
 
