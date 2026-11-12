@@ -21,25 +21,14 @@
         </div>
       } @else {
         <div class="border-finance-border border-t"></div>
-        <app-form-field [$id]="'profile-name'" [$label]="'Display name'">
-          <input
-            id="profile-name"
-            [formField]="$form.name"
-            autocomplete="name"
-            placeholder="Uses username when blank"
-          />
-        </app-form-field>
-        <app-form-field [$id]="'profile-username'" [$label]="'Username'" [$required]="true"
-          ><input id="profile-username" [formField]="$form.username" autocomplete="username"
-        /></app-form-field>
-        <app-form-field [$id]="'profile-password'" [$label]="'New password'"
-          ><input
-            id="profile-password"
-            [formField]="$form.password"
-            type="password"
-            autocomplete="new-password"
-            placeholder="Leave blank to keep current password"
-        /></app-form-field>
+        <app-account-fields
+          [$idPrefix]="'profile'"
+          [$nameField]="$form.name"
+          [$usernameField]="$form.username"
+          [$passwordField]="$form.password"
+          [$passwordLabel]="'New password'"
+          [$passwordPlaceholder]="'Leave blank to keep current password'"
+        />
         @if ($error(); as error) {
           <p class="text-finance-negative text-sm" role="alert">{{ error }}</p>
         }

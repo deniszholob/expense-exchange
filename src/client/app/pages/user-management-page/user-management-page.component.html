@@ -88,22 +88,14 @@
           </p>
         </div>
         <form class="flex flex-col gap-4" (submit)="addAccount($event)">
-          <app-form-field [$id]="'account-name'" [$label]="'Display name'"
-            ><input id="account-name" [formField]="$form.name" autocomplete="name"
-          /></app-form-field>
-          <app-form-field [$id]="'account-username'" [$label]="'Username'" [$required]="true"
-            ><input id="account-username" [formField]="$form.username" autocomplete="off"
-          /></app-form-field>
-          <app-form-field
-            [$id]="'account-password'"
-            [$label]="'Initial password'"
-            [$required]="true"
-            ><input
-              id="account-password"
-              [formField]="$form.password"
-              type="password"
-              autocomplete="new-password"
-          /></app-form-field>
+          <app-account-fields
+            [$idPrefix]="'account'"
+            [$nameField]="$form.name"
+            [$usernameField]="$form.username"
+            [$passwordField]="$form.password"
+            [$passwordLabel]="'Initial password'"
+            [$passwordRequired]="true"
+          />
           @if ($accountFormError(); as error) {
             <p class="text-finance-negative text-sm" role="alert">{{ error }}</p>
           }
@@ -134,26 +126,14 @@
                   class="grid w-full gap-3 sm:grid-cols-2"
                   (submit)="saveAccount(account.id, $event)"
                 >
-                  <app-form-field [$id]="'edit-name-' + account.id" [$label]="'Display name'"
-                    ><input [id]="'edit-name-' + account.id" [formField]="$editForm.name"
-                  /></app-form-field>
-                  <app-form-field
-                    [$id]="'edit-username-' + account.id"
-                    [$label]="'Username'"
-                    [$required]="true"
-                    ><input
-                      [id]="'edit-username-' + account.id"
-                      [formField]="$editForm.username"
-                      autocomplete="off"
-                  /></app-form-field>
-                  <app-form-field [$id]="'edit-password-' + account.id" [$label]="'New password'"
-                    ><input
-                      [id]="'edit-password-' + account.id"
-                      [formField]="$editForm.password"
-                      type="password"
-                      autocomplete="new-password"
-                      placeholder="Leave blank to keep current password"
-                  /></app-form-field>
+                  <app-account-fields
+                    [$idPrefix]="'edit-' + account.id"
+                    [$nameField]="$editForm.name"
+                    [$usernameField]="$editForm.username"
+                    [$passwordField]="$editForm.password"
+                    [$passwordLabel]="'New password'"
+                    [$passwordPlaceholder]="'Leave blank to keep current password'"
+                  />
                   <div class="flex items-end gap-2">
                     <button class="btn-primary" type="submit">Save account</button
                     ><button class="btn-secondary" (click)="cancelEditing()" type="button">

@@ -14,14 +14,8 @@ import { AppService } from 'src/client/app/app.service';
 import { PAGE_ROUTES } from 'src/client/app/app.info';
 import { UserRole } from '../../../../util/user-role.enum';
 import { UserMonogramPipe } from '../../shared/user-monogram.pipe';
-import {
-  FormField,
-  form,
-  maxLength,
-  minLength,
-  required,
-} from '@angular/forms/signals';
-import { FormFieldComponent } from '../../components/forms/form-field/form-field.component';
+import { form, maxLength, minLength, required } from '@angular/forms/signals';
+import { AccountFieldsComponent } from '../../components/forms/account-fields/account-fields.component';
 import { DataSource } from '../../shared/data-source.enum';
 // #endregion
 
@@ -35,8 +29,7 @@ import { DataSource } from '../../shared/data-source.enum';
     PageLayoutComponent,
     LucideLogOut,
     UserMonogramPipe,
-    FormField,
-    FormFieldComponent,
+    AccountFieldsComponent,
   ],
 })
 export class ProfilePageComponent {

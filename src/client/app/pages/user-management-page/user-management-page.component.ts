@@ -26,6 +26,7 @@ import { DataSource } from 'src/client/app/shared/data-source.enum';
 import { UserRole } from '../../../../util/user-role.enum';
 import { PageLayoutComponent } from 'src/client/app/layout';
 import { FormFieldComponent } from '../../components/forms/form-field/form-field.component';
+import { AccountFieldsComponent } from '../../components/forms/account-fields/account-fields.component';
 import { getHttpErrorMessage } from '../../shared/http-error-message';
 // #endregion
 
@@ -39,6 +40,7 @@ import { getHttpErrorMessage } from '../../shared/http-error-message';
     PageLayoutComponent,
     FormField,
     FormFieldComponent,
+    AccountFieldsComponent,
     LucidePencil,
     LucideTrash2,
     LucideUserRoundPlus,

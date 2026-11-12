@@ -1,0 +1,25 @@
+<div class="flex w-full flex-col gap-4">
+  <app-form-field [$id]="$idPrefix() + '-name'" [$label]="'Display name'">
+    <input [id]="$idPrefix() + '-name'" [formField]="$nameField()" autocomplete="name" />
+  </app-form-field>
+  <app-form-field [$id]="$idPrefix() + '-username'" [$label]="'Username'" [$required]="true">
+    <input
+      [id]="$idPrefix() + '-username'"
+      [formField]="$usernameField()"
+      autocomplete="username"
+    />
+  </app-form-field>
+  <app-form-field
+    [$id]="$idPrefix() + '-password'"
+    [$label]="$passwordLabel()"
+    [$required]="$passwordRequired()"
+  >
+    <input
+      [id]="$idPrefix() + '-password'"
+      [formField]="$passwordField()"
+      [placeholder]="$passwordPlaceholder()"
+      type="password"
+      autocomplete="new-password"
+    />
+  </app-form-field>
+</div>
