@@ -15,7 +15,7 @@ import type { GroupMemberDto } from 'src/client/api/generated/expense-exchange-a
   selector: 'app-group-member-multi-select',
   template: `
     <fieldset
-      class="border-finance-border rounded-control flex flex-col gap-2 border p-3"
+      class="rounded-control border-finance-border-strong bg-finance-raised flex w-full flex-col gap-2 border px-3 py-2.5 pr-10 focus-within:border-sky-400 focus-within:ring-2 focus-within:ring-sky-400/30"
     >
       <legend class="sr-only">Choose people who share this expense</legend>
       @for (user of $groupMembers(); track user.id) {

@@ -37,7 +37,12 @@
     @if ($draftDataSource() === DataSource.RemoteApi) {
       <div class="border-finance-border grid grid-cols-1 gap-4 border-t pt-5 md:grid-cols-2">
         <div class="min-w-0">
-          <app-form-field [$id]="'remoteApi'" [$label]="'Remote API server URL'">
+          <app-form-field
+            [$id]="'remoteApi'"
+            [$label]="'Remote API server URL'"
+            [$value]="$remoteApiUrl()"
+            (clearRequested)="clearApiUrl()"
+          >
             <input
               id="remoteApi"
               [value]="$remoteApiUrl()"

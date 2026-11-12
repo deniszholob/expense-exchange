@@ -12,11 +12,11 @@
       <app-form-field [$id]="'amount'" [$label]="'Amount (USD)'" [$required]="true">
         <div class="relative">
           <span
-            class="text-finance-muted pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-sm"
+            class="text-finance-muted pointer-events-none absolute top-1/2 left-3 z-10 -translate-y-1/2 text-sm"
             >$</span
           >
           <input
-            class="pl-7 text-right font-medium tabular-nums"
+            class="pl-7 text-left font-medium tabular-nums"
             id="amount"
             [formField]="$form.amount"
             type="number"

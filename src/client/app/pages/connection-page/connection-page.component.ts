@@ -102,6 +102,14 @@ export class ConnectionPageComponent {
   protected updateApiUrl(event: Event): void {
     const url =
       event.target instanceof HTMLInputElement ? event.target.value : '';
+    this.setApiUrl(url);
+  }
+
+  protected clearApiUrl(): void {
+    this.setApiUrl('');
+  }
+
+  private setApiUrl(url: string): void {
     this.$remoteApiUrl.set(url);
     this.$selectionDirty.set(true);
     this.$message.set(undefined);

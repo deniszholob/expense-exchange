@@ -28,7 +28,7 @@
   }
 
   body {
-    @apply bg-finance-canvas text-finance-text flex min-h-full flex-col antialiased;
+    @apply bg-finance-canvas text-finance-text flex h-dvh min-h-0 flex-col overflow-hidden antialiased;
     background-image: radial-gradient(
       ellipse at 50% -25%,
       #172a45 0%,
@@ -42,6 +42,29 @@
   textarea {
     @apply rounded-control border-finance-border-strong bg-finance-raised text-finance-text w-full border px-3 py-2.5 text-sm shadow-sm transition-colors;
     color-scheme: dark;
+  }
+
+  select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239aabc1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-position: right 0.75rem center;
+    background-repeat: no-repeat;
+    background-size: 1rem 1rem;
+  }
+
+  input[type='number']::-webkit-inner-spin-button {
+    opacity: 1;
+  }
+
+  input[type='date']::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.65;
+    transition: opacity 150ms ease;
+  }
+
+  input[type='date']:hover::-webkit-calendar-picker-indicator,
+  input[type='date']:focus-visible::-webkit-calendar-picker-indicator {
+    opacity: 1;
   }
 
   input[type='checkbox'],
@@ -81,6 +104,37 @@
 @layer components {
   .section {
     @apply flex flex-col gap-5;
+  }
+
+  .form-field-clear-button {
+    right: 0.5rem;
+  }
+
+  .form-field-control:has(.form-field-clear-button)
+    > :is(
+      input:not([type='checkbox']):not([type='radio']):not([type='number']):not(
+          [type='date']
+        ),
+      textarea
+    ) {
+    padding-right: 2.75rem;
+  }
+
+  .form-field-control:has(.form-field-clear-button) > select {
+    padding-right: 4.5rem;
+  }
+
+  .form-field-control:has(.form-field-clear-button) input[type='number'] {
+    padding-right: 0.75rem;
+  }
+
+  .form-field-control:has(.form-field-clear-button) > input[type='date'] {
+    padding-right: 0.625rem;
+  }
+
+  .form-field-control:has(input[type='number'], select, input[type='date'])
+    > .form-field-clear-button {
+    right: 1.75rem;
   }
 
   .container-fixed {
