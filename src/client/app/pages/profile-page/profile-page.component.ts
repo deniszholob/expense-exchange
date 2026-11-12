@@ -79,7 +79,7 @@ export class ProfilePageComponent {
 
   protected signOut(): void {
     this.appService.signOut();
-    void this.router.navigate(['/', PAGE_ROUTES.CONNECTION_PAGE_ROOT]);
+    void this.router.navigate(['/', PAGE_ROUTES.LOGIN_PAGE_ROOT]);
   }
 }
 // #endregion
