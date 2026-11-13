@@ -4,6 +4,16 @@ import type { DateRange } from './date-range.model';
 // #endregion
 
 // #region Functions
+export function createDefaultDataRange(now: Date = new Date()): DateRange {
+  return {
+    preset: DateRangePreset.AllTime,
+    year: null,
+    month: now.getMonth() + 1,
+    startDate: '',
+    endDate: '',
+  };
+}
+
 export function createDateRangeForPreset(
   preset: DateRangePreset,
   now: Date = new Date(),
@@ -97,7 +107,7 @@ export function getEarliestDate(dates: readonly string[]): string | undefined {
   return earliestDate;
 }
 
-export function formatDateRangeLabel(range: DateRange): string {
+export function formatDataRangeLabel(range: DateRange): string {
   if (range.preset === DateRangePreset.AllTime) return 'All time';
   if (range.preset === DateRangePreset.Month && range.startDate) {
     return new Intl.DateTimeFormat(undefined, {

@@ -1,6 +1,6 @@
 <app-page-layout>
   <div class="flex flex-col gap-6">
-    <div
+    <!-- <div
       class="rounded-card from-finance-accent-soft to-finance-surface flex flex-wrap items-center justify-between gap-4 border border-sky-400/15 bg-gradient-to-r p-5 sm:p-7"
     >
       <div>
@@ -17,7 +17,7 @@
       >
         <svg class="size-4" lucideReceipt aria-hidden="true"></svg> View transactions
       </a>
-    </div>
+    </div> -->
 
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
       <article class="stat-card">
@@ -87,13 +87,6 @@
         <p class="text-finance-muted mt-1 text-xs">
           See who paid for each person and how the group balances out.
         </p>
-      </div>
-      <div class="border-finance-border border-b px-5 py-4 sm:px-6">
-        <app-date-range-selector
-          [($range)]="$dateRange"
-          [$idPrefix]="'dashboard-balance'"
-          [$earliestExpenseDate]="$earliestExpenseDate()"
-        />
       </div>
       @if ($rangeSummary().transactionCount === 0) {
         <p class="text-finance-muted px-5 py-8 text-center text-sm sm:px-6">

@@ -62,6 +62,12 @@
     opacity: 0;
   }
 
+  input[type='date']::-webkit-clear-button,
+  input[type='date']::-webkit-inner-spin-button {
+    display: none;
+    -webkit-appearance: none;
+  }
+
   input[type='checkbox'],
   input[type='radio'] {
     @apply size-4 shrink-0 accent-sky-400;

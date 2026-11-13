@@ -1,0 +1,16 @@
+<button
+  class="rounded-control inline-flex items-center gap-2 px-3 py-2 text-sm font-medium transition-colors"
+  [class.bg-finance-accent-soft]="$expanded()"
+  [class.text-sky-300]="$expanded()"
+  [class.text-finance-muted]="!$expanded()"
+  [class.hover:bg-finance-raised]="!$expanded()"
+  [class.hover:text-finance-text]="!$expanded()"
+  [attr.aria-expanded]="$expanded()"
+  [attr.aria-label]="'Select data range, currently ' + $label()"
+  [attr.aria-controls]="$panelId()"
+  (click)="toggleRequested.emit()"
+  type="button"
+>
+  <svg class="size-4" lucideCalendarDays aria-hidden="true"></svg>
+  {{ $label() }}
+</button>

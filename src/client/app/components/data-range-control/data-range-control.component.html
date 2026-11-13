@@ -1,0 +1,18 @@
+<div class="relative">
+  <app-data-range-trigger
+    [$label]="$dataRangeLabel()"
+    [$expanded]="$panelOpen()"
+    [$panelId]="$panelId()"
+    (toggleRequested)="togglePanel()"
+  />
+  @if ($panelOpen()) {
+    <div class="absolute top-full right-0 z-50 mt-2 w-[min(36rem,calc(100vw-2rem))]">
+      <app-data-range-panel
+        [($range)]="$dataRange"
+        [$earliestDate]="$earliestDate()"
+        [$idPrefix]="$idPrefix()"
+        [$panelId]="$panelId()"
+      />
+    </div>
+  }
+</div>

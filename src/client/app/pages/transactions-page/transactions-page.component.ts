@@ -4,6 +4,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  inject,
   signal,
 } from '@angular/core';
 import { FormField, form } from '@angular/forms/signals';
@@ -17,7 +18,6 @@ import type {
 } from 'src/client/api/generated/expense-exchange-api.schemas';
 import { TransactionsService } from 'src/client/api/generated/transactions/transactions.service';
 import { TransactionDetailsComponent } from 'src/client/app/components/transaction-details/transaction-details.component';
-import { DateRangeSelectorComponent } from 'src/client/app/components/date-range-selector/date-range-selector.component';
 import { FormFieldComponent } from 'src/client/app/components/forms/form-field/form-field.component';
 import { SegmentedControlComponent } from 'src/client/app/components/forms/segmented-control/segmented-control.component';
 import { TransactionTableComponent } from 'src/client/app/components/transaction-table/transaction-table.component';
@@ -38,12 +38,8 @@ import {
   TransactionScope,
   TRANSACTION_SCOPE_INFO_OPTIONS,
 } from 'src/client/app/shared/transaction-scope.enum';
-import { DateRangePreset } from 'src/client/app/shared/date-range/date-range-preset.enum';
-import {
-  createDateRangeForPreset,
-  getEarliestDate,
-  isDateWithinRange,
-} from 'src/client/app/shared/date-range/date-range.util';
+import { DataRangeService } from 'src/client/app/shared/data-range.service';
+import { isDateWithinRange } from 'src/client/app/shared/date-range/date-range.util';
 // #endregion
 
 // #region Component
@@ -57,13 +53,13 @@ import {
     FormField,
     FormFieldComponent,
     TransactionDetailsComponent,
-    DateRangeSelectorComponent,
     SegmentedControlComponent,
     TransactionTableComponent,
     PageLayoutComponent,
   ],
 })
 export class TransactionsPageComponent extends DetailsPageDirective {
+  private readonly dataRangeService = inject(DataRangeService);
   protected readonly ROUTE_KEYWORDS = ROUTE_KEYWORDS;
   protected readonly TransactionListFilter = TransactionListFilter;
   protected readonly TransactionType = TransactionType;
@@ -89,14 +85,6 @@ export class TransactionsPageComponent extends DetailsPageDirective {
   );
   protected readonly $totalTransactionCount = computed(
     () => this.appService.$transactions().length,
-  );
-  protected readonly $dateRange = signal(
-    createDateRangeForPreset(DateRangePreset.AllTime),
-  );
-  protected readonly $earliestTransactionDate = computed(() =>
-    getEarliestDate(
-      this.appService.$transactions().map((item) => item.completeDate),
-    ),
   );
   protected readonly $personalScopeAvailable = computed(() => {
     const currentUserId = this.appService.$currentUser()?.id;
@@ -165,7 +153,9 @@ export class TransactionsPageComponent extends DetailsPageDirective {
     const type = this.$filterData().type;
     const scope = this.$filterData().scope;
     return rows
-      .filter((row) => isDateWithinRange(row.rangeDate, this.$dateRange()))
+      .filter((row) =>
+        isDateWithinRange(row.rangeDate, this.dataRangeService.$dataRange()),
+      )
       .filter((row) =>
         type === TransactionListFilter.All
           ? true

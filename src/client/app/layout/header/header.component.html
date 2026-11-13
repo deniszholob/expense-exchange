@@ -1,5 +1,5 @@
 <header
-  class="border-finance-border bg-finance-canvas/90 shrink-0 border-b shadow-lg shadow-black/10 backdrop-blur-xl"
+  class="border-finance-border bg-finance-canvas/90 relative z-30 shrink-0 border-b shadow-lg shadow-black/10 backdrop-blur-xl"
 >
   <div class="container-fixed gap-0 py-2 sm:py-3">
     <div class="flex min-h-10 items-center gap-2">
@@ -19,20 +19,42 @@
 
       <nav class="flex min-w-0 flex-1 flex-wrap items-center gap-1" aria-label="Main navigation">
         @for (link of $links(); track link.id) {
-          <a
-            class="rounded-control text-finance-muted hover:bg-finance-raised hover:text-finance-text inline-flex items-center gap-2 px-3 py-2 text-sm font-medium no-underline transition-colors"
-            [class.ml-auto]="link.id === PageRoute.Data"
-            [routerLink]="['/', link.id]"
-            routerLinkActive="bg-finance-accent-soft text-sky-300"
-          >
-            <span class="inline-flex size-4 items-center justify-center" aria-hidden="true">
-              <ng-container
-                [ngComponentOutlet]="link.icon"
-                [ngComponentOutletInputs]="{ size: 16 }"
+          @if (link.id === PageRoute.Data) {
+            <div class="ml-auto flex items-center gap-1">
+              <app-data-range-control
+                [($dataRange)]="dataRangeService.$dataRange"
+                [$earliestDate]="$earliestTransactionDate()"
+                [$idPrefix]="'global-data-range'"
               />
-            </span>
-            {{ link.display }}
-          </a>
+              <a
+                class="rounded-control text-finance-muted hover:bg-finance-raised hover:text-finance-text inline-flex items-center gap-2 px-3 py-2 text-sm font-medium no-underline transition-colors"
+                [routerLink]="['/', link.id]"
+                routerLinkActive="bg-finance-accent-soft text-sky-300"
+              >
+                <span class="inline-flex size-4 items-center justify-center" aria-hidden="true">
+                  <ng-container
+                    [ngComponentOutlet]="link.icon"
+                    [ngComponentOutletInputs]="{ size: 16 }"
+                  />
+                </span>
+                {{ link.display }}
+              </a>
+            </div>
+          } @else {
+            <a
+              class="rounded-control text-finance-muted hover:bg-finance-raised hover:text-finance-text inline-flex items-center gap-2 px-3 py-2 text-sm font-medium no-underline transition-colors"
+              [routerLink]="['/', link.id]"
+              routerLinkActive="bg-finance-accent-soft text-sky-300"
+            >
+              <span class="inline-flex size-4 items-center justify-center" aria-hidden="true">
+                <ng-container
+                  [ngComponentOutlet]="link.icon"
+                  [ngComponentOutletInputs]="{ size: 16 }"
+                />
+              </span>
+              {{ link.display }}
+            </a>
+          }
         }
       </nav>
 

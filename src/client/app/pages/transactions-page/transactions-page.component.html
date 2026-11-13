@@ -14,13 +14,6 @@
 
     @case (DetailsPageState.NO_PARAMS) {
       <div class="flex min-h-0 flex-1 flex-col gap-4">
-        <div class="surface-card shrink-0 p-5">
-          <app-date-range-selector
-            [($range)]="$dateRange"
-            [$idPrefix]="'transactions-list'"
-            [$earliestExpenseDate]="$earliestTransactionDate()"
-          />
-        </div>
         <div class="flex shrink-0 items-end gap-4">
           <div class="shrink-0">
             <app-form-field

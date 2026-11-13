@@ -13,17 +13,12 @@ import { SegmentedControlComponent } from 'src/client/app/components/forms/segme
 import { PageLayoutComponent } from 'src/client/app/layout';
 import { AppService } from 'src/client/app/app.service';
 import { TransactionType } from 'src/client/api/generated/expense-exchange-api.schemas';
+import { DataRangeService } from 'src/client/app/shared/data-range.service';
 import {
   TransactionScope,
   TRANSACTION_SCOPE_INFO_OPTIONS,
 } from 'src/client/app/shared/transaction-scope.enum';
-import { DateRangeSelectorComponent } from '../../components/date-range-selector/date-range-selector.component';
-import { DateRangePreset } from '../../shared/date-range/date-range-preset.enum';
-import {
-  createDateRangeForPreset,
-  formatDateRangeLabel,
-  getEarliestDate,
-} from '../../shared/date-range/date-range.util';
+import { formatDataRangeLabel } from '../../shared/date-range/date-range.util';
 import { createDashboardRangeSummary } from './dashboard-range-summary.model';
 // #endregion
 
@@ -37,13 +32,13 @@ import { createDashboardRangeSummary } from './dashboard-range-summary.model';
     CommonModule,
     PageLayoutComponent,
     RouterModule,
-    DateRangeSelectorComponent,
     SegmentedControlComponent,
     LucideReceipt,
   ],
 })
 export class DashboardPageComponent {
   private readonly appService = inject(AppService);
+  private readonly dataRangeService = inject(DataRangeService);
   protected readonly $groupMembers = this.appService.$groupMembers;
   protected readonly $currentUser = this.appService.$currentUser;
   protected readonly $spendingScope = signal(TransactionScope.Group);
@@ -56,24 +51,14 @@ export class DashboardPageComponent {
       }),
     })),
   );
-  protected readonly $dateRange = signal(
-    createDateRangeForPreset(DateRangePreset.Month),
-  );
-  protected readonly $earliestExpenseDate = computed(() =>
-    getEarliestDate(
-      this.appService
-        .$transactions()
-        .map((transaction) => transaction.completeDate),
-    ),
-  );
   protected readonly $rangeLabel = computed(() =>
-    formatDateRangeLabel(this.$dateRange()),
+    formatDataRangeLabel(this.dataRangeService.$dataRange()),
   );
   protected readonly $rangeSummary = computed(() =>
     createDashboardRangeSummary(
       this.appService.$transactions(),
       this.$groupMembers(),
-      this.$dateRange(),
+      this.dataRangeService.$dataRange(),
       this.$currentUser()?.id,
     ),
   );

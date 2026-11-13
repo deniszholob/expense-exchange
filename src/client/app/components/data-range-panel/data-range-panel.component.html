@@ -1,0 +1,117 @@
+<section
+  class="surface-card w-full p-4 shadow-2xl"
+  [id]="$panelId()"
+  aria-label="Global data range"
+>
+  <div class="mb-4 grid grid-cols-3 gap-3">
+    <button
+      class="rounded-control border-finance-border text-finance-muted hover:bg-finance-hover hover:text-finance-text w-full border px-3 py-1.5 text-sm transition-colors"
+      (click)="selectAllTime()"
+      type="button"
+    >
+      All time
+    </button>
+    <button
+      class="rounded-control border-finance-border text-finance-muted hover:bg-finance-hover hover:text-finance-text w-full border px-3 py-1.5 text-sm transition-colors"
+      (click)="selectCurrentYear()"
+      type="button"
+    >
+      {{ $currentYearLabel }}
+    </button>
+    <button
+      class="rounded-control border-finance-border text-finance-muted hover:bg-finance-hover hover:text-finance-text w-full border px-3 py-1.5 text-sm transition-colors"
+      (click)="selectCurrentMonth()"
+      type="button"
+    >
+      {{ $currentMonthLabel }}
+    </button>
+  </div>
+
+  <div
+    class="flex w-full flex-col gap-4"
+    [attr.aria-label]="'Date range: ' + $rangeLabel()"
+    role="group"
+  >
+    <div class="grid gap-4 sm:grid-cols-2">
+      <label class="text-finance-text flex flex-col gap-2 text-sm font-medium">
+        Year
+        <select (change)="selectYear($event)">
+          <option [selected]="$yearSelection() === 'all'" value="all">All years</option>
+          @for (year of $yearOptions(); track year) {
+            <option [selected]="$yearSelection() === '' + year" value="{{ year }}">
+              {{ year }}
+            </option>
+          }
+        </select>
+      </label>
+      <label class="text-finance-text flex flex-col gap-2 text-sm font-medium">
+        Month
+        <select [value]="$monthSelection()" (change)="selectMonth($event)">
+          <option value="all">Any month</option>
+          @for (month of $monthOptions; track month.value) {
+            <option value="{{ month.value }}">{{ month.label }}</option>
+          }
+        </select>
+      </label>
+    </div>
+
+    <div class="grid gap-4 sm:grid-cols-2">
+      <app-form-field
+        [$id]="$idPrefix() + '-start'"
+        [$label]="'Date paid from'"
+        [$value]="$range().startDate"
+        (clearRequested)="clearStartDate()"
+      >
+        <input
+          [id]="$idPrefix() + '-start'"
+          [value]="$startDateDisplay()"
+          (change)="updateStartDateText($event)"
+          (click)="openDatePicker($event, startDatePicker)"
+          inputmode="numeric"
+          placeholder="yyyy/mm/dd"
+          type="text"
+        />
+        <input
+          class="pointer-events-none absolute top-0 right-0 size-px opacity-0"
+          #startDatePicker
+          [value]="$range().startDate"
+          (change)="updateStartDate($event)"
+          aria-hidden="true"
+          tabindex="-1"
+          type="date"
+        />
+      </app-form-field>
+      <app-form-field
+        [$id]="$idPrefix() + '-end'"
+        [$label]="'Date paid through'"
+        [$value]="$range().endDate"
+        (clearRequested)="clearEndDate()"
+      >
+        <input
+          [id]="$idPrefix() + '-end'"
+          [value]="$endDateDisplay()"
+          (change)="updateEndDateText($event)"
+          (click)="openDatePicker($event, endDatePicker)"
+          inputmode="numeric"
+          placeholder="yyyy/mm/dd"
+          type="text"
+        />
+        <input
+          class="pointer-events-none absolute top-0 right-0 size-px opacity-0"
+          #endDatePicker
+          [value]="$range().endDate"
+          (change)="updateEndDate($event)"
+          aria-hidden="true"
+          tabindex="-1"
+          type="date"
+        />
+      </app-form-field>
+    </div>
+
+    @if (!$rangeValid()) {
+      <p class="text-finance-negative text-sm" role="alert">
+        The end date must be on or after the start date.
+      </p>
+    }
+  </div>
+</section>
