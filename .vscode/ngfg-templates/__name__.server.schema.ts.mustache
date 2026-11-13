@@ -1,0 +1,31 @@
+// #region Imports
+import { z } from 'zod';
+// #endregion
+
+// #region Schemas
+export const Create{{upperCamelCaseName}}Schema = z.object({
+  name: z.string().trim().min(1),
+});
+
+export const {{upperCamelCaseName}}Schema =
+  Create{{upperCamelCaseName}}Schema.extend({
+    id: z.string().min(1),
+  });
+
+export const {{upperCamelCaseName}}StoreSchema = z.object({
+  version: z.literal(1),
+  records: z.array({{upperCamelCaseName}}Schema),
+});
+// #endregion
+
+// #region Models
+export type Create{{upperCamelCaseName}} = z.infer<
+  typeof Create{{upperCamelCaseName}}Schema
+>;
+export type {{upperCamelCaseName}} = z.infer<
+  typeof {{upperCamelCaseName}}Schema
+>;
+export type {{upperCamelCaseName}}Store = z.infer<
+  typeof {{upperCamelCaseName}}StoreSchema
+>;
+// #endregion

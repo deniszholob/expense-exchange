@@ -1,0 +1,23 @@
+// #region Imports
+import { Module } from '@nestjs/common';
+import {
+  {{upperCamelCaseName}}JsonAdapter,
+} from './{{dashCaseName}}.server.__adaptertype__.adapter';
+import { {{upperCamelCaseName}}Controller } from './{{dashCaseName}}.server.controller';
+import { {{upperCamelCaseName}}Repository } from './{{dashCaseName}}.server.repository';
+import { {{upperCamelCaseName}}Service } from './{{dashCaseName}}.server.service';
+// #endregion
+
+// #region Module
+@Module({
+  controllers: [{{upperCamelCaseName}}Controller],
+  providers: [
+    {{upperCamelCaseName}}Service,
+    {
+      provide: {{upperCamelCaseName}}Repository,
+      useClass: {{upperCamelCaseName}}JsonAdapter,
+    },
+  ],
+})
+export class {{upperCamelCaseName}}Module {}
+// #endregion

@@ -1,0 +1,25 @@
+import { Provider } from '@angular/core';
+// import { Observable, of } from 'rxjs';
+import { {{upperCamelCaseName}}Service } from './{{dashCaseName}}.service';
+
+// import { ExampleReturnType } from './example-return-type.model';
+// import { MOCK_ExampleReturnType } from './example-return-type.model.mock';
+// export const MOCK_ExampleReturnType: ExampleReturnType = {};
+
+export function createMock{{upperCamelCaseName}}Service(
+  overrides: Partial<{{upperCamelCaseName}}Service> = {},
+): Partial<{{upperCamelCaseName}}Service> {
+  return {
+  // method(): Observable<ExampleReturnType> {
+  //  return of(MOCK_ExampleReturnType);
+  // },
+    ...overrides,
+  };
+}
+
+export const MOCK_{{upperCamelCaseName}}ServiceProvider: Provider = {
+  provide: {{upperCamelCaseName}}Service,
+  // useValue for stateless service
+  // useFactory for statefull service
+  useValue: createMock{{upperCamelCaseName}}Service(),
+};

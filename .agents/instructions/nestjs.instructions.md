@@ -35,6 +35,8 @@ Apply to NestJS modules, controllers, providers, API schemas, persistence adapte
 ## API documentation and generated client
 
 - Generate Swagger/OpenAPI from the running Nest application and shared schemas. Keep interactive docs at `/api/docs` and the JSON spec aligned with the implemented API.
+- Document request and response bodies with named Swagger DTO classes. Use those classes in `@ApiBody()` and response decorators; use `isArray: true` for array responses and named DTO properties for nested objects. This ensures OpenAPI emits reusable component schemas and generated clients share stable, meaningful model names instead of creating a separate anonymous type for each operation.
+- Do not pass inline schemas or schemas converted from Zod (for example, `z.toJSONSchema()`) into Swagger decorators for API bodies or responses. Keep shared Zod schemas as the runtime validation source at the request boundary, and keep DTO fields aligned with their inferred types (use `implements` where the shape matches). Give request and response DTOs distinct names when their contracts differ.
 - Add endpoint summaries, operation descriptions, response schemas, and error responses so the spec is useful to both people and generators.
 - Generate the Angular API client from the OpenAPI document through the repository's documented script. Do not hand-edit generated client/spec output.
 - Keep the API base URL configurable for the browser demo and desktop wrapper. Configure CORS for explicit origins; do not use unrestricted origins with credentials.

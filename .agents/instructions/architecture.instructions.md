@@ -47,6 +47,7 @@ Apply to frontend/backend structure, shared models, API clients, data sources, a
 - Controllers and application services depend on repository interfaces, not directly on JSON files or a database client.
 - Use a JSON file repository adapter for backend persistence. Keep serialization, schema validation, atomic write behavior, and path configuration within that adapter.
 - Keep API/domain models independent of JSON layout. Version stored data and centralize schema upgrades at the persistence boundary.
+- Do not add migration or backward-compatibility code for data formats that have not shipped. Update the current schema, defaults, and fixtures together. If it is unclear whether a format has shipped, ask before adding migration behavior.
 - Any database adapter must satisfy the same repository contracts. Keep the contracts proportionate to current use; do not add speculative abstractions unrelated to the supported persistence behavior.
 - Document limits of JSON persistence (especially concurrent writes) and keep runtime files outside source control and image build context.
 

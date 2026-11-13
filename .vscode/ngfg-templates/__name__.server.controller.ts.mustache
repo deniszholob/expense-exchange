@@ -1,0 +1,96 @@
+// #region Imports
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
+import {
+  ApiBadRequestResponse,
+  ApiBody,
+  ApiCreatedResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
+import {
+  Create{{upperCamelCaseName}}Dto,
+  {{upperCamelCaseName}}Dto,
+} from './{{dashCaseName}}.server.dto';
+import type {
+  Create{{upperCamelCaseName}},
+  {{upperCamelCaseName}},
+} from './{{dashCaseName}}.server.schema';
+import { Create{{upperCamelCaseName}}Schema } from './{{dashCaseName}}.server.schema';
+import { {{upperCamelCaseName}}Service } from './{{dashCaseName}}.server.service';
+// #endregion
+
+// #region Controller
+@ApiTags('{{dashCaseName}}')
+@Controller('{{dashCaseName}}')
+export class {{upperCamelCaseName}}Controller {
+  public constructor(private readonly service: {{upperCamelCaseName}}Service) {}
+
+  @Get()
+  @ApiOperation({ summary: 'List {{dashCaseName}} records' })
+  @ApiOkResponse({ type: {{upperCamelCaseName}}Dto, isArray: true })
+  public getAll(): Promise<{{upperCamelCaseName}}[]> {
+    return this.service.getAll();
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Get a {{dashCaseName}} record' })
+  @ApiOkResponse({ type: {{upperCamelCaseName}}Dto })
+  @ApiNotFoundResponse({ description: 'Record not found' })
+  public getById(@Param('id') id: string): Promise<{{upperCamelCaseName}}> {
+    return this.service.getById(id);
+  }
+
+  @Post()
+  @ApiOperation({ summary: 'Create a {{dashCaseName}} record' })
+  @ApiBody({ type: Create{{upperCamelCaseName}}Dto })
+  @ApiCreatedResponse({ type: {{upperCamelCaseName}}Dto })
+  @ApiBadRequestResponse({ description: 'Invalid request data' })
+  public create(
+    @Body() body: Create{{upperCamelCaseName}}Dto,
+  ): Promise<{{upperCamelCaseName}}> {
+    return this.service.create(validateInput(body));
+  }
+
+  @Put(':id')
+  @ApiOperation({ summary: 'Update a {{dashCaseName}} record' })
+  @ApiBody({ type: Create{{upperCamelCaseName}}Dto })
+  @ApiOkResponse({ type: {{upperCamelCaseName}}Dto })
+  @ApiBadRequestResponse({ description: 'Invalid request data' })
+  @ApiNotFoundResponse({ description: 'Record not found' })
+  public update(
+    @Param('id') id: string,
+    @Body() body: Create{{upperCamelCaseName}}Dto,
+  ): Promise<{{upperCamelCaseName}}> {
+    return this.service.update(id, validateInput(body));
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete a {{dashCaseName}} record' })
+  @ApiOkResponse({ type: {{upperCamelCaseName}}Dto })
+  @ApiNotFoundResponse({ description: 'Record not found' })
+  public delete(@Param('id') id: string): Promise<{{upperCamelCaseName}}> {
+    return this.service.delete(id);
+  }
+}
+// #endregion
+
+// #region Helpers
+function validateInput(
+  body: Create{{upperCamelCaseName}}Dto,
+): Create{{upperCamelCaseName}} {
+  const result = Create{{upperCamelCaseName}}Schema.safeParse(body);
+  if (!result.success) throw new BadRequestException('Invalid request data');
+  return result.data;
+}
+// #endregion

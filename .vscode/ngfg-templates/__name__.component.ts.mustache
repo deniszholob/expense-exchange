@@ -1,0 +1,43 @@
+import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
+
+// import { TooltipDirective } from 'src/app/utils/tooltip/tooltip.directive';
+import { TooltipDirective } from '../../../utils/tooltip/tooltip.directive';
+
+@Component({
+  selector: '{{componentPrefix}}-{{dashCaseName}}',
+  templateUrl: './{{dashCaseName}}.component.html',
+  styles: [':host{display:contents}'], // host: { class: 'contents' }
+  imports: [
+    CommonModule,
+    TooltipDirective, // Auto show tooltips on elements with title
+  ],
+})
+export class {{upperCamelCaseName}}Component {
+  // #region constants
+  // #endregion
+
+  // #region injection
+  // #endregion
+
+  // #region inputs
+  // #endregion
+
+  // #region outputs
+  // #endregion
+
+  // #region computed
+  // #endregion
+
+  // #region Lifecycle
+  // #endregion
+
+  // #region Event Handlers
+  // #endregion
+
+  // #region class helpers
+  // #endregion
+}
+
+// #region function helpers
+// #endregion

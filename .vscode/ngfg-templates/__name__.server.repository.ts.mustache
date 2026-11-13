@@ -1,0 +1,21 @@
+// #region Imports
+import type {
+  Create{{upperCamelCaseName}},
+  {{upperCamelCaseName}},
+} from './{{dashCaseName}}.server.schema';
+// #endregion
+
+// #region Repository Contract
+export abstract class {{upperCamelCaseName}}Repository {
+  public abstract getAll(): Promise<{{upperCamelCaseName}}[]>;
+  public abstract getById(id: string): Promise<{{upperCamelCaseName}}>;
+  public abstract create(
+    input: Create{{upperCamelCaseName}},
+  ): Promise<{{upperCamelCaseName}}>;
+  public abstract update(
+    id: string,
+    input: Create{{upperCamelCaseName}},
+  ): Promise<{{upperCamelCaseName}}>;
+  public abstract delete(id: string): Promise<{{upperCamelCaseName}}>;
+}
+// #endregion

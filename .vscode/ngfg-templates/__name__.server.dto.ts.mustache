@@ -1,0 +1,22 @@
+// #region Imports
+import { ApiProperty } from '@nestjs/swagger';
+import type {
+  Create{{upperCamelCaseName}},
+  {{upperCamelCaseName}},
+} from './{{dashCaseName}}.server.schema';
+// #endregion
+
+// #region DTOs
+export class Create{{upperCamelCaseName}}Dto implements Create{{upperCamelCaseName}} {
+  @ApiProperty({ minLength: 1 })
+  public name!: string;
+}
+
+export class {{upperCamelCaseName}}Dto
+  extends Create{{upperCamelCaseName}}Dto
+  implements {{upperCamelCaseName}}
+{
+  @ApiProperty({ minLength: 1 })
+  public id!: string;
+}
+// #endregion

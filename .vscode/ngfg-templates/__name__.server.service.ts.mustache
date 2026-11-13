@@ -1,0 +1,42 @@
+// #region Imports
+import { Injectable } from '@nestjs/common';
+import { {{upperCamelCaseName}}Repository } from './{{dashCaseName}}.server.repository';
+import type {
+  Create{{upperCamelCaseName}},
+  {{upperCamelCaseName}},
+} from './{{dashCaseName}}.server.schema';
+// #endregion
+
+// #region Service
+@Injectable()
+export class {{upperCamelCaseName}}Service {
+  public constructor(
+    private readonly repository: {{upperCamelCaseName}}Repository,
+  ) {}
+
+  public getAll(): Promise<{{upperCamelCaseName}}[]> {
+    return this.repository.getAll();
+  }
+
+  public getById(id: string): Promise<{{upperCamelCaseName}}> {
+    return this.repository.getById(id);
+  }
+
+  public create(
+    input: Create{{upperCamelCaseName}},
+  ): Promise<{{upperCamelCaseName}}> {
+    return this.repository.create(input);
+  }
+
+  public update(
+    id: string,
+    input: Create{{upperCamelCaseName}},
+  ): Promise<{{upperCamelCaseName}}> {
+    return this.repository.update(id, input);
+  }
+
+  public delete(id: string): Promise<{{upperCamelCaseName}}> {
+    return this.repository.delete(id);
+  }
+}
+// #endregion

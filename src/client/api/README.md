@@ -9,10 +9,7 @@ The source of truth is the NestJS controllers and DTOs in
 `src/server/`. The generation flow is:
 
 ```text
-NestJS controllers and DTOs
-        -> OpenAPI document
-        -> Orval
-        -> Angular HttpClient services and httpResource functions
+NestJS controllers and DTOs -> OpenAPI document -> Orval -> Angular HttpClient services and httpResource functions
 ```
 
 From the repository root, regenerate the clients with:
