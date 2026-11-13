@@ -1,0 +1,7 @@
+## Transaction CSV import
+
+Run `tools/import-transactions/import-transactions.script.sh [input.csv] [output.json]` to import the configured CSV. The wrapper loads the default Node version from NVM if Node is missing from `PATH`, then uses Node's built-in TypeScript transformer; `pnpm` and `tsx` are not required. Node.js `>=22.22.3` is required. Input and output default to the paths in `import-transactions.script.config.ts`; CLI paths override them. By default, the importer merges by stable row ID, refreshing matching source rows and preserving unrelated transactions. Set `clearExistingTransactions` to `true` in the config to clear the destination store before importing.
+
+Update [`import-transactions.script.config.ts`](import-transactions.script.config.ts) for each import source: set the target user ID, CSV headers, input path, and exact source-code-to-beneficiary mappings. Each mapping can contain any number of user IDs. Unmapped values are logged and skipped.
+
+Each imported transaction uses the configured `targetUserId` as payer or refund receiver. The configured beneficiary-code column is looked up exactly in `beneficiaryMappings`; unmapped values are skipped and reported. Negative amounts become refunds, with their absolute value stored because the transaction model requires positive amounts; positive amounts become expenses. Rows without a name, usable amount, or complete valid date are skipped and reported. Unconfigured columns are ignored.
