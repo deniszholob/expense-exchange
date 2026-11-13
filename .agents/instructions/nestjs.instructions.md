@@ -20,6 +20,7 @@ Apply to NestJS modules, controllers, providers, API schemas, persistence adapte
 ## TypeScript and async behavior
 
 - Follow `.agents/instructions/typescript.instructions.md` for strict typing, string enums, regions, imports, and error narrowing.
+- For Node ESM server-side relative imports, include the `.js` specifier so TypeScript resolves the source file and Node resolves the emitted module. Extensionless imports can work in bundlers but fail when Node loads emitted ESM directly; this repository encountered that failure during OpenAPI generation after switching server resolution to `Bundler`. The server now uses `NodeNext` and `.js` specifiers.
 - Use `async`/`await` consistently for promise-based I/O. Await writes and handle failures; do not silently detach asynchronous tasks.
 - Avoid blocking filesystem or CPU-heavy work in request handlers. Keep JSON I/O bounded and asynchronous.
 - Do not return `any`, raw exceptions, stack traces, internal paths, secrets, or implementation details to clients.
@@ -36,6 +37,7 @@ Apply to NestJS modules, controllers, providers, API schemas, persistence adapte
 
 - Generate Swagger/OpenAPI from the running Nest application and shared schemas. Keep interactive docs at `/api/docs` and the JSON spec aligned with the implemented API.
 - Document request and response bodies with named Swagger DTO classes. Use those classes in `@ApiBody()` and response decorators; use `isArray: true` for array responses and named DTO properties for nested objects. This ensures OpenAPI emits reusable component schemas and generated clients share stable, meaningful model names instead of creating a separate anonymous type for each operation.
+- When multiple DTOs expose the same domain enum, document it once in OpenAPI with its canonical enum name so API generation reuses one enum type rather than creating duplicate DTO-scoped enums.
 - Do not pass inline schemas or schemas converted from Zod (for example, `z.toJSONSchema()`) into Swagger decorators for API bodies or responses. Keep shared Zod schemas as the runtime validation source at the request boundary, and keep DTO fields aligned with their inferred types (use `implements` where the shape matches). Give request and response DTOs distinct names when their contracts differ.
 - Add endpoint summaries, operation descriptions, response schemas, and error responses so the spec is useful to both people and generators.
 - Generate the Angular API client from the OpenAPI document through the repository's documented script. Do not hand-edit generated client/spec output.

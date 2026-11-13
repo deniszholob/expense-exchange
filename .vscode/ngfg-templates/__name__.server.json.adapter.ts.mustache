@@ -1,0 +1,72 @@
+// #region Imports
+import { randomUUID } from 'node:crypto';
+import { join } from 'node:path';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { JsonStore } from '../utils/json-store';
+import { {{upperCamelCaseName}}Repository } from './{{dashCaseName}}.server.repository';
+import {
+  {{upperCamelCaseName}}Schema,
+  {{upperCamelCaseName}}StoreSchema,
+} from './{{dashCaseName}}.server.schema';
+import type {
+  Create{{upperCamelCaseName}},
+  {{upperCamelCaseName}},
+} from './{{dashCaseName}}.server.schema';
+// #endregion
+
+// #region Adapter
+@Injectable()
+export class {{upperCamelCaseName}}JsonAdapter extends {{upperCamelCaseName}}Repository {
+  private readonly store = new JsonStore(
+    join(process.env['DATA_DIR'] ?? '.dist/data', '{{dashCaseName}}.json'),
+    {{upperCamelCaseName}}StoreSchema,
+    () => ({ version: 1, records: [] }),
+  );
+
+  public async getAll(): Promise<{{upperCamelCaseName}}[]> {
+    return (await this.store.read()).records;
+  }
+
+  public async getById(id: string): Promise<{{upperCamelCaseName}}> {
+    const record = (await this.store.read()).records.find(
+      (item) => item.id === id,
+    );
+    if (!record) throw new NotFoundException('Record not found');
+    return record;
+  }
+
+  public async create(
+    input: Create{{upperCamelCaseName}},
+  ): Promise<{{upperCamelCaseName}}> {
+    return this.store.update((store) => {
+      const record = {{upperCamelCaseName}}Schema.parse({
+        ...input,
+        id: randomUUID(),
+      });
+      store.records.push(record);
+      return record;
+    });
+  }
+
+  public async update(
+    id: string,
+    input: Create{{upperCamelCaseName}},
+  ): Promise<{{upperCamelCaseName}}> {
+    return this.store.update((store) => {
+      const index = store.records.findIndex((item) => item.id === id);
+      if (index < 0) throw new NotFoundException('Record not found');
+      const record = {{upperCamelCaseName}}Schema.parse({ ...input, id });
+      store.records[index] = record;
+      return record;
+    });
+  }
+
+  public async delete(id: string): Promise<{{upperCamelCaseName}}> {
+    return this.store.update((store) => {
+      const index = store.records.findIndex((item) => item.id === id);
+      if (index < 0) throw new NotFoundException('Record not found');
+      return store.records.splice(index, 1)[0]!;
+    });
+  }
+}
+// #endregion

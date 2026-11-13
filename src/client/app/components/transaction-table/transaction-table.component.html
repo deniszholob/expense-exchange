@@ -1,0 +1,38 @@
+<ng-template #typeCell let-row="row">
+  <span
+    class="rounded-control border-finance-border inline-flex border px-2 py-1 text-xs"
+    [class.text-finance-negative]="row.kind === TransactionType.Expense"
+    [class.text-finance-positive]="row.kind === TransactionType.Income"
+    [class.text-amber-300]="row.kind === TransactionType.Refund"
+  >
+    {{ row.kind }}
+  </span>
+</ng-template>
+
+<ng-template #amountCell let-row="row">
+  <span
+    class="font-semibold tabular-nums"
+    [class.text-finance-negative]="row.kind === TransactionType.Expense"
+    [class.text-finance-positive]="row.kind === TransactionType.Income"
+    [class.text-amber-300]="row.kind === TransactionType.Refund"
+  >
+    {{ row.kind === TransactionType.Expense ? '−' : '+' }}{{ row.amount | currency }}
+  </span>
+</ng-template>
+
+<app-data-table
+  [$data]="$rows()"
+  [$totalResults]="$totalResults()"
+  [$columns]="$columns()"
+  [$tableClass]="'min-w-[860px] table-auto lg:table-fixed'"
+  [$title]="'Transactions'"
+  [$caption]="'Transactions'"
+  [$emptyMessage]="'No transactions in this date range.'"
+  [$addActionLabel]="'Add transaction'"
+  [$canEditRow]="canManageRow"
+  [$canDeleteRow]="canManageRow"
+  [$striped]="false"
+  (addRequested)="addRequested.emit()"
+  (editRequested)="editRow($event)"
+  (deleteRequested)="deleteRow($event)"
+/>

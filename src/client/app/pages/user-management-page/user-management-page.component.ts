@@ -19,11 +19,13 @@ import {
   LucideUserRoundPlus,
 } from '@lucide/angular';
 import { firstValueFrom } from 'rxjs';
-import type { AuthUserDto } from 'src/client/api/generated/expense-exchange-api.schemas';
+import {
+  UserRole,
+  type AuthUserDto,
+} from 'src/client/api/generated/expense-exchange-api.schemas';
 import { AuthService } from 'src/client/api/generated/auth/auth.service';
 import { AppService } from 'src/client/app/app.service';
 import { DataSource } from 'src/client/app/shared/data-source.enum';
-import { UserRole } from '../../../../util/user-role.enum';
 import { PageLayoutComponent } from 'src/client/app/layout';
 import { FormFieldComponent } from '../../components/forms/form-field/form-field.component';
 import { AccountFieldsComponent } from '../../components/forms/account-fields/account-fields.component';
@@ -35,6 +37,7 @@ import { getHttpErrorMessage } from '../../shared/http-error-message';
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-user-management-page',
   templateUrl: './user-management-page.component.html',
+  host: { class: 'contents' },
   imports: [
     CommonModule,
     PageLayoutComponent,
@@ -160,9 +163,10 @@ export class UserManagementPageComponent {
       .some((member) => member.id === id);
     const referenced = this.appService
       .exportLocalStore()
-      .expenses.some(
-        (expense) =>
-          expense.paidByUserId === id || expense.paidForUserIds.includes(id),
+      .transactions.some(
+        (transaction) =>
+          transaction.targetUserId === id ||
+          transaction.beneficiaryUserIds.includes(id),
       );
     if (inGroup || referenced) {
       this.$error.set(

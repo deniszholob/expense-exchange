@@ -13,6 +13,8 @@ Apply to frontend/backend structure, shared models, API clients, data sources, a
 - `src/server/`: NestJS API and server-only adapters.
 - `src/desktop/`: Electron main process and narrow desktop bridge code.
 - `src/util/`: framework-independent shared utilities and domain contracts.
+- `tools/`: TypeScript repository tools, each in its own `<tool-name>/` folder with `<tool-name>.script.ts` and optional `<tool-name>.script.config.ts`; optional shell launchers only invoke the TypeScript tool.
+- `src/assets/`: shared static assets, screenshots, and brand icons.
 - Shared domain contracts belong in a location importable by both client and server without pulling browser-only or Node-only dependencies across the boundary.
 - The Docker runtime serves the Angular build and API from one origin where practical. GitHub Pages serves only static frontend assets.
 - Electron initially loads the frontend and connects through the same API/data-source abstractions. Do not add native file APIs to shared domain code.
@@ -22,6 +24,7 @@ Apply to frontend/backend structure, shared models, API clients, data sources, a
 
 - Define domain schemas with Zod and derive TypeScript types from them. Avoid maintaining schemas, interfaces, API DTOs, and client models that duplicate the same shape.
 - Keep domain contracts independent of Angular, Nest decorators, HTTP request objects, and filesystem APIs.
+- Keep Zod schemas in `src/util/` only when both the server and browser need the same runtime validation, such as validating browser-local data. Put server-only schemas and enums inside their server domain. Generated client enums and DTOs are build output derived from the server API; server code must not import them.
 - Validate data at boundaries: API requests/responses, imported files, Web Storage reads, and JSON repository reads.
 - Keep public API models separate from persistence-only fields such as password hashes and internal metadata.
 
@@ -31,6 +34,7 @@ Apply to frontend/backend structure, shared models, API clients, data sources, a
 - Generate OpenAPI from the Nest application using Swagger integration. Expose interactive docs at `/api/docs` and a machine-readable spec.
 - Generate the Angular API client from the OpenAPI document as part of the documented build workflow. Treat generated code as output; do not hand-edit it.
 - Keep generated Angular API clients under `src/client/api/generated/` and their maintained guide at `src/client/api/README.md`.
+- Client code must not import from `src/server/`. Use generated API DTOs, enums, and services for server-owned contracts; use `src/util/` only for framework-independent domain behavior that is not an API contract.
 - Keep a public health endpoint separate from authenticated data routes. It returns only basic health/version information, never user data or secrets.
 - Keep the API base URL configurable so the browser demo can point to a self-hosted service or compatible mock server. Configure CORS narrowly for intended origins.
 

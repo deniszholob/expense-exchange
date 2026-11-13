@@ -10,23 +10,22 @@ import {
 import type { HttpResourceRef } from '@angular/common/http';
 import { firstValueFrom, timeout } from 'rxjs';
 import { z } from 'zod';
-import { AuthService as AuthApiService } from '../api/generated/auth/auth.service';
-import { authControllerListLoginAccountsResource } from '../api/generated/auth/auth.resource';
-import { HealthService } from '../api/generated/health/health.service';
-import { expenseControllerGetExpensesResource } from '../api/generated/expenses/expenses.resource';
-import { groupMembersControllerGetMembersResource } from '../api/generated/group-members/group-members.resource';
+import { AuthService as AuthApiService } from 'src/client/api/generated/auth/auth.service';
+import { authControllerListLoginAccountsResource } from 'src/client/api/generated/auth/auth.resource';
+import { HealthService } from 'src/client/api/generated/health/health.service';
+import { transactionControllerGetTransactionsResource } from 'src/client/api/generated/transactions/transactions.resource';
+import { groupMembersControllerGetMembersResource } from 'src/client/api/generated/group-members/group-members.resource';
 import {
-  AuthUserDtoRole,
+  UserRole,
   type AuthUserDto,
   type LoginAccountDto,
-  ExpenseDto,
-  GroupMemberDto,
-} from '../api/generated/expense-exchange-api.schemas';
+  type GroupMemberDto,
+  type TransactionDto,
+} from 'src/client/api/generated/expense-exchange-api.schemas';
 import { DATA_SOURCE_INFO, DataSource } from './shared/data-source.enum';
-import type { DetailedExpense } from './shared/detailed-expense/detailed-expense.model';
 import { getConfiguredRemoteApiUrl } from './shared/remote-api-config';
-import { UserRole } from '../../util/user-role.enum';
 import { getHttpErrorMessage } from './shared/http-error-message';
+import { LocalTransactionSchema } from 'src/client/app/shared/local-transaction.schema';
 // #endregion
 
 // #region Constants
@@ -43,8 +42,8 @@ export class AppService {
   private readonly $groupMembersResource = signal<
     HttpResourceRef<GroupMemberDto[]> | undefined
   >(undefined);
-  private readonly $expensesResource = signal<
-    HttpResourceRef<ExpenseDto[]> | undefined
+  private readonly $transactionsResource = signal<
+    HttpResourceRef<TransactionDto[]> | undefined
   >(undefined);
   private readonly $loginAccountsResource = signal<
     HttpResourceRef<LoginAccountDto[]> | undefined
@@ -69,19 +68,13 @@ export class AppService {
     const resource = this.$loginAccountsResource();
     return resource?.hasValue() ? resource.value() : [];
   });
-  public readonly $expenses = computed(() => {
+  public readonly $transactions = computed(() => {
     if (this.$dataSource() === DataSource.Local)
-      return this.$localStore().expenses;
-    const resource = this.$expensesResource();
+      return this.$localStore().transactions;
+    const resource = this.$transactionsResource();
     return resource?.hasValue() ? resource.value() : [];
   });
-  public readonly $detailedExpenses = computed(() =>
-    expensesUserIdToDetailedExpense(
-      this.$expenses(),
-      groupMemberArrayToMapById(this.$groupMembers()),
-    ),
-  );
-  public readonly $currentUser = signal<AuthUser | undefined>(undefined);
+  public readonly $currentUser = signal<AuthUserDto | undefined>(undefined);
   public readonly $authSetupRequired = signal<boolean>(false);
   public readonly $authStatusReady = signal<boolean>(false);
   public readonly $authError = signal<string | undefined>(undefined);
@@ -89,12 +82,12 @@ export class AppService {
   public readonly $apiLoading = computed(
     () =>
       this.$groupMembersResource()?.isLoading() === true ||
-      this.$expensesResource()?.isLoading() === true,
+      this.$transactionsResource()?.isLoading() === true,
   );
   public readonly $apiError = computed(
     () =>
       this.$groupMembersResource()?.error() ??
-      this.$expensesResource()?.error(),
+      this.$transactionsResource()?.error(),
   );
 
   public readonly $dataSource = signal(readDataSource());
@@ -116,7 +109,7 @@ export class AppService {
       .finally(() => {
         this.$currentUser.set(undefined);
         this.$groupMembersResource.set(undefined);
-        this.$expensesResource.set(undefined);
+        this.$transactionsResource.set(undefined);
       });
   }
 
@@ -126,7 +119,7 @@ export class AppService {
       const result = await firstValueFrom(
         this.authApi.authControllerLogin({ username, password }),
       );
-      this.$currentUser.set(toAuthUser(result.user));
+      this.$currentUser.set(result.user);
       this.ensureRemoteResources();
     } catch (error: unknown) {
       this.$authError.set(getHttpErrorMessage(error, 'Unable to sign in.'));
@@ -144,7 +137,7 @@ export class AppService {
       const result = await firstValueFrom(
         this.authApi.authControllerSetup({ name, username, password }),
       );
-      this.$currentUser.set(toAuthUser(result.user));
+      this.$currentUser.set(result.user);
       this.$authSetupRequired.set(false);
       this.ensureRemoteResources();
     } catch (error: unknown) {
@@ -170,7 +163,7 @@ export class AppService {
         password: password || undefined,
       }),
     );
-    this.$currentUser.set(toAuthUser(user));
+    this.$currentUser.set(user);
   }
 
   public readonly authenticationReady: Promise<void> =
@@ -184,7 +177,7 @@ export class AppService {
     this.$authSetupRequired.set(false);
     this.$currentUser.set(undefined);
     this.$groupMembersResource.set(undefined);
-    this.$expensesResource.set(undefined);
+    this.$transactionsResource.set(undefined);
     this.$loginAccountsResource.set(undefined);
     try {
       await firstValueFrom(
@@ -210,7 +203,7 @@ export class AppService {
               .pipe(timeout({ first: REMOTE_STATUS_TIMEOUT_MS })),
           );
           if (checkId !== this.remoteConnectionCheckId) return;
-          this.$currentUser.set(toAuthUser(result));
+          this.$currentUser.set(result);
           this.ensureRemoteResources();
         } catch {
           if (checkId !== this.remoteConnectionCheckId) return;
@@ -260,20 +253,20 @@ export class AppService {
     }));
   }
 
-  public upsertLocalExpense(expense: ExpenseDto): void {
+  public upsertLocalTransaction(transaction: TransactionDto): void {
     this.updateLocalStore((store) => ({
       ...store,
-      expenses: [
-        ...store.expenses.filter((item) => item.id !== expense.id),
-        expense,
+      transactions: [
+        ...store.transactions.filter((item) => item.id !== transaction.id),
+        transaction,
       ],
     }));
   }
 
-  public removeLocalExpense(id: string): void {
+  public removeLocalTransaction(id: string): void {
     this.updateLocalStore((store) => ({
       ...store,
-      expenses: store.expenses.filter((item) => item.id !== id),
+      transactions: store.transactions.filter((item) => item.id !== id),
     }));
   }
 
@@ -281,8 +274,10 @@ export class AppService {
     const parsed = LocalStoreSchema.safeParse(value);
     if (!parsed.success) return false;
     this.updateLocalStore(() => ({
-      ...parsed.data,
+      version: parsed.data.version,
+      users: parsed.data.users,
       availableUsers: parsed.data.availableUsers ?? parsed.data.users,
+      transactions: parsed.data.transactions,
     }));
     return true;
   }
@@ -291,10 +286,10 @@ export class AppService {
   }
   public clearLocalStore(): void {
     this.updateLocalStore(() => ({
-      version: 1,
+      version: 2,
       users: [],
       availableUsers: [],
-      expenses: [],
+      transactions: [],
     }));
   }
   public selectDataSource(source: DataSource): void {
@@ -312,7 +307,7 @@ export class AppService {
     this.$authSetupRequired.set(false);
     this.$authStatusReady.set(source === DataSource.Local);
     this.$groupMembersResource.set(undefined);
-    this.$expensesResource.set(undefined);
+    this.$transactionsResource.set(undefined);
     this.$loginAccountsResource.set(undefined);
     if (source === DataSource.Local) {
       this.$currentUser.set(LOCAL_AUTH_USER);
@@ -325,8 +320,8 @@ export class AppService {
     this.$currentUser.set(undefined);
   }
 
-  public refreshExpenses(): void {
-    const resource = this.$expensesResource();
+  public refreshTransactions(): void {
+    const resource = this.$transactionsResource();
     if (resource) resource.reload();
     else if (this.$currentUser()) this.ensureRemoteResources();
   }
@@ -347,15 +342,15 @@ export class AppService {
   }
 
   private ensureRemoteResources(): void {
-    if (this.$groupMembersResource() && this.$expensesResource()) return;
+    if (this.$groupMembersResource() && this.$transactionsResource()) return;
     runInInjectionContext(this.injector, () => {
       if (!this.$groupMembersResource())
         this.$groupMembersResource.set(
           groupMembersControllerGetMembersResource({ defaultValue: [] }),
         );
-      if (!this.$expensesResource())
-        this.$expensesResource.set(
-          expenseControllerGetExpensesResource({ defaultValue: [] }),
+      if (!this.$transactionsResource())
+        this.$transactionsResource.set(
+          transactionControllerGetTransactionsResource({ defaultValue: [] }),
         );
     });
   }
@@ -378,54 +373,29 @@ export class AppService {
 // #endregion
 
 // #region Helpers
-export interface AuthUser {
-  id: string;
-  name: string;
-  username: string;
-  role: UserRole;
-}
-
 export interface LocalStore {
-  version: 1;
+  version: 2;
   users: GroupMemberDto[];
   availableUsers: GroupMemberDto[];
-  expenses: ExpenseDto[];
+  transactions: TransactionDto[];
 }
 
 const LOCAL_DATA_STORAGE_KEY = 'expense-exchange.local-data';
 const REMOTE_STATUS_TIMEOUT_MS = 6000;
-const LOCAL_AUTH_USER: AuthUser = {
+const LOCAL_AUTH_USER: AuthUserDto = {
   id: 'local-user',
   name: 'Local',
   username: 'local',
   role: UserRole.User,
 };
 const LocalStoreSchema = z.object({
-  version: z.literal(1),
+  version: z.literal(2),
   users: z.array(z.object({ id: z.string(), name: z.string() })),
   availableUsers: z
     .array(z.object({ id: z.string(), name: z.string() }))
     .optional(),
-  expenses: z.array(
-    z.object({
-      id: z.string(),
-      name: z.string(),
-      description: z.string(),
-      amount: z.number(),
-      datePaid: z.string(),
-      forDate: z.string(),
-      paidByUserId: z.string(),
-      paidForUserIds: z.array(z.string()),
-    }),
-  ),
+  transactions: z.array(LocalTransactionSchema),
 });
-
-function toAuthUser(user: AuthUserDto): AuthUser {
-  return {
-    ...user,
-    role: user.role === AuthUserDtoRole.Admin ? UserRole.Admin : UserRole.User,
-  };
-}
 
 function readLocalStore(): LocalStore {
   try {
@@ -435,15 +405,22 @@ function readLocalStore(): LocalStore {
       const result = LocalStoreSchema.safeParse(parsed);
       if (result.success) {
         return {
-          ...result.data,
+          version: result.data.version,
+          users: result.data.users,
           availableUsers: result.data.availableUsers ?? result.data.users,
+          transactions: result.data.transactions,
         };
       }
     }
   } catch {
     /* Use a clean local store when browser storage is unavailable or invalid. */
   }
-  return { version: 1, users: [], availableUsers: [], expenses: [] };
+  return {
+    version: 2,
+    users: [],
+    availableUsers: [],
+    transactions: [],
+  };
 }
 
 function readDataSource(): DataSource {
@@ -468,29 +445,4 @@ function isDataSourceConfigured(): boolean {
   }
 }
 
-function groupMemberArrayToMapById(
-  users: GroupMemberDto[],
-): Map<string, GroupMemberDto> {
-  return new Map(users.map((user) => [user.id, user]));
-}
-
-function expenseUserIdToRender(
-  id: string,
-  users: Map<string, GroupMemberDto>,
-): GroupMemberDto {
-  return users.get(id) ?? { id, name: id };
-}
-
-function expensesUserIdToDetailedExpense(
-  expenses: ExpenseDto[],
-  users: Map<string, GroupMemberDto>,
-): DetailedExpense[] {
-  return expenses.map((expense) => ({
-    ...expense,
-    paidByUser: expenseUserIdToRender(expense.paidByUserId, users),
-    paidForUsers: expense.paidForUserIds.map((id) =>
-      expenseUserIdToRender(id, users),
-    ),
-  }));
-}
 // #endregion

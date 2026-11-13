@@ -1,5 +1,5 @@
 // #region Imports
-import type { GroupMemberDto } from '../../api/generated/expense-exchange-api.schemas';
+import type { GroupMemberDto } from 'src/client/api/generated/expense-exchange-api.schemas';
 // #endregion
 
 // #region User Helpers

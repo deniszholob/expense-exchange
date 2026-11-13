@@ -9,7 +9,7 @@ import {
 
 import { GroupPageComponent } from './group-page.component';
 import { importProvidersFrom } from '@angular/core';
-import { MOCK_ExpenseApiProvider } from 'src/client/app/expense-api.mock';
+import { MOCK_TransactionApiProvider } from 'src/client/api/mocks/transaction-api.mock';
 // #endregion
 
 // #region Implementation
@@ -22,7 +22,7 @@ const meta: Meta<ComponentWithCustomControls> = {
   decorators: [
     moduleMetadata({ imports: [] }),
     applicationConfig({
-      providers: [importProvidersFrom(), MOCK_ExpenseApiProvider],
+      providers: [importProvidersFrom(), MOCK_TransactionApiProvider],
     }),
   ],
   parameters: {

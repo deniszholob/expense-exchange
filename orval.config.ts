@@ -16,6 +16,7 @@ export default defineConfig({
           baseUrl: { apiId: 'ExpenseExchange' },
           retrievalClient: 'both',
         },
+        enumGenerationType: 'enum',
       },
     },
   },

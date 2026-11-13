@@ -21,7 +21,7 @@ export interface SegmentedControlOption {
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-segmented-control',
   templateUrl: './segmented-control.component.html',
-  host: { class: 'block' },
+  host: { class: 'contents' },
 })
 export class SegmentedControlComponent implements FormValueControl<string> {
   public readonly value = model.required<string>();

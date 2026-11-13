@@ -8,7 +8,7 @@ import {
 import { BrowserModule } from '@angular/platform-browser';
 import { provideRouter, TitleStrategy } from '@angular/router';
 
-import { provideExpenseExchangeBaseUrl } from '../api/generated/expense-exchange-api.base-url';
+import { provideExpenseExchangeBaseUrl } from 'src/client/api/generated/expense-exchange-api.base-url';
 import { appRoutes } from './app.routes';
 import { AppTitleService } from './core';
 import { remoteApiBaseUrlInterceptor } from './shared/remote-api-config';

@@ -13,9 +13,9 @@
       </div>
       <a
         class="btn-primary inline-flex min-h-10 items-center justify-center gap-2 px-4 py-2 text-sm no-underline"
-        routerLink="/expenses/new"
+        routerLink="/transactions"
       >
-        <svg class="size-4" lucidePlus aria-hidden="true"></svg> Add expense
+        <svg class="size-4" lucideReceipt aria-hidden="true"></svg> View transactions
       </a>
     </div>
 
@@ -23,38 +23,27 @@
       <article class="stat-card">
         <div class="flex flex-wrap items-center justify-between gap-2">
           <span class="eyebrow">NET CASH FLOW · {{ $rangeLabel() | uppercase }}</span>
-          <div class="flex gap-1" role="group" aria-label="Spending view">
-            <button
-              class="btn-secondary min-h-8 px-2 py-1 text-xs"
-              [class.btn-primary]="$spendingScope() === DashboardSpendingScope.Group"
-              [attr.aria-pressed]="$spendingScope() === DashboardSpendingScope.Group"
-              (click)="selectSpendingScope(DashboardSpendingScope.Group)"
-              type="button"
-            >
-              Group
-            </button>
-            <button
-              class="btn-secondary min-h-8 px-2 py-1 text-xs"
-              [class.btn-primary]="$spendingScope() === DashboardSpendingScope.Personal"
-              [attr.aria-pressed]="$spendingScope() === DashboardSpendingScope.Personal"
-              [disabled]="!$personalSpendingAvailable()"
-              [attr.title]="
-                $personalSpendingAvailable()
-                  ? 'Show your expense shares'
-                  : 'Personal spending is available when signed in as a group member'
-              "
-              (click)="selectSpendingScope(DashboardSpendingScope.Personal)"
-              type="button"
-            >
-              My share
-            </button>
-          </div>
+          <app-segmented-control
+            [(value)]="$spendingScope"
+            [$label]="'Cash flow scope'"
+            [$options]="$scopeOptions()"
+          />
         </div>
-        <strong class="text-finance-negative text-3xl font-semibold tracking-tight tabular-nums">
-          −{{ $trackedSpending() | currency }}
-        </strong>
+        @if ($trackedNetCashFlow() > 0) {
+          <strong class="text-finance-positive text-3xl font-semibold tracking-tight tabular-nums">
+            +{{ $trackedNetCashFlow() | currency }}
+          </strong>
+        } @else if ($trackedNetCashFlow() < 0) {
+          <strong class="text-finance-negative text-3xl font-semibold tracking-tight tabular-nums">
+            −{{ -$trackedNetCashFlow() | currency }}
+          </strong>
+        } @else {
+          <strong class="text-3xl font-semibold tracking-tight tabular-nums">
+            {{ 0 | currency }}
+          </strong>
+        }
         <span class="text-finance-muted text-xs">{{ $spendingDescription() }}</span>
-        <div class="mt-2" role="img" aria-label="Income compared with expenses">
+        <div class="mt-2" role="img" aria-label="Income, expenses, and refunds">
           <div class="bg-finance-raised flex h-2 overflow-hidden rounded-full" aria-hidden="true">
             <span
               class="bg-finance-positive block h-full transition-[width]"
@@ -64,10 +53,15 @@
               class="bg-finance-negative block h-full transition-[width]"
               [style.width.%]="$expenseBarWidth()"
             ></span>
+            <span
+              class="block h-full bg-amber-400 transition-[width]"
+              [style.width.%]="$refundBarWidth()"
+            ></span>
           </div>
           <div class="text-finance-muted mt-2 flex justify-between gap-3 text-xs tabular-nums">
             <span class="text-finance-positive">Income {{ $trackedIncome() | currency }}</span>
             <span class="text-finance-negative">Expenses −{{ $trackedSpending() | currency }}</span>
+            <span class="text-amber-300">Refunds +{{ $trackedRefunds() | currency }}</span>
           </div>
         </div>
       </article>
@@ -94,15 +88,16 @@
           See who paid for each person and how the group balances out.
         </p>
       </div>
-      <app-date-range-selector
-        class="border-finance-border block border-b px-5 py-4 sm:px-6"
-        [($range)]="$dateRange"
-        [$idPrefix]="'dashboard-balance'"
-        [$earliestExpenseDate]="$earliestExpenseDate()"
-      />
-      @if ($rangeSummary().expenseCount === 0) {
+      <div class="border-finance-border border-b px-5 py-4 sm:px-6">
+        <app-date-range-selector
+          [($range)]="$dateRange"
+          [$idPrefix]="'dashboard-balance'"
+          [$earliestExpenseDate]="$earliestExpenseDate()"
+        />
+      </div>
+      @if ($rangeSummary().transactionCount === 0) {
         <p class="text-finance-muted px-5 py-8 text-center text-sm sm:px-6">
-          No expenses match this date range.
+          No transactions match this date range.
         </p>
       } @else {
         <div class="grid gap-6 p-5 sm:p-6 lg:grid-cols-2">
@@ -177,17 +172,19 @@
       >
         <div>
           <h2 class="font-semibold">Recent activity</h2>
-          <p class="text-finance-muted mt-1 text-xs">The latest expenses added to your ledger</p>
+          <p class="text-finance-muted mt-1 text-xs">
+            The latest transactions added to your ledger
+          </p>
         </div>
-        <a class="link text-sm no-underline" routerLink="/expenses">View all</a>
+        <a class="link text-sm no-underline" routerLink="/transactions">View all</a>
       </div>
-      @if ($recentExpenses().length === 0) {
+      @if ($recentTransactions().length === 0) {
         <div class="text-finance-muted px-5 py-10 text-center text-sm">
-          Your recent expenses will appear here.
+          Your recent transactions will appear here.
         </div>
       } @else {
         <ul class="divide-finance-border divide-y">
-          @for (expense of $recentExpenses(); track expense.id) {
+          @for (transaction of $recentTransactions(); track transaction.id) {
             <li class="flex flex-wrap items-center justify-between gap-3 px-5 py-4 sm:px-6">
               <div class="flex min-w-0 items-center gap-3">
                 <span
@@ -196,15 +193,21 @@
                   <svg class="size-4" lucideReceipt aria-hidden="true"></svg>
                 </span>
                 <div class="min-w-0">
-                  <p class="truncate text-sm font-medium">{{ expense.name }}</p>
+                  <p class="truncate text-sm font-medium">{{ transaction.name }}</p>
                   <p class="text-finance-muted mt-1 text-xs">
-                    Paid by {{ expense.paidByUser.name }} ·
-                    {{ expense.datePaid | date: 'mediumDate' }}
+                    {{ transaction.type === TransactionType.Expense ? 'Paid by' : 'Received by' }}
+                    {{ transaction.targetName }} ·
+                    {{ transaction.completeDate | date: 'mediumDate' }}
                   </p>
                 </div>
               </div>
-              <strong class="text-finance-negative text-sm font-semibold tabular-nums">
-                {{ -expense.amount | currency }}
+              <strong
+                class="text-sm font-semibold tabular-nums"
+                [class.text-finance-negative]="transaction.type === TransactionType.Expense"
+                [class.text-finance-positive]="transaction.type !== TransactionType.Expense"
+              >
+                {{ transaction.type === TransactionType.Expense ? '−' : '+'
+                }}{{ transaction.amount | currency }}
               </strong>
             </li>
           }

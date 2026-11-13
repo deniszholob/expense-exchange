@@ -10,7 +10,7 @@ import {
 import { importProvidersFrom } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { HeaderComponent } from './header.component';
-import { MOCK_ExpenseApiProvider } from 'src/client/app/expense-api.mock';
+import { MOCK_TransactionApiProvider } from 'src/client/api/mocks/transaction-api.mock';
 import { MOCK_Router } from 'src/client/app/app.routes.mock';
 // #endregion
 
@@ -34,7 +34,7 @@ const meta: Meta<ComponentWithCustomControls> = {
     applicationConfig({
       providers: [
         importProvidersFrom(),
-        MOCK_ExpenseApiProvider,
+        MOCK_TransactionApiProvider,
         // { provide: Router, useValue: mockRouter },
         // provideRouter([
         //   { path: '', component: TestComponent },

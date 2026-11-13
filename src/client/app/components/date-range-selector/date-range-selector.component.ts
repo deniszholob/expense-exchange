@@ -39,6 +39,7 @@ const MONTH_OPTIONS = [
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-date-range-selector',
   templateUrl: './date-range-selector.component.html',
+  host: { class: 'contents' },
   imports: [FormFieldComponent],
 })
 export class DateRangeSelectorComponent {

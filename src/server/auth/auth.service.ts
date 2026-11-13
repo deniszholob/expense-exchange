@@ -12,24 +12,21 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { ExpenseRepository } from '../expenses/expense.repository.js';
-import { AuthRepository, type AuthAccount } from './auth.repository.js';
-import { UserRole } from '../../util/user-role.enum.js';
+import { GroupMemberRepository } from '../group-member/group-member.repository.js';
+import { AuthRepository } from './auth.repository.js';
+import type { AuthAccount } from './auth-account.schema.js';
+import type { AuthUser, LoginAccount } from './auth.schema.js';
+import { UserRole } from './user-role.enum.js';
 // #endregion
 
 // #region Types and Constants
 const scrypt = promisify(scryptCallback);
-const TOKEN_LIFETIME_SECONDS = 60 * 60 * 24 * 14;
-export interface AuthUser {
-  id: string;
-  name: string;
-  username: string;
-  role: UserRole;
-}
-export interface LoginAccount {
-  username: string;
-  role: UserRole;
-}
+
+const TOKEN_LIFETIME_DAYS = 14;
+const TOKEN_LIFETIME_HOURS = 24 * TOKEN_LIFETIME_DAYS;
+const TOKEN_LIFETIME_MINUTES = 60 * TOKEN_LIFETIME_HOURS;
+const TOKEN_LIFETIME_SECONDS = 60 * TOKEN_LIFETIME_MINUTES;
+
 interface AccountsStore {
   accounts: AuthAccount[];
 }
@@ -41,7 +38,7 @@ export class AuthService {
   private accountWriteQueue: Promise<void> = Promise.resolve();
   public constructor(
     private readonly repository: AuthRepository,
-    private readonly expenses: ExpenseRepository,
+    private readonly groupMembers: GroupMemberRepository,
   ) {}
 
   public async status(): Promise<{ setupRequired: boolean }> {
@@ -141,7 +138,9 @@ export class AuthService {
 
   public async deleteManagedAccount(id: string): Promise<AuthUser> {
     if (
-      (await this.expenses.getGroupMembers()).some((member) => member.id === id)
+      (await this.groupMembers.getGroupMembers()).some(
+        (member) => member.id === id,
+      )
     )
       throw new ConflictException(
         'Remove this account from the group before deleting it',

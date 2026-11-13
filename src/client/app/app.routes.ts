@@ -1,7 +1,7 @@
 // #region Imports
 import { inject, isDevMode } from '@angular/core';
 import type { RedirectFunction, Route } from '@angular/router';
-import { PAGE_ROUTES, ROUTE_KEYWORDS } from './app.info';
+import { PageRoute, ROUTE_KEYWORDS } from './app.info';
 import { AppService } from './app.service';
 import { AdminGuard } from './guards/admin.guard';
 import { AuthGuard } from './guards/auth.guard';
@@ -13,16 +13,15 @@ import { DataSource } from './shared/data-source.enum';
 const DEV_ROUTE: Route[] = [];
 const redirectToStartupPage: RedirectFunction = () => {
   const appService = inject(AppService);
-  if (!appService.$dataSourceConfigured())
-    return `/${PAGE_ROUTES.CONNECTION_PAGE_ROOT}`;
+  if (!appService.$dataSourceConfigured()) return `/${PageRoute.Data}`;
   if (appService.$dataSource() === DataSource.Local)
-    return `/${PAGE_ROUTES.DASHBOARD_PAGE_ROOT}`;
-  return `/${PAGE_ROUTES.LOGIN_PAGE_ROOT}`;
+    return `/${PageRoute.Dashboard}`;
+  return `/${PageRoute.Login}`;
 };
 // https://angular.dev/api/core/isDevMode?tab=description
 if (isDevMode()) {
   DEV_ROUTE.push({
-    path: PAGE_ROUTES.DEV_PAGE_ROOT,
+    path: PageRoute.Dev,
     loadComponent: () =>
       import('./pages/dev-page/dev-page.component').then(
         (m) => m.DevPageComponent,
@@ -36,14 +35,14 @@ export const appRoutes: Route[] = [
   // { path: 'home', redirectTo: HOME_PAGE_ROOT, pathMatch: 'full' },
   // ======================================================================== //
   {
-    path: PAGE_ROUTES.LOGIN_PAGE_ROOT,
+    path: PageRoute.Login,
     loadComponent: () =>
       import('./pages/login-page/login-page.component').then(
         (module) => module.LoginPageComponent,
       ),
   },
   {
-    path: PAGE_ROUTES.PROFILE_PAGE_ROOT,
+    path: PageRoute.Profile,
     loadComponent: () =>
       import('./pages/profile-page/profile-page.component').then(
         (module) => module.ProfilePageComponent,
@@ -51,19 +50,19 @@ export const appRoutes: Route[] = [
     canActivate: [AuthGuard],
   },
   {
-    path: PAGE_ROUTES.CONNECTION_PAGE_ROOT,
+    path: PageRoute.Data,
     loadComponent: () =>
       import('./pages/connection-page/connection-page.component').then(
         (module) => module.ConnectionPageComponent,
       ),
   },
   {
-    path: PAGE_ROUTES.SETTINGS_PAGE_ROOT,
-    redirectTo: PAGE_ROUTES.CONNECTION_PAGE_ROOT,
+    path: PageRoute.Settings,
+    redirectTo: PageRoute.Data,
     pathMatch: 'full',
   },
   {
-    path: PAGE_ROUTES.DASHBOARD_PAGE_ROOT,
+    path: PageRoute.Dashboard,
     loadComponent: () =>
       import('./pages/dashboard-page/dashboard-page.component').then(
         (module) => module.DashboardPageComponent,
@@ -71,7 +70,7 @@ export const appRoutes: Route[] = [
     canActivate: [AuthGuard, UserGuard],
   },
   {
-    path: PAGE_ROUTES.GROUP_PAGE_ROOT,
+    path: PageRoute.Group,
     loadComponent: () =>
       import('./pages/group-page/group-page.component').then(
         (module) => module.GroupPageComponent,
@@ -79,7 +78,7 @@ export const appRoutes: Route[] = [
     canActivate: [AuthGuard, UserGuard],
   },
   {
-    path: PAGE_ROUTES.USER_MANAGEMENT_PAGE_ROOT,
+    path: PageRoute.Users,
     loadComponent: () =>
       import('./pages/user-management-page/user-management-page.component').then(
         (module) => module.UserManagementPageComponent,
@@ -87,20 +86,20 @@ export const appRoutes: Route[] = [
     canActivate: [AuthGuard, AdminGuard],
   },
   {
-    path: PAGE_ROUTES.EXPENSES_PAGE_ROOT,
+    path: PageRoute.Transactions,
     children: [
       {
         path: ROUTE_KEYWORDS.ROOT,
         loadComponent: () =>
-          import('./pages/expenses-page/expenses-page.component').then(
-            (module) => module.ExpensesPageComponent,
+          import('./pages/transactions-page/transactions-page.component').then(
+            (module) => module.TransactionsPageComponent,
           ),
       },
       {
         path: ROUTE_KEYWORDS.DETAIL_ITEM,
         loadComponent: () =>
-          import('./pages/expenses-page/expenses-page.component').then(
-            (module) => module.ExpensesPageComponent,
+          import('./pages/transactions-page/transactions-page.component').then(
+            (module) => module.TransactionsPageComponent,
           ),
       },
     ],

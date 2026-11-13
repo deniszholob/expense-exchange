@@ -4,7 +4,7 @@ This folder contains custom templates for the Angular Files Generator extension.
 
 The `.server.` templates use `server` as the custom template type. Select **Custom**, enter the feature name, then enter `server` to generate the server files together in that feature's output folder. They scaffold CRUD endpoints and the matching service, repository contract, Swagger DTOs, Zod validation, and a JSON file adapter. The generated example resource has a required `name` field; adapt it to the feature's domain.
 
-The current Angular Files Generator replaces `__name__` in output filenames, but does not replace `__adaptertype__`. This template contains a JSON file adapter: after generation, rename the adapter file by replacing `__adaptertype__` with `json`. The module import path must use the same filename. Other storage technologies need their own adapter implementation.
+The server templates generate a JSON adapter named `__name__.server.json.adapter.ts`. Each adapter delegates generic persistence work to `src/server/utils/json-store.ts`; only the adapter owns its domain schema and CRUD operations. Use this adapter pattern when adding another server resource, and add a separate adapter class only when supporting another persistence technology.
 
 Following the template pattern from
 

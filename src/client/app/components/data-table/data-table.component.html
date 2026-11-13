@@ -1,0 +1,181 @@
+<section
+  class="surface-card flex h-full min-h-0 flex-col overflow-hidden"
+  [attr.aria-label]="$title()"
+>
+  <header
+    class="border-finance-border flex shrink-0 items-center justify-between gap-4 border-b px-4 py-2"
+  >
+    <div class="min-w-0">
+      <h2 class="truncate text-sm font-semibold">{{ $title() }}</h2>
+      <p class="text-finance-muted mt-0.5 truncate text-xs">
+        {{ $filteredResults() }} filtered · {{ $totalResultCount() }} total results
+      </p>
+    </div>
+    @if ($showAddAction()) {
+      <button class="btn-primary shrink-0 px-3 py-1.5 text-sm" (click)="requestAdd()" type="button">
+        <svg class="size-4" lucidePlus aria-hidden="true"></svg>
+        {{ $addActionLabel() }}
+      </button>
+    }
+  </header>
+
+  <div class="flex min-h-0 flex-1 flex-col overflow-auto">
+    <table
+      class="table-base w-full min-w-full shrink-0 rounded-none border-0"
+      [class]="$tableClass()"
+    >
+      @if ($caption()) {
+        <caption class="sr-only">
+          {{
+            $caption()
+          }}
+        </caption>
+      }
+      <thead>
+        <tr>
+          @for (column of $columns(); track column.key) {
+            <th
+              [class]="column.headerClass ?? ''"
+              [attr.aria-sort]="
+                $sortState()?.key === column.key
+                  ? $sortState()?.direction === 'asc'
+                    ? 'ascending'
+                    : 'descending'
+                  : null
+              "
+            >
+              @if (column.sortable) {
+                <button
+                  class="text-finance-muted hover:text-finance-text inline-flex min-h-0 items-center gap-1 px-0 py-0 text-xs font-semibold tracking-wide uppercase transition-colors focus-visible:ring-2 focus-visible:ring-sky-400"
+                  [attr.aria-label]="'Sort by ' + column.label"
+                  (click)="sort(column)"
+                  type="button"
+                >
+                  {{ column.label }}
+                  @if ($sortState()?.key === column.key) {
+                    @if ($sortState()?.direction === 'asc') {
+                      <svg class="size-3.5 text-sky-300" lucideArrowUp aria-hidden="true"></svg>
+                    } @else {
+                      <svg class="size-3.5 text-sky-300" lucideArrowDown aria-hidden="true"></svg>
+                    }
+                  } @else {
+                    <svg class="size-3.5 opacity-60" lucideArrowDownUp aria-hidden="true"></svg>
+                  }
+                </button>
+              } @else {
+                {{ column.label }}
+              }
+            </th>
+          }
+          @if ($hasRowActions()) {
+            <th class="w-28 text-right">Actions</th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @if ($data().length > 0) {
+          @for (row of $renderRows(); track row.id; let rowIndex = $index) {
+            <tr
+              class="hover:bg-finance-hover"
+              [class.bg-finance-raised/30]="$striped() && rowIndex % 2 === 1"
+            >
+              @for (cell of row.cells; track cell.column.key) {
+                <td [class]="cell.column.cellClass ?? ''" [attr.title]="cell.tooltip ?? null">
+                  @if (cell.column.cellTemplate; as cellTemplate) {
+                    <ng-container
+                      [ngTemplateOutlet]="cellTemplate"
+                      [ngTemplateOutletContext]="{
+                        $implicit: row.data,
+                        row: row.data,
+                        value: cell.value,
+                        column: cell.column,
+                      }"
+                    />
+                  } @else {
+                    {{ cell.displayValue }}
+                  }
+                </td>
+              }
+              @if ($hasRowActions()) {
+                <td>
+                  <div class="flex justify-end gap-1">
+                    @if (row.canEdit) {
+                      <button
+                        class="btn-icon rounded-control text-finance-muted hover:bg-finance-raised hover:text-sky-300"
+                        [attr.aria-label]="'Edit row ' + (row.rowIndex + 1)"
+                        (click)="requestEdit(row)"
+                        type="button"
+                      >
+                        <svg class="size-4" lucidePencil aria-hidden="true"></svg>
+                      </button>
+                    }
+                    @if (row.canDelete) {
+                      <button
+                        class="btn-icon rounded-control text-finance-muted hover:bg-rose-500/10 hover:text-rose-300"
+                        [attr.aria-label]="'Delete row ' + (row.rowIndex + 1)"
+                        (click)="requestDelete(row)"
+                        type="button"
+                      >
+                        <svg class="size-4" lucideTrash2 aria-hidden="true"></svg>
+                      </button>
+                    }
+                  </div>
+                </td>
+              }
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+    @if ($data().length === 0) {
+      <div
+        class="text-finance-muted flex min-h-0 flex-1 items-center justify-center px-4 py-8 text-center text-sm"
+        role="status"
+      >
+        {{ $emptyMessage() }}
+      </div>
+    }
+  </div>
+
+  <footer
+    class="border-finance-border text-finance-muted flex shrink-0 items-center justify-between gap-3 border-t px-4 py-2 text-xs"
+  >
+    <div class="flex min-w-0 items-center gap-3 whitespace-nowrap">
+      <label class="inline-flex shrink-0 items-center gap-2 whitespace-nowrap">
+        <span>Rows per page</span>
+        <select
+          class="rounded-control border-finance-border bg-finance-raised text-finance-text w-16 shrink-0 border px-2 py-1 focus:border-sky-400 focus:ring-2 focus:ring-sky-400/30"
+          [value]="$pageSize()"
+          (change)="setPageSize($event)"
+          aria-label="Rows per page"
+        >
+          @for (pageSize of $pageSizeOptions; track pageSize) {
+            <option [value]="pageSize">{{ pageSize === 'all' ? 'All' : pageSize }}</option>
+          }
+        </select>
+      </label>
+      <span class="truncate">Showing {{ $rangeStart() }}–{{ $rangeEnd() }}</span>
+    </div>
+    <nav class="flex shrink-0 items-center gap-0 whitespace-nowrap" aria-label="Table pagination">
+      <span>Page {{ $effectivePage() }} of {{ $pageCount() }}</span>
+      <button
+        class="btn-icon rounded-control text-finance-muted hover:bg-finance-raised hover:text-finance-text disabled:opacity-40"
+        [disabled]="$effectivePage() <= 1"
+        (click)="goToPreviousPage()"
+        type="button"
+        aria-label="Previous page"
+      >
+        <svg class="size-5" lucideChevronLeft aria-hidden="true"></svg>
+      </button>
+      <button
+        class="btn-icon rounded-control text-finance-muted hover:bg-finance-raised hover:text-finance-text disabled:opacity-40"
+        [disabled]="$effectivePage() >= $pageCount()"
+        (click)="goToNextPage()"
+        type="button"
+        aria-label="Next page"
+      >
+        <svg class="size-5" lucideChevronRight aria-hidden="true"></svg>
+      </button>
+    </nav>
+  </footer>
+</section>

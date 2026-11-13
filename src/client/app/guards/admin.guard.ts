@@ -4,8 +4,8 @@ import { Router } from '@angular/router';
 import type { CanActivateFn } from '@angular/router';
 import { AppService } from '../app.service';
 import { DataSource } from '../shared/data-source.enum';
-import { UserRole } from '../../../util/user-role.enum';
-import { PAGE_ROUTES } from '../app.info';
+import { UserRole } from 'src/client/api/generated/expense-exchange-api.schemas';
+import { PageRoute } from '../app.info';
 // #endregion
 
 // #region Guard
@@ -16,8 +16,7 @@ export const AdminGuard: CanActivateFn = async () => {
   if (app.$dataSource() === DataSource.Local) return true;
   const currentUser = app.$currentUser();
   if (currentUser?.role === UserRole.Admin) return true;
-  if (!currentUser)
-    return router.createUrlTree(['/', PAGE_ROUTES.LOGIN_PAGE_ROOT]);
-  return router.createUrlTree(['/', PAGE_ROUTES.DASHBOARD_PAGE_ROOT]);
+  if (!currentUser) return router.createUrlTree(['/', PageRoute.Login]);
+  return router.createUrlTree(['/', PageRoute.Dashboard]);
 };
 // #endregion

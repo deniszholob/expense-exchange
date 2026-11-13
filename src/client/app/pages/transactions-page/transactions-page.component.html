@@ -1,0 +1,90 @@
+<app-page-layout [$fillHeight]="$pageState() === DetailsPageState.NO_PARAMS">
+  @switch ($pageState()) {
+    @case (DetailsPageState.LOADING) {
+      <div
+        class="surface-card text-finance-muted flex min-h-48 items-center justify-center gap-3"
+        role="status"
+      >
+        <span
+          class="size-5 animate-spin rounded-full border-2 border-sky-400/30 border-t-sky-300"
+        ></span>
+        Loading transaction…
+      </div>
+    }
+
+    @case (DetailsPageState.NO_PARAMS) {
+      <div class="flex min-h-0 flex-1 flex-col gap-4">
+        <div class="surface-card shrink-0 p-5">
+          <app-date-range-selector
+            [($range)]="$dateRange"
+            [$idPrefix]="'transactions-list'"
+            [$earliestExpenseDate]="$earliestTransactionDate()"
+          />
+        </div>
+        <div class="flex shrink-0 items-end gap-4">
+          <div class="shrink-0">
+            <app-form-field
+              [$id]="'transaction-type-filter'"
+              [$label]="'Type'"
+              [$clearable]="false"
+            >
+              <app-segmented-control
+                id="transaction-type-filter"
+                [formField]="$filters.type"
+                [$label]="'Transaction type'"
+                [$options]="$typeOptions"
+              />
+            </app-form-field>
+          </div>
+          <div class="shrink-0">
+            <app-form-field
+              [$id]="'transaction-scope-filter'"
+              [$label]="'Scope'"
+              [$clearable]="false"
+            >
+              <app-segmented-control
+                id="transaction-scope-filter"
+                [formField]="$filters.scope"
+                [$label]="'Transaction scope'"
+                [$options]="$scopeOptions()"
+              />
+            </app-form-field>
+          </div>
+        </div>
+        <div class="min-h-0 flex-1">
+          <app-transaction-table
+            [$rows]="$transactionRows()"
+            [$totalResults]="$totalTransactionCount()"
+            (addRequested)="onAddTransaction()"
+            (editRequested)="onEditTransaction($event)"
+            (deleteRequested)="onDeleteTransaction($event)"
+          />
+        </div>
+      </div>
+    }
+
+    @case (DetailsPageState.LOADED_PARAM_DATA) {
+      <app-transaction-details
+        [transaction]="$transaction()"
+        [expenses]="$expenseTransactions()"
+        [initialType]="$newTransactionType()"
+        [currentUser]="this.appService.$currentUser()"
+        [groupMembers]="this.appService.$groupMembers()"
+        (save)="onSaveTransaction($event)"
+        (cancelRequested)="onCancelTransaction()"
+      />
+    }
+    @case (DetailsPageState.ERROR) {
+      <div
+        class="rounded-card border border-rose-400/30 bg-rose-500/10 p-5 text-rose-200"
+        role="alert"
+      >
+        <ul class="list-inside list-disc">
+          @for (error of $errors(); track $index) {
+            <li>{{ error }}</li>
+          }
+        </ul>
+      </div>
+    }
+  }
+</app-page-layout>

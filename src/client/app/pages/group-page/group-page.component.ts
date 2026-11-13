@@ -11,7 +11,7 @@ import { FormField, form, required } from '@angular/forms/signals';
 import { LucideTrash2, LucideUsersRound } from '@lucide/angular';
 import { firstValueFrom } from 'rxjs';
 import {
-  AuthUserDtoRole,
+  UserRole,
   type AuthUserDto,
 } from 'src/client/api/generated/expense-exchange-api.schemas';
 import { AuthService } from 'src/client/api/generated/auth/auth.service';
@@ -36,6 +36,7 @@ interface GroupMemberViewModel {
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-group-page',
   templateUrl: './group-page.component.html',
+  host: { class: 'contents' },
   imports: [
     CommonModule,
     PageLayoutComponent,
@@ -69,7 +70,7 @@ export class GroupPageComponent {
     const memberIds = new Set(this.$groupMembers().map((member) => member.id));
     return this.$accounts().filter(
       (account) =>
-        account.role !== AuthUserDtoRole.Admin && !memberIds.has(account.id),
+        account.role !== UserRole.Admin && !memberIds.has(account.id),
     );
   });
   protected readonly $availableLocalUsers = computed(() => {
@@ -119,10 +120,10 @@ export class GroupPageComponent {
         if (
           this.appService
             .exportLocalStore()
-            .expenses.some(
-              (expense) =>
-                expense.paidByUserId === id ||
-                expense.paidForUserIds.includes(id),
+            .transactions.some(
+              (transaction) =>
+                transaction.targetUserId === id ||
+                transaction.beneficiaryUserIds.includes(id),
             )
         ) {
           this.$error.set('This person is referenced by an expense.');

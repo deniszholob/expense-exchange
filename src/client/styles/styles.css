@@ -159,27 +159,27 @@
     @apply rounded-control border border-amber-400/30 bg-amber-500/15 font-semibold text-amber-200 transition-colors hover:bg-amber-500/25;
   }
 
-  .table-finance {
+  .table-base {
     @apply rounded-card border-finance-border bg-finance-surface min-w-full border-separate border-spacing-0 overflow-hidden border text-sm;
   }
 
-  .table-finance th {
-    @apply border-finance-border bg-finance-raised text-finance-muted border-b px-4 py-3 text-left text-xs font-semibold tracking-wide uppercase;
+  .table-base th {
+    @apply border-finance-border bg-finance-raised text-finance-muted border-b px-4 py-4 text-left text-xs font-semibold tracking-wide uppercase;
   }
 
-  .table-finance td {
+  .table-base td {
     @apply border-finance-border text-finance-text border-b px-4 py-3;
   }
 
-  .table-finance tbody tr:last-child td {
+  .table-base tbody tr:last-child td {
     @apply border-b-0;
   }
 
-  .table-finance tbody tr {
+  .table-base tbody tr {
     @apply hover:bg-finance-hover transition-colors;
   }
 
-  .table-finance tbody tr:nth-child(even) {
+  .table-base tbody tr:nth-child(even) {
     @apply bg-white/[0.02];
   }
 

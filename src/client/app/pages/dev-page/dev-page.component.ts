@@ -6,7 +6,7 @@ import { PageLayoutComponent } from 'src/client/app/layout';
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-dev-page',
   templateUrl: './dev-page.component.html',
-  styles: [':host{display:contents}'],
+  host: { class: 'contents' },
   imports: [CommonModule, PageLayoutComponent],
 })
 export class DevPageComponent {}

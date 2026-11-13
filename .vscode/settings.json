@@ -14,83 +14,82 @@
   // Case sensitive file ordering in tree
   "explorer.sortOrderLexicographicOptions": "lower",
   // Enable the inline display if inferred types for ts
-  "typescript.inlayHints.functionLikeReturnTypes.enabled": true,
-  "typescript.inlayHints.parameterTypes.enabled": true,
-  "typescript.inlayHints.propertyDeclarationTypes.enabled": true,
-  "typescript.inlayHints.variableTypes.enabled": true,
+  "js/ts.inlayHints.functionLikeReturnTypes.enabled": true,
+  "js/ts.inlayHints.parameterTypes.enabled": true,
+  "js/ts.inlayHints.propertyDeclarationTypes.enabled": true,
+  "js/ts.inlayHints.variableTypes.enabled": true,
   // Enable the inline display if inferred types for ts
-  "javascript.inlayHints.functionLikeReturnTypes.enabled": true,
-  "javascript.inlayHints.parameterTypes.enabled": true,
-  "javascript.inlayHints.propertyDeclarationTypes.enabled": true,
-  "javascript.inlayHints.variableTypes.enabled": true,
-   // Editor Icon Theme
-   "workbench.iconTheme": "material-icon-theme",
-   "material-icon-theme.activeIconPack": "angular_ngrx",
-   "material-icon-theme.folders.associations": {
-     "interceptors": "guard",
-     "wrappers": "hook",
-     "forms": "docs"
-   },
-   "material-icon-theme.folders.customClones": [
-     {
-       "name": "components",
-       "folderNames": ["components"],
-       "base": "components",
-       "color": "blue-700"
-     },
-     {
-       "name": "directives",
-       "folderNames": ["directives"],
-       "base": "components",
-       "color": "purple-400"
-     },
-     {
-       "name": "formly",
-       "folderNames": ["formly"],
-       "base": "docs",
-       "color": "red-500"
-     }
-   ],
-   "material-icon-theme.files.associations": {
-     "*.interceptor.ts": "angular-guard",
-     "*.events.ts": "tcl",
-     "*.data.ts": "database",
-     "*.const.ts": "database",
-     "index.ts": "url",
-     "public-api.ts": "url",
-     "models.ts": "url",
-     "services.ts": "url"
-   },
-   "material-icon-theme.files.customClones": [
-     {
-       "name": "typescript-model",
-       "fileExtensions": ["model.ts"],
-       "base": "typescript",
-       "color": "red-400"
-     },
-     {
-       "name": "typescript-enum",
-       "fileExtensions": ["enum.ts"],
-       "base": "typescript",
-       "color": "teal-400"
-     },
-     {
-       "name": "typescript-util",
-       "fileExtensions": ["util.ts"],
-       "base": "typescript",
-       "color": "light-green-600"
-     },
-     {
-       "name": "typescript-mock",
-       "fileExtensions": ["mock.ts"],
-       "base": "typescript",
-       "color": "brown-400"
-     }
-   ],
+  // Editor Icon Theme
+  "workbench.iconTheme": "material-icon-theme",
+  "material-icon-theme.activeIconPack": "angular_ngrx",
+  "material-icon-theme.folders.associations": {
+    "interceptors": "guard",
+    "wrappers": "hook",
+    "forms": "docs",
+  },
+  "material-icon-theme.folders.customClones": [
+    {
+      "name": "components",
+      "folderNames": ["components"],
+      "base": "components",
+      "color": "blue-700",
+    },
+    {
+      "name": "directives",
+      "folderNames": ["directives"],
+      "base": "components",
+      "color": "purple-400",
+    },
+    {
+      "name": "formly",
+      "folderNames": ["formly"],
+      "base": "docs",
+      "color": "red-500",
+    },
+  ],
+  "material-icon-theme.files.associations": {
+    "*.interceptor.ts": "angular-guard",
+    "*.events.ts": "tcl",
+    "*.data.ts": "database",
+    "*.const.ts": "database",
+    "*.schema.ts": "graphql",
+    "*.repository.ts": "database",
+    "*.json.adapter.ts": "json",
+    "index.ts": "url",
+    "public-api.ts": "url",
+    "models.ts": "url",
+    "services.ts": "url",
+  },
+  "material-icon-theme.files.customClones": [
+    {
+      "name": "typescript-model",
+      "fileExtensions": ["model.ts", "dto.ts"],
+      "base": "typescript",
+      "color": "red-400",
+    },
+    {
+      "name": "typescript-enum",
+      "fileExtensions": ["enum.ts"],
+      "base": "typescript",
+      "color": "teal-400",
+    },
+    {
+      "name": "typescript-util",
+      "fileExtensions": ["util.ts"],
+      "base": "typescript",
+      "color": "light-green-600",
+    },
+    {
+      "name": "typescript-mock",
+      "fileExtensions": ["mock.ts"],
+      "base": "typescript",
+      "color": "brown-400",
+    },
+  ],
   "workbench.editor.pinnedTabsOnSeparateRow": true,
   "files.associations": {
     "*.css": "tailwindcss",
-    "*.scss": "tailwindcss"
+    "*.scss": "tailwindcss",
   },
   "files.insertFinalNewline": true,
   "files.trimFinalNewlines": true,
@@ -140,11 +139,11 @@
     "**/test-setup*": false,
     "**/*.d.ts": false,
     "**/.env": false,
-    "**/debug.log": false
+    "**/debug.log": false,
   },
   "cSpell.words": [
     "automigrate",
     "devkit",
     "tailwindcss"
-  ]
+  ],
 }

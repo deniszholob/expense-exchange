@@ -11,6 +11,7 @@ import type { LoginAccountDto } from 'src/client/api/generated/expense-exchange-
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-auth-account-selector',
   templateUrl: './auth-account-selector.component.html',
+  host: { class: 'contents' },
 })
 export class AuthAccountSelectorComponent {
   public readonly $accounts = input.required<LoginAccountDto[]>();

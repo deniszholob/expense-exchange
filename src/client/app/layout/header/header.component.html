@@ -1,11 +1,11 @@
 <header
-  class="border-finance-border bg-finance-canvas/90 border-b shadow-lg shadow-black/10 backdrop-blur-xl"
+  class="border-finance-border bg-finance-canvas/90 shrink-0 border-b shadow-lg shadow-black/10 backdrop-blur-xl"
 >
   <div class="container-fixed gap-0 py-2 sm:py-3">
     <div class="flex min-h-10 items-center gap-2">
       <a
         class="text-finance-text flex shrink-0 items-center no-underline"
-        [routerLink]="['/', PAGE_ROUTES.CONNECTION_PAGE_ROOT]"
+        [routerLink]="['/', PageRoute.Data]"
         aria-label="Expense Exchange home"
       >
         <img
@@ -21,34 +21,17 @@
         @for (link of $links(); track link.id) {
           <a
             class="rounded-control text-finance-muted hover:bg-finance-raised hover:text-finance-text inline-flex items-center gap-2 px-3 py-2 text-sm font-medium no-underline transition-colors"
-            [class.ml-auto]="link.id === 'data'"
-            routerLink="/{{ link.id }}"
+            [class.ml-auto]="link.id === PageRoute.Data"
+            [routerLink]="['/', link.id]"
             routerLinkActive="bg-finance-accent-soft text-sky-300"
           >
-            @switch (link.id) {
-              @case ('dash') {
-                <svg class="size-4" lucideChartNoAxesCombined aria-hidden="true"></svg>
-              }
-              @case ('expenses') {
-                <svg class="size-4" lucideReceipt aria-hidden="true"></svg>
-              }
-              @case ('users') {
-                <svg class="size-4" lucideUsersRound aria-hidden="true"></svg>
-              }
-              @case ('group') {
-                <svg class="size-4" lucideUsersRound aria-hidden="true"></svg>
-              }
-              @case ('data') {
-                <svg class="size-4" lucideDatabase aria-hidden="true"></svg>
-              }
-              @case ('dev') {
-                <svg class="size-4" lucideCode2 aria-hidden="true"></svg>
-              }
-            }
-            {{ link.displayAs }}
-            @if (link.note) {
-              <small> ({{ link.note }})</small>
-            }
+            <span class="inline-flex size-4 items-center justify-center" aria-hidden="true">
+              <ng-container
+                [ngComponentOutlet]="link.icon"
+                [ngComponentOutletInputs]="{ size: 16 }"
+              />
+            </span>
+            {{ link.display }}
           </a>
         }
       </nav>
@@ -56,7 +39,7 @@
       @if (appService.$currentUser(); as currentUser) {
         <a
           class="rounded-control border-finance-border bg-finance-surface text-finance-text hover:border-finance-border-strong hover:bg-finance-raised inline-flex shrink-0 items-center gap-2 border px-2 py-1.5 text-sm font-medium no-underline transition-colors"
-          [routerLink]="['/', PAGE_ROUTES.PROFILE_PAGE_ROOT]"
+          [routerLink]="['/', PageRoute.Profile]"
           [attr.aria-label]="'Profile: ' + currentUser.name"
         >
           <span
@@ -74,7 +57,7 @@
       ) {
         <a
           class="rounded-control inline-flex min-h-10 shrink-0 items-center justify-center bg-sky-600 px-4 py-2 text-sm font-semibold text-white no-underline transition-colors hover:bg-sky-500"
-          routerLink="/login"
+          [routerLink]="['/', PageRoute.Login]"
         >
           Sign in
         </a>

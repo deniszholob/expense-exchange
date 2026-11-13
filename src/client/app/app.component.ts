@@ -13,7 +13,7 @@ import { HeaderComponent } from './layout';
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styles: [':host{display:contents}'],
+  host: { class: 'contents' },
   imports: [CommonModule, HeaderComponent, RouterModule],
 })
 export class AppComponent {

@@ -16,7 +16,7 @@ import {
 } from '@angular/forms/signals';
 import { PageLayoutComponent } from 'src/client/app/layout';
 import { AppService } from 'src/client/app/app.service';
-import { PAGE_ROUTES } from 'src/client/app/app.info';
+import { PageRoute } from 'src/client/app/app.info';
 import { DataSource } from 'src/client/app/shared/data-source.enum';
 import { FormFieldComponent } from '../../components/forms/form-field/form-field.component';
 import { AuthAccountSelectorComponent } from '../../components/auth-account-selector/auth-account-selector.component';
@@ -27,6 +27,7 @@ import { AuthAccountSelectorComponent } from '../../components/auth-account-sele
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-login-page',
   templateUrl: './login-page.component.html',
+  host: { class: 'contents' },
   imports: [
     CommonModule,
     PageLayoutComponent,
@@ -61,16 +62,16 @@ export class LoginPageComponent {
 
   public constructor() {
     if (!this.appService.$dataSourceConfigured()) {
-      void this.router.navigate(['/', PAGE_ROUTES.CONNECTION_PAGE_ROOT]);
+      void this.router.navigate(['/', PageRoute.Data]);
       return;
     }
     if (this.appService.$dataSource() === DataSource.Local) {
-      void this.router.navigate(['/', PAGE_ROUTES.DASHBOARD_PAGE_ROOT]);
+      void this.router.navigate(['/', PageRoute.Dashboard]);
       return;
     }
     void this.appService.authenticationReady.then(() => {
       if (this.appService.$currentUser())
-        void this.router.navigate(['/', PAGE_ROUTES.DASHBOARD_PAGE_ROOT]);
+        void this.router.navigate(['/', PageRoute.Dashboard]);
     });
   }
 
@@ -83,7 +84,7 @@ export class LoginPageComponent {
         this.$credentials().username,
         this.$credentials().password,
       );
-      await this.router.navigate(['/', PAGE_ROUTES.DASHBOARD_PAGE_ROOT]);
+      await this.router.navigate(['/', PageRoute.Dashboard]);
     } catch {
       // The service exposes a safe user-facing authentication error.
     } finally {

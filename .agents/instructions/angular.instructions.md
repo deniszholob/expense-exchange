@@ -23,6 +23,7 @@ Apply to Angular components, directives, pipes, routes, services, templates, and
 - Import symbols directly from the owning feature file. Do not add feature barrel files that only re-export other files or create passthrough exports.
 - Do not add component inputs/outputs or runtime behavior solely to simplify a Storybook story. Use story wrappers, decorators, or mocks.
 - Keep the application zoneless: do not add Zone.js as a browser polyfill, use Angular's zoneless change-detection provider, and keep the Vitest TestBed zoneless. Use signals and other Angular change-detection notifications for UI updates.
+- Keep client styles beside their owning UI code under `src/client/`.
 
 ## Signals and state
 
@@ -44,6 +45,7 @@ Apply to Angular components, directives, pipes, routes, services, templates, and
 - Use `inject()` for Angular dependency injection. Keep injectable services focused on a single responsibility and use `providedIn: 'root'` for application-wide singleton services.
 - Use `ChangeDetectionStrategy.OnPush` for components. Prefer signals and immutable updates to keep rendering predictable.
 - Put host attributes/listeners in the component/directive `host` metadata. Do not use `@HostBinding` or `@HostListener`.
+- Set component hosts to `display: contents` (for example, `host: { class: 'contents' }`) by default so layout and styling are owned by the component's rendered elements. Use a different host display only when `contents` causes an awkward workaround or breaks required behavior; keep that exception deliberate and minimal.
 
 ## Forms
 
@@ -51,6 +53,12 @@ Apply to Angular components, directives, pipes, routes, services, templates, and
 - Do not introduce new template-driven forms or legacy reactive forms (`ngModel`, `FormGroup`, `FormControl`, `FormBuilder`, `formControl`, `formControlName`).
 - Implement custom Signal Forms controls with `FormValueControl`; do not add `ControlValueAccessor` or `NG_VALUE_ACCESSOR` compatibility paths.
 - Keep validation rules and messages centralized/reusable where they are shared. Validate again at API and persistence boundaries; client validation is not a security boundary.
+- Use generated API DTOs directly for form state and outputs when their shape fits. Do not add parallel interfaces that repeat DTO fields; keep UI-only differences explicit and minimal when necessary.
+
+## Enums and display metadata
+
+- For client enum values shown to users, keep display metadata in a `Record<Enum, Info>` and derive its option list from `Object.values(Enum)`. For generated API enums, place display metadata in a separate client utility and import the generated enum; never edit generated files.
+- Define finite UI state enums once and reuse them across pages, components, and stories instead of declaring copies with the same members.
 
 ## Templates
 
@@ -78,6 +86,7 @@ Apply to Angular components, directives, pipes, routes, services, templates, and
 - Add a Storybook story for each reusable component, showing meaningful inputs/states and interactions.
 - Keep the shared `FormFieldComponent` `FormField` story as the canonical stacked form-control catalog. Update it whenever a form-control type or shared field behavior is added or changed.
 - Keep stories representative and use synthetic, non-sensitive data. Do not expand production APIs solely to satisfy Storybook.
+- Put client API fixtures, interceptors, and providers that mock generated API contracts under `src/client/api/mocks/`. Keep component-specific display fixtures and presentation setup beside the owning component.
 - Keep component files together in a clearly named feature folder, with the primary component, template, optional focused stylesheet, story, and tests adjacent as appropriate.
 - Before scaffolding Angular components or other file families, check `.vscode/ngfg-templates/` and use the repository's configured templates when one applies. Keep component logic in its TypeScript file, markup in its HTML template, and add component CSS only when Tailwind and shared styles are insufficient.
 - Keep TypeScript regions consistent with `.agents/instructions/typescript.instructions.md`; do not leave empty regions.

@@ -20,8 +20,14 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
-import { z } from 'zod';
 import { AuthService } from './auth.service.js';
+import {
+  AdminSetupSchema,
+  CreateAuthAccountSchema,
+  LoginCredentialsSchema,
+  UpdateAuthAccountSchema,
+  UpdateProfileSchema,
+} from './auth.schema.js';
 import {
   AdminSetupDto,
   AuthResponseDto,
@@ -34,36 +40,13 @@ import {
   CreateAuthAccountDto,
   UpdateAuthAccountDto,
 } from './auth.dto.js';
-import { AuthGuard } from './auth.guard.js';
-import { AdminGuard } from './admin.guard.js';
-import type { AuthenticatedRequest } from './auth.guard.js';
-import { UserRole } from '../../util/user-role.enum.js';
+import { AuthGuard } from '../guards/auth.guard.js';
+import { AdminGuard } from '../guards/admin.guard.js';
+import type { AuthenticatedRequest } from '../guards/auth.guard.js';
+import { UserRole } from './user-role.enum.js';
 // #endregion
 
 // #region Controller
-const CredentialsSchema = z.object({
-  username: z.string().trim().min(3).max(64),
-  password: z.string().min(10).max(200),
-});
-const SetupSchema = CredentialsSchema.extend({
-  name: z.string().trim().max(100).optional(),
-});
-const CreateAccountSchema = CredentialsSchema.extend({
-  name: z.string().trim().max(100).optional(),
-});
-const UpdateAccountSchema = z
-  .object({
-    name: z.string().trim().max(100).optional(),
-    username: z.string().trim().min(3).max(64).optional(),
-    password: z.string().max(200).optional(),
-  })
-  .refine(
-    (value) =>
-      value.password === undefined ||
-      value.password.length === 0 ||
-      value.password.length >= 10,
-  );
-
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
@@ -109,7 +92,7 @@ export class AuthController {
   public async createAccount(
     @Body() body: CreateAuthAccountDto,
   ): Promise<AuthUserDto> {
-    const input = CreateAccountSchema.safeParse(body);
+    const input = CreateAuthAccountSchema.safeParse(body);
     if (!input.success)
       throw new BadRequestException(
         'Provide a username and password of at least 10 characters',
@@ -129,7 +112,7 @@ export class AuthController {
     @Param('id') id: string,
     @Body() body: UpdateAuthAccountDto,
   ): Promise<AuthUserDto> {
-    const input = UpdateAccountSchema.safeParse(body);
+    const input = UpdateAuthAccountSchema.safeParse(body);
     if (!input.success)
       throw new BadRequestException('Invalid account updates');
     return this.auth.updateManagedAccount(id, input.data);
@@ -151,7 +134,7 @@ export class AuthController {
     @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
   ): Promise<AuthResponseDto> {
-    const input = SetupSchema.safeParse(body);
+    const input = AdminSetupSchema.safeParse(body);
     if (!input.success)
       throw new BadRequestException(
         'Provide a username and password of at least 10 characters',
@@ -186,7 +169,7 @@ export class AuthController {
     @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
   ): Promise<AuthResponseDto> {
-    const input = CredentialsSchema.safeParse(body);
+    const input = LoginCredentialsSchema.safeParse(body);
     if (!input.success) throw new BadRequestException('Invalid credentials');
     return this.loginCredentials(
       input.data.username,
@@ -227,19 +210,8 @@ export class AuthController {
     const user = await this.auth.authenticate(
       readCookie(request, 'expense_exchange_session'),
     );
-    const input = z
-      .object({
-        name: z.string().trim().max(100).optional(),
-        username: z.string().trim().min(3).max(64),
-        password: z.string().max(200).optional(),
-      })
-      .safeParse(body);
-    if (
-      !input.success ||
-      (input.data.password !== undefined &&
-        input.data.password.length > 0 &&
-        input.data.password.length < 10)
-    )
+    const input = UpdateProfileSchema.safeParse(body);
+    if (!input.success)
       throw new BadRequestException(
         'Username must be 3–64 characters and a new password must be at least 10 characters',
       );

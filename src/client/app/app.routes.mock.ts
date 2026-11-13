@@ -1,18 +1,27 @@
 // #region Imports
 import { Component } from '@angular/core';
 import { of } from 'rxjs';
+import { PageRoute } from './app.info';
 // #endregion
 
 // #region Implementation
 
-@Component({ template: `` })
+@Component({ template: ``, host: { class: 'contents' } })
 class TestComponent {}
 
 // Mock Routes
 const mockRoutes = [
-  { path: 'dashboard', component: TestComponent, canActivate: [() => true] },
-  { path: 'settings', component: TestComponent }, // No guard, always visible
-  { path: 'expenses', component: TestComponent, canActivate: [() => false] }, // Will be filtered out
+  {
+    path: PageRoute.Dashboard,
+    component: TestComponent,
+    canActivate: [() => true],
+  },
+  { path: PageRoute.Settings, component: TestComponent },
+  {
+    path: PageRoute.Transactions,
+    component: TestComponent,
+    canActivate: [() => false],
+  }, // Will be filtered out
 ];
 
 // Mock Router

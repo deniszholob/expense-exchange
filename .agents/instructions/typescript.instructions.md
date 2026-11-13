@@ -11,10 +11,7 @@ Apply to all TypeScript code in the repository, including Angular, NestJS, scrip
 
 - Author executable source, tooling, and configuration in TypeScript. Do not add JavaScript source files with `.js`, `.jsx`, `.mjs`, or `.cjs` extensions.
 - Generated JavaScript may exist only inside ignored build output such as `.dist/` or `.builds/`; never use generated output as editable source.
-- Keep application code in `src/client/`, `src/server/`, `src/desktop/`, or `src/util/`, grouped by domain. Keep TypeScript repository tools under `tools/`.
-- Keep client styles under `src/client/`. Put static assets, screenshots, and shared brand icons under `src/assets/`.
-- Keep each repository tool in its own `tools/<tool-name>/` folder, with the primary file named `<tool-name>.script.ts` and configuration named `<tool-name>.script.config.ts` when settings are needed.
-- A matching executable `<tool-name>.script.sh` may be used as a terminal convenience wrapper. Keep it limited to locating the repository root and invoking the TypeScript script; tool logic belongs in TypeScript.
+- Use the configured `src/*` path alias for absolute source imports. Keep short same-feature imports relative.
 
 ## Type safety
 
@@ -43,6 +40,7 @@ Apply to all TypeScript code in the repository, including Angular, NestJS, scrip
 
 - Use string unions where they are the natural shape of a discriminated union or a small local type that is not a domain identifier. Do not turn every union into an enum mechanically.
 - For exhaustive static mappings from an enum to labels, classes, icons, or behavior, use `Record<Enum, Value>` so adding an enum member creates a compile-time obligation.
+- Prefer `Record` lookups for static value mappings instead of nested ternaries, `if` chains, or `switch` statements. Keep branching for genuine control flow or conditions that cannot be represented clearly as data.
 - Do not duplicate enum value spellings in translation keys or persisted identifiers. Use the enum value as the stable identifier and keep display labels separate.
 
 ## Functions and control flow
@@ -59,7 +57,7 @@ Apply to all TypeScript code in the repository, including Angular, NestJS, scrip
 - MUST use `// #region Section Name` and `// #endregion` comments in every TypeScript file to group its meaningful logical sections.
 - Keep region names descriptive and consistent. Do not create empty regions or split a short file into unnecessary sections; a short file can use a single region for its contents.
 - For classes, use a consistent order where the sections apply: constants; inputs/outputs or injected dependencies; signals/observables and properties; constructor; lifecycle hooks; public methods; private methods; module-level helpers.
-- Keep one primary exported construct per file when practical. Name files and folders after the primary symbol and keep related tests, mocks, and stories adjacent according to the feature's established layout.
+- Keep one primary exported construct per file when practical. Name files and folders after the primary symbol and keep related tests and stories adjacent according to the feature's established layout. Put client API fixtures, interceptors, and providers that mock generated API contracts under `src/client/api/mocks/`; keep component-specific display fixtures beside their component.
 - Avoid feature-local barrel files that only re-export symbols from other feature files. Import from the owning module directly. Use a deliberate shared-model entry point only when it defines a real public boundary.
 
 ## Imports, dependencies, and formatting

@@ -11,8 +11,8 @@ import { Router } from '@angular/router';
 import { LucideLogOut } from '@lucide/angular';
 import { PageLayoutComponent } from 'src/client/app/layout';
 import { AppService } from 'src/client/app/app.service';
-import { PAGE_ROUTES } from 'src/client/app/app.info';
-import { UserRole } from '../../../../util/user-role.enum';
+import { PageRoute } from 'src/client/app/app.info';
+import { UserRole } from 'src/client/api/generated/expense-exchange-api.schemas';
 import { UserMonogramPipe } from '../../shared/user-monogram.pipe';
 import { form, maxLength, minLength, required } from '@angular/forms/signals';
 import { AccountFieldsComponent } from '../../components/forms/account-fields/account-fields.component';
@@ -24,6 +24,7 @@ import { DataSource } from '../../shared/data-source.enum';
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-profile-page',
   templateUrl: './profile-page.component.html',
+  host: { class: 'contents' },
   imports: [
     CommonModule,
     PageLayoutComponent,
@@ -76,7 +77,7 @@ export class ProfilePageComponent {
 
   protected signOut(): void {
     this.appService.signOut();
-    void this.router.navigate(['/', PAGE_ROUTES.LOGIN_PAGE_ROOT]);
+    void this.router.navigate(['/', PageRoute.Login]);
   }
 }
 // #endregion

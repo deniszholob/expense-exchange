@@ -9,6 +9,7 @@ import { FormFieldComponent } from '../form-field/form-field.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-account-fields',
   templateUrl: './account-fields.component.html',
+  host: { class: 'contents' },
   imports: [FormField, FormFieldComponent],
 })
 export class AccountFieldsComponent {

@@ -5,25 +5,59 @@
  * Self-hosted Expense Exchange API
  * OpenAPI spec version: 1.0.0
  */
-export interface ExpenseDto {
-  id: string;
-  name: string;
-  description: string;
+export enum TransactionType {
+  Expense = 'Expense',
+  Income = 'Income',
+  Refund = 'Refund',
+}
+export interface TransactionDto {
+  type: TransactionType;
+  /** @exclusiveMinimum 0 */
   amount: number;
-  datePaid: string;
-  forDate: string;
-  paidByUserId: string;
-  paidForUserIds: string[];
+  /** @minLength 1 */
+  name: string;
+  postDate: string;
+  completeDate: string;
+  /**
+   * The user who paid for an expense or received income/refund funds.
+   * @minLength 1
+   */
+  targetUserId: string;
+  /**
+   * Explicit list of users who benefit from the transaction; includes targetUserId only when they benefit.
+   * @minItems 1
+   */
+  beneficiaryUserIds: string[];
+  note?: string;
+  /** @minLength 1 */
+  linkedTransactionId?: string;
+  /** @minLength 1 */
+  id: string;
+  /** @minLength 1 */
+  ownerUserId?: string;
 }
 
-export interface CreateExpenseDto {
-  name: string;
-  description: string;
+export interface CreateTransactionDto {
+  type: TransactionType;
+  /** @exclusiveMinimum 0 */
   amount: number;
-  datePaid: string;
-  forDate: string;
-  paidByUserId: string;
-  paidForUserIds: string[];
+  /** @minLength 1 */
+  name: string;
+  postDate: string;
+  completeDate: string;
+  /**
+   * The user who paid for an expense or received income/refund funds.
+   * @minLength 1
+   */
+  targetUserId: string;
+  /**
+   * Explicit list of users who benefit from the transaction; includes targetUserId only when they benefit.
+   * @minItems 1
+   */
+  beneficiaryUserIds: string[];
+  note?: string;
+  /** @minLength 1 */
+  linkedTransactionId?: string;
 }
 
 export interface GroupMemberDto {
@@ -40,32 +74,20 @@ export interface AuthStatusDto {
   setupRequired: boolean;
 }
 
-export type LoginAccountDtoRole =
-  (typeof LoginAccountDtoRole)[keyof typeof LoginAccountDtoRole];
-
-export const LoginAccountDtoRole = {
-  Admin: 'Admin',
-  User: 'User',
-} as const;
-
+export enum UserRole {
+  Admin = 'Admin',
+  User = 'User',
+}
 export interface LoginAccountDto {
   username: string;
-  role: LoginAccountDtoRole;
+  role: UserRole;
 }
-
-export type AuthUserDtoRole =
-  (typeof AuthUserDtoRole)[keyof typeof AuthUserDtoRole];
-
-export const AuthUserDtoRole = {
-  Admin: 'Admin',
-  User: 'User',
-} as const;
 
 export interface AuthUserDto {
   id: string;
   name: string;
   username: string;
-  role: AuthUserDtoRole;
+  role: UserRole;
 }
 
 export interface CreateAuthAccountDto {

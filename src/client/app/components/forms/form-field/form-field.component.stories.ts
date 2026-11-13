@@ -1,6 +1,10 @@
 // #region Imports
 import { moduleMetadata } from '@storybook/angular-vite';
 import type { Meta, StoryObj } from '@storybook/angular-vite';
+import {
+  TransactionScope,
+  TRANSACTION_SCOPE_INFO_OPTIONS,
+} from 'src/client/app/shared/transaction-scope.enum';
 import { FormFieldComponent } from './form-field.component';
 import { MultiSelectComponent } from '../multi-select/multi-select.component';
 import { SegmentedControlComponent } from '../segmented-control/segmented-control.component';
@@ -34,11 +38,11 @@ export const FormField: StoryObj<FormFieldComponent> = {
         { id: 'bob', name: 'Bob' },
       ],
       selectedOptions: ['alice'],
-      scopeOptions: [
-        { value: 'Group', label: 'Group' },
-        { value: 'MyShare', label: 'My share' },
-      ],
-      selectedScope: 'Group',
+      scopeOptions: TRANSACTION_SCOPE_INFO_OPTIONS.map(({ id, display }) => ({
+        value: id,
+        label: display,
+      })),
+      selectedScope: TransactionScope.Group,
     },
     template: `
       <div class="mx-auto flex w-full max-w-xl flex-col gap-5 p-5">

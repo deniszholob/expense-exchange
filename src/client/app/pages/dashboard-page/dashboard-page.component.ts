@@ -8,9 +8,15 @@ import {
   signal,
 } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { LucidePlus, LucideReceipt } from '@lucide/angular';
+import { LucideReceipt } from '@lucide/angular';
+import { SegmentedControlComponent } from 'src/client/app/components/forms/segmented-control/segmented-control.component';
 import { PageLayoutComponent } from 'src/client/app/layout';
 import { AppService } from 'src/client/app/app.service';
+import { TransactionType } from 'src/client/api/generated/expense-exchange-api.schemas';
+import {
+  TransactionScope,
+  TRANSACTION_SCOPE_INFO_OPTIONS,
+} from 'src/client/app/shared/transaction-scope.enum';
 import { DateRangeSelectorComponent } from '../../components/date-range-selector/date-range-selector.component';
 import { DateRangePreset } from '../../shared/date-range/date-range-preset.enum';
 import {
@@ -21,24 +27,18 @@ import {
 import { createDashboardRangeSummary } from './dashboard-range-summary.model';
 // #endregion
 
-// #region Enums
-enum DashboardSpendingScope {
-  Group = 'Group',
-  Personal = 'Personal',
-}
-// #endregion
-
 // #region Component
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-dashboard-page',
   templateUrl: './dashboard-page.component.html',
+  host: { class: 'contents' },
   imports: [
     CommonModule,
     PageLayoutComponent,
     RouterModule,
     DateRangeSelectorComponent,
-    LucidePlus,
+    SegmentedControlComponent,
     LucideReceipt,
   ],
 })
@@ -46,14 +46,24 @@ export class DashboardPageComponent {
   private readonly appService = inject(AppService);
   protected readonly $groupMembers = this.appService.$groupMembers;
   protected readonly $currentUser = this.appService.$currentUser;
-  protected readonly DashboardSpendingScope = DashboardSpendingScope;
-  protected readonly $spendingScope = signal(DashboardSpendingScope.Group);
+  protected readonly $spendingScope = signal(TransactionScope.Group);
+  protected readonly $scopeOptions = computed(() =>
+    TRANSACTION_SCOPE_INFO_OPTIONS.map(({ id, display }) => ({
+      value: id,
+      label: display,
+      ...(id === TransactionScope.MyShare && {
+        disabled: !this.$personalSpendingAvailable(),
+      }),
+    })),
+  );
   protected readonly $dateRange = signal(
     createDateRangeForPreset(DateRangePreset.Month),
   );
   protected readonly $earliestExpenseDate = computed(() =>
     getEarliestDate(
-      this.appService.$expenses().map((expense) => expense.datePaid),
+      this.appService
+        .$transactions()
+        .map((transaction) => transaction.completeDate),
     ),
   );
   protected readonly $rangeLabel = computed(() =>
@@ -61,7 +71,8 @@ export class DashboardPageComponent {
   );
   protected readonly $rangeSummary = computed(() =>
     createDashboardRangeSummary(
-      this.appService.$detailedExpenses(),
+      this.appService.$transactions(),
+      this.$groupMembers(),
       this.$dateRange(),
       this.$currentUser()?.id,
     ),
@@ -73,41 +84,63 @@ export class DashboardPageComponent {
       this.$groupMembers().some((user) => user.id === userId)
     );
   });
-  protected readonly $recentExpenses = computed(() =>
-    [...this.appService.$detailedExpenses()]
-      .sort((first, second) => second.datePaid.localeCompare(first.datePaid))
-      .slice(0, 5),
-  );
+  protected readonly $recentTransactions = computed(() => {
+    const members = new Map(
+      this.$groupMembers().map((member) => [member.id, member.name]),
+    );
+    return [...this.appService.$transactions()]
+      .sort((first, second) =>
+        second.completeDate.localeCompare(first.completeDate),
+      )
+      .slice(0, 5)
+      .map((transaction) => ({
+        ...transaction,
+        targetName:
+          members.get(transaction.targetUserId) ?? transaction.targetUserId,
+      }));
+  });
+  protected readonly TransactionType = TransactionType;
   protected readonly $expenseCount = computed(
     () => this.$rangeSummary().expenseCount,
   );
   protected readonly $trackedSpending = computed(() =>
-    this.$spendingScope() === DashboardSpendingScope.Personal
+    this.$spendingScope() === TransactionScope.MyShare
       ? this.$rangeSummary().personalSpending
       : this.$rangeSummary().totalSpending,
   );
-  protected readonly $trackedIncome = computed(() => 0);
+  protected readonly $trackedIncome = computed(() =>
+    this.$spendingScope() === TransactionScope.MyShare
+      ? this.$rangeSummary().personalIncome
+      : this.$rangeSummary().totalIncome,
+  );
+  protected readonly $trackedRefunds = computed(() =>
+    this.$spendingScope() === TransactionScope.MyShare
+      ? this.$rangeSummary().personalRefunds
+      : this.$rangeSummary().totalRefunds,
+  );
+  protected readonly $trackedNetCashFlow = computed(
+    () =>
+      this.$trackedIncome() + this.$trackedRefunds() - this.$trackedSpending(),
+  );
   protected readonly $incomeBarWidth = computed(() => {
-    const total = this.$trackedIncome() + this.$trackedSpending();
+    const total =
+      this.$trackedIncome() + this.$trackedSpending() + this.$trackedRefunds();
     return total === 0 ? 0 : (this.$trackedIncome() / total) * 100;
   });
   protected readonly $expenseBarWidth = computed(() => {
-    const total = this.$trackedIncome() + this.$trackedSpending();
+    const total =
+      this.$trackedIncome() + this.$trackedSpending() + this.$trackedRefunds();
     return total === 0 ? 0 : (this.$trackedSpending() / total) * 100;
   });
+  protected readonly $refundBarWidth = computed(() => {
+    const total =
+      this.$trackedIncome() + this.$trackedSpending() + this.$trackedRefunds();
+    return total === 0 ? 0 : (this.$trackedRefunds() / total) * 100;
+  });
   protected readonly $spendingDescription = computed(() =>
-    this.$spendingScope() === DashboardSpendingScope.Personal
-      ? 'Your allocated expense shares in the selected range'
-      : 'Total group expenses paid in the selected range',
+    this.$spendingScope() === TransactionScope.MyShare
+      ? 'Your share of expenses, income, and refunds in the selected range'
+      : 'Group expenses, income, and refunds in the selected range',
   );
-
-  protected selectSpendingScope(scope: DashboardSpendingScope): void {
-    if (
-      scope === DashboardSpendingScope.Personal &&
-      !this.$personalSpendingAvailable()
-    )
-      return;
-    this.$spendingScope.set(scope);
-  }
 }
 // #endregion

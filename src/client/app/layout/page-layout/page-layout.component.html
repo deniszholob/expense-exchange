@@ -1,3 +1,8 @@
-<div class="container-fixed">
+<div
+  class="container-fixed"
+  [class.h-full]="$fillHeight()"
+  [class.min-h-0]="$fillHeight()"
+  [class.overflow-hidden]="$fillHeight()"
+>
   <ng-content></ng-content>
 </div>

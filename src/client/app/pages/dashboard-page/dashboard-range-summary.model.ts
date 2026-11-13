@@ -1,6 +1,7 @@
 // #region Imports
 import type { GroupMemberDto } from 'src/client/api/generated/expense-exchange-api.schemas';
-import type { DetailedExpense } from '../../shared/detailed-expense/detailed-expense.model';
+import { TransactionType } from 'src/client/api/generated/expense-exchange-api.schemas';
+import type { TransactionDto } from 'src/client/api/generated/expense-exchange-api.schemas';
 import type { DateRange } from '../../shared/date-range/date-range.model';
 import { isDateWithinRange } from '../../shared/date-range/date-range.util';
 // #endregion
@@ -19,8 +20,13 @@ export interface DashboardObligation {
 }
 
 export interface DashboardRangeSummary {
+  transactionCount: number;
   totalSpending: number;
   personalSpending: number;
+  totalIncome: number;
+  personalIncome: number;
+  totalRefunds: number;
+  personalRefunds: number;
   expenseCount: number;
   paidForShares: DashboardPaidForShare[];
   obligations: DashboardObligation[];
@@ -40,12 +46,25 @@ interface DashboardPaidForShareAccumulator {
 
 // #region Functions
 export function createDashboardRangeSummary(
-  expenses: readonly DetailedExpense[],
+  transactions: readonly TransactionDto[],
+  groupMembers: readonly GroupMemberDto[],
   range: DateRange,
   personId?: string,
 ): DashboardRangeSummary {
-  const rangedExpenses = expenses.filter((expense) =>
-    isDateWithinRange(expense.datePaid, range),
+  const rangedTransactions = transactions.filter((transaction) =>
+    isDateWithinRange(transaction.completeDate, range),
+  );
+  const membersById = new Map(
+    groupMembers.map((member) => [member.id, member]),
+  );
+  const rangedExpenses = rangedTransactions.filter(
+    (transaction) => transaction.type === TransactionType.Expense,
+  );
+  const rangedIncome = rangedTransactions.filter(
+    (transaction) => transaction.type === TransactionType.Income,
+  );
+  const rangedRefunds = rangedTransactions.filter(
+    (transaction) => transaction.type === TransactionType.Refund,
   );
   const netByUser = new Map<string, DashboardNetPosition>();
   const paidForByPair = new Map<
@@ -54,14 +73,26 @@ export function createDashboardRangeSummary(
   >();
   let totalCents = 0;
   let personalSpendingCents = 0;
+  const totalIncomeCents = rangedIncome.reduce(
+    (total, income) => total + Math.round(income.amount * 100),
+    0,
+  );
+  const totalRefundCents = rangedRefunds.reduce(
+    (total, refund) => total + Math.round(refund.amount * 100),
+    0,
+  );
+  let personalIncomeCents = 0;
+  let personalRefundCents = 0;
 
   for (const expense of rangedExpenses) {
-    const amountCents = Math.round(expense.amount * 100);
-    const beneficiaries = [...expense.paidForUsers].sort(compareUsers);
-    if (beneficiaries.length === 0) continue;
+    const paidBy = getGroupMember(expense.targetUserId, membersById);
+    const beneficiaries = expense.beneficiaryUserIds
+      .map((id) => getGroupMember(id, membersById))
+      .sort(compareUsers);
 
+    const amountCents = Math.round(expense.amount * 100);
     totalCents += amountCents;
-    addNetAmount(netByUser, expense.paidByUser, amountCents);
+    addNetAmount(netByUser, paidBy, amountCents);
 
     const baseShareCents = Math.floor(amountCents / beneficiaries.length);
     let remainderCents = amountCents % beneficiaries.length;
@@ -69,20 +100,43 @@ export function createDashboardRangeSummary(
       const shareCents = baseShareCents + (remainderCents > 0 ? 1 : 0);
       remainderCents -= remainderCents > 0 ? 1 : 0;
       addNetAmount(netByUser, beneficiary, -shareCents);
-      addPaidForShare(
-        paidForByPair,
-        expense.paidByUser,
-        beneficiary,
-        shareCents,
-      );
+      if (beneficiary.id !== paidBy.id)
+        addPaidForShare(paidForByPair, paidBy, beneficiary, shareCents);
       if (beneficiary.id === personId) personalSpendingCents += shareCents;
+    }
+  }
+
+  for (const inflow of [...rangedIncome, ...rangedRefunds]) {
+    const receiver = getGroupMember(inflow.targetUserId, membersById);
+    const beneficiaries = inflow.beneficiaryUserIds
+      .map((id) => getGroupMember(id, membersById))
+      .sort(compareUsers);
+    const amountCents = Math.round(inflow.amount * 100);
+    const baseShareCents = Math.floor(amountCents / beneficiaries.length);
+    let remainderCents = amountCents % beneficiaries.length;
+    addNetAmount(netByUser, receiver, -amountCents);
+    for (const beneficiary of beneficiaries) {
+      const shareCents = baseShareCents + (remainderCents > 0 ? 1 : 0);
+      remainderCents -= remainderCents > 0 ? 1 : 0;
+      addNetAmount(netByUser, beneficiary, shareCents);
+      if (beneficiary.id === personId) {
+        if (inflow.type === TransactionType.Income)
+          personalIncomeCents += shareCents;
+        if (inflow.type === TransactionType.Refund)
+          personalRefundCents += shareCents;
+      }
     }
   }
 
   const positions = [...netByUser.values()].sort(comparePositions);
   return {
+    transactionCount: rangedTransactions.length,
     totalSpending: totalCents / 100,
     personalSpending: personalSpendingCents / 100,
+    totalIncome: totalIncomeCents / 100,
+    personalIncome: personalIncomeCents / 100,
+    totalRefunds: totalRefundCents / 100,
+    personalRefunds: personalRefundCents / 100,
     expenseCount: rangedExpenses.length,
     paidForShares: [...paidForByPair.values()]
       .flatMap((shares) => [...shares.values()])
@@ -94,6 +148,13 @@ export function createDashboardRangeSummary(
       .sort(comparePaidForShares),
     obligations: createObligations(positions),
   };
+}
+
+function getGroupMember(
+  id: string,
+  membersById: ReadonlyMap<string, GroupMemberDto>,
+): GroupMemberDto {
+  return membersById.get(id) ?? { id, name: id };
 }
 
 function addNetAmount(

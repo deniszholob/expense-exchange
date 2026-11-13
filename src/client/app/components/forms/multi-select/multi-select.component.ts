@@ -20,7 +20,7 @@ export interface MultiSelectOption {
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-multi-select',
   templateUrl: './multi-select.component.html',
-  host: { class: 'block' },
+  host: { class: 'contents' },
 })
 export class MultiSelectComponent implements FormValueControl<string[]> {
   public readonly value = model.required<string[]>();

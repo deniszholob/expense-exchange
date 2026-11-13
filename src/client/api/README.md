@@ -5,8 +5,8 @@ This README documents the generated OpenAPI client artifacts in
 Do not manually edit, add, or remove generated files there.
 Changes will be overwritten the next time the API client is generated.
 
-The source of truth is the NestJS controllers and DTOs in
-`src/server/`. The generation flow is:
+The source of truth is the shared domain schemas in `src/util/` and the NestJS
+controllers in `src/server/`. The generation flow is:
 
 ```text
 NestJS controllers and DTOs -> OpenAPI document -> Orval -> Angular HttpClient services and httpResource functions
@@ -33,16 +33,16 @@ Use the generated resource function for signal-based reads:
 ```ts
 import { Injectable } from '@angular/core';
 
-import { expenseControllerGetExpensesResource } from 'src/client/api/generated/expenses/expenses.resource';
+import { transactionControllerGetTransactionsResource } from 'src/client/api/generated/transactions/transactions.resource';
 
 @Injectable({ providedIn: 'root' })
 export class ExampleState {
-  public readonly expensesResource = expenseControllerGetExpensesResource({
+  public readonly transactionsResource = transactionControllerGetTransactionsResource({
     defaultValue: [],
   });
 
   public reload(): void {
-    this.expensesResource.reload();
+    this.transactionsResource.reload();
   }
 }
 ```
@@ -51,12 +51,12 @@ Read the resource through its signals in the Angular template. Use
 `hasValue()` before reading the resolved value:
 
 ```html
-@if (expensesResource.isLoading()) {
-<p>Loading expenses...</p>
-} @else if (expensesResource.error(); as error) {
-<p>Unable to load expenses: {{ error.message }}</p>
-} @else if (expensesResource.hasValue()) {
-<p>Expenses: {{ expensesResource.value().length }}</p>
+@if (transactionsResource.isLoading()) {
+<p>Loading transactions...</p>
+} @else if (transactionsResource.error(); as error) {
+<p>Unable to load transactions: {{ error.message }}</p>
+} @else if (transactionsResource.hasValue()) {
+<p>Transactions: {{ transactionsResource.value().length }}</p>
 }
 ```
 
@@ -69,15 +69,15 @@ imperative event handler needs to await the request:
 import { inject, Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
-import type { CreateExpenseDto, ExpenseDto } from 'src/client/api/generated/expense-exchange-api.schemas';
-import { ExpensesService } from 'src/client/api/generated/expenses/expenses.service';
+import type { CreateTransactionDto, TransactionDto } from 'src/client/api/generated/expense-exchange-api.schemas';
+import { TransactionsService } from 'src/client/api/generated/transactions/transactions.service';
 
 @Injectable({ providedIn: 'root' })
 export class ExampleActions {
-  private readonly expensesService = inject(ExpensesService);
+  private readonly transactionsService = inject(TransactionsService);
 
-  public async createExpense(expense: CreateExpenseDto): Promise<ExpenseDto> {
-    return firstValueFrom(this.expensesService.expenseControllerCreateExpense(expense));
+  public async createTransaction(transaction: CreateTransactionDto): Promise<TransactionDto> {
+    return firstValueFrom(this.transactionsService.transactionControllerCreateTransaction(transaction));
   }
 }
 ```
@@ -89,16 +89,16 @@ observable typed and store the result in a signal for the template:
 import { inject, Injectable, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
-import { ExpensesService } from 'src/client/api/generated/expenses/expenses.service';
+import { TransactionsService } from 'src/client/api/generated/transactions/transactions.service';
 
 @Injectable({ providedIn: 'root' })
 export class ExampleActions {
-  private readonly expensesService = inject(ExpensesService);
+  private readonly transactionsService = inject(TransactionsService);
   public readonly $message = signal<string | undefined>(undefined);
 
-  public async refreshExpenses(): Promise<void> {
-    const response = await firstValueFrom(this.expensesService.expenseControllerGetExpenses());
-    this.$message.set(`${response.length} expenses loaded`);
+  public async refreshTransactions(): Promise<void> {
+    const response = await firstValueFrom(this.transactionsService.transactionControllerGetTransactions());
+    this.$message.set(`${response.length} transactions loaded`);
   }
 }
 ```

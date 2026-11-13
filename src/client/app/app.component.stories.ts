@@ -8,7 +8,7 @@ import { AppComponent } from './app.component';
 import { Router, RouterModule } from '@angular/router';
 import { MOCK_Router } from './app.routes.mock';
 import { importProvidersFrom } from '@angular/core';
-import { MOCK_ExpenseApiProvider } from './expense-api.mock';
+import { MOCK_TransactionApiProvider } from 'src/client/api/mocks/transaction-api.mock';
 
 type ComponentWithCustomControls = AppComponent;
 
@@ -26,7 +26,7 @@ const meta: Meta<ComponentWithCustomControls> = {
       ],
     }),
     applicationConfig({
-      providers: [importProvidersFrom(), MOCK_ExpenseApiProvider],
+      providers: [importProvidersFrom(), MOCK_TransactionApiProvider],
     }),
   ],
   parameters: {

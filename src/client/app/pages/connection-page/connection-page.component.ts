@@ -28,7 +28,7 @@ import {
 } from 'src/client/app/shared/remote-api-config';
 import { RemoteApiHealthProbeService } from 'src/client/app/shared/remote-api-health-probe.service';
 import { FormFieldComponent } from '../../components/forms/form-field/form-field.component';
-import { PAGE_ROUTES } from '../../app.info';
+import { PageRoute } from '../../app.info';
 // #endregion
 
 // #region Component
@@ -36,6 +36,7 @@ import { PAGE_ROUTES } from '../../app.info';
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-connection-page',
   templateUrl: './connection-page.component.html',
+  host: { class: 'contents' },
   imports: [CommonModule, PageLayoutComponent, FormField, FormFieldComponent],
 })
 export class ConnectionPageComponent {
@@ -172,15 +173,15 @@ export class ConnectionPageComponent {
       );
       if (!this.$setupRequired()) {
         const destination = this.appService.$currentUser()
-          ? PAGE_ROUTES.DASHBOARD_PAGE_ROOT
-          : PAGE_ROUTES.LOGIN_PAGE_ROOT;
+          ? PageRoute.Dashboard
+          : PageRoute.Login;
         await this.router.navigate(['/', destination]);
       }
       return;
     }
     this.$draftApiHealth.set('idle');
     this.$message.set('Local data source selected for this browser.');
-    await this.router.navigate(['/', PAGE_ROUTES.DASHBOARD_PAGE_ROOT]);
+    await this.router.navigate(['/', PageRoute.Dashboard]);
   }
 
   public constructor() {
@@ -231,7 +232,7 @@ export class ConnectionPageComponent {
       this.$authData.update((data) => ({ ...data, password: '' }));
     }
     if (!this.$authFormError())
-      await this.router.navigate(['/', PAGE_ROUTES.DASHBOARD_PAGE_ROOT]);
+      await this.router.navigate(['/', PageRoute.Dashboard]);
   }
 
   protected async importFile(event: Event): Promise<void> {

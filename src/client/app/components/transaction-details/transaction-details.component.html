@@ -1,0 +1,185 @@
+<div class="mx-auto w-full max-w-3xl">
+  <form class="surface-card flex flex-col gap-6 p-5 sm:p-7" (submit)="onSaveTransaction($event)">
+    <div class="border-finance-border border-b pb-5">
+      <h2 class="text-xl font-semibold">
+        @if ($isEditing()) {
+          Update {{ $isExpense() ? 'expense' : $isRefund() ? 'refund' : 'income' }}
+        } @else {
+          Add {{ $isExpense() ? 'expense' : $isRefund() ? 'refund' : 'income' }}
+        }
+      </h2>
+      <p class="text-finance-muted mt-1 text-sm">
+        @if ($isExpense()) {
+          Record the payment and choose who should share it.
+        } @else {
+          Record when the funds were posted and received, and who they benefit.
+        }
+      </p>
+    </div>
+
+    <details class="bg-finance-raised rounded-control border-finance-border border p-4">
+      <summary class="text-finance-text cursor-pointer font-medium">
+        Transaction entry examples
+      </summary>
+      <p class="text-finance-muted mt-2 text-sm">
+        The target is who paid or received the funds. Benefits lists everyone the transaction should
+        be allocated to; it does not automatically include the target.
+      </p>
+      <div class="mt-4 grid gap-3 sm:grid-cols-2">
+        <article class="bg-finance-surface rounded-control border-finance-border border p-3">
+          <h3 class="font-medium">Shared expense</h3>
+          <p class="text-finance-muted mt-1 text-sm">
+            Expense · $100 groceries · Paid by Bob · Benefits: Bob and Alice
+          </p>
+        </article>
+        <article class="bg-finance-surface rounded-control border-finance-border border p-3">
+          <h3 class="font-medium">Personal income</h3>
+          <p class="text-finance-muted mt-1 text-sm">
+            Income · $2,000 paycheck · Received by Bob · Benefits: Bob
+          </p>
+        </article>
+        <article class="bg-finance-surface rounded-control border-finance-border border p-3">
+          <h3 class="font-medium">Shared expense refund</h3>
+          <p class="text-finance-muted mt-1 text-sm">
+            Refund · $20 returned item · Received by Bob · Benefits: Bob and Alice · Link the
+            original expense. It reduces expenses rather than counting as income.
+          </p>
+        </article>
+        <article class="bg-finance-surface rounded-control border-finance-border border p-3">
+          <h3 class="font-medium">Gift card redeemed for someone else</h3>
+          <p class="text-finance-muted mt-1 text-sm">
+            Income · $50 gift card · Received/redeemed by Bob · Benefits: Alice. This allocates the
+            value to Alice, so the group balance can show Bob owes Alice.
+          </p>
+        </article>
+      </div>
+    </details>
+
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+      <app-form-field [$id]="'transaction-type'" [$label]="'Transaction type'" [$clearable]="false">
+        <app-segmented-control
+          id="transaction-type"
+          [formField]="$form.type"
+          [$label]="'Transaction type'"
+          [$options]="$typeOptions()"
+          [$stretch]="true"
+        />
+      </app-form-field>
+
+      <app-form-field
+        [$id]="'name'"
+        [$label]="
+          $isExpense() ? 'Expense name' : $isRefund() ? 'Refund description' : 'Income source'
+        "
+        [$required]="true"
+      >
+        <input
+          id="name"
+          [formField]="$form.name"
+          [placeholder]="
+            $isExpense() ? 'e.g. Groceries' : $isRefund() ? 'e.g. Returned item' : 'e.g. Paycheck'
+          "
+          type="text"
+          autocomplete="off"
+        />
+      </app-form-field>
+
+      <app-form-field [$id]="'amount'" [$label]="'Amount (USD)'" [$required]="true">
+        <div class="relative">
+          <span
+            class="text-finance-muted pointer-events-none absolute top-1/2 left-3 z-10 -translate-y-1/2 text-sm"
+            >$</span
+          >
+          <input
+            class="pl-7 text-left font-medium tabular-nums"
+            id="amount"
+            [formField]="$form.amount"
+            type="number"
+            step="0.01"
+          />
+        </div>
+      </app-form-field>
+
+      <app-form-field
+        [$id]="'postDate'"
+        [$label]="$isExpense() ? 'Expense date' : $isRefund() ? 'Date initiated' : 'Statement date'"
+        [$required]="true"
+      >
+        <input id="postDate" [formField]="$form.postDate" type="date" />
+      </app-form-field>
+
+      <app-form-field
+        [$id]="'targetUserId'"
+        [$label]="$isExpense() ? 'Paid by' : 'Received by'"
+        [$required]="true"
+      >
+        <select id="targetUserId" [formField]="$form.targetUserId">
+          @for (user of groupMembers(); track user.id) {
+            <option [value]="user.id">{{ user.name }}</option>
+          }
+        </select>
+      </app-form-field>
+
+      <app-form-field
+        [$id]="'completeDate'"
+        [$label]="$isExpense() ? 'Date paid' : $isRefund() ? 'Date refunded' : 'Date received'"
+        [$required]="true"
+      >
+        <input id="completeDate" [formField]="$form.completeDate" type="date" />
+      </app-form-field>
+
+      <div class="grid grid-cols-1 items-start gap-5 sm:col-span-2 sm:grid-cols-2">
+        <div class="flex flex-col gap-5">
+          <app-form-field [$id]="'beneficiaryUserIds'" [$label]="'Benefits'" [$required]="true">
+            <app-multi-select
+              id="beneficiaryUserIds"
+              [formField]="$form.beneficiaryUserIds"
+              [$options]="$shareOptions()"
+            />
+            <span class="text-finance-muted text-xs">
+              Select everyone who benefits, including the payer or recipient only when they benefit.
+            </span>
+          </app-form-field>
+          @if ($isRefund()) {
+            <app-form-field [$id]="'linkedTransactionId'" [$label]="'Related expense'">
+              <select id="linkedTransactionId" [formField]="$form.linkedTransactionId">
+                <option value="">No linked expense</option>
+                @for (expense of expenses(); track expense.id) {
+                  <option [value]="expense.id">{{ expense.name }}</option>
+                }
+              </select>
+            </app-form-field>
+          }
+        </div>
+        <app-form-field [$id]="'note'" [$label]="'Note'">
+          <textarea
+            id="note"
+            [formField]="$form.note"
+            rows="2"
+            placeholder="Add a useful detail (optional)"
+          ></textarea>
+        </app-form-field>
+      </div>
+    </div>
+
+    <div
+      class="border-finance-border flex flex-col-reverse gap-3 border-t pt-5 sm:flex-row sm:justify-end"
+    >
+      <button
+        class="rounded-control border-finance-border text-finance-muted hover:bg-finance-raised hover:text-finance-text border px-5"
+        (click)="onCancel()"
+        type="button"
+      >
+        Cancel
+      </button>
+      <button class="btn-primary sm:min-w-44" type="submit">
+        <svg class="size-4" lucideCheck aria-hidden="true"></svg>
+        @if ($isEditing()) {
+          Save changes
+        } @else {
+          Add {{ $isExpense() ? 'expense' : $isRefund() ? 'refund' : 'income' }}
+        }
+      </button>
+    </div>
+  </form>
+</div>

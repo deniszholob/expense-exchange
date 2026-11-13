@@ -2,7 +2,7 @@
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import type { CanActivateFn } from '@angular/router';
-import { PAGE_ROUTES } from '../app.info';
+import { PageRoute } from '../app.info';
 import { AppService } from '../app.service';
 import { DataSource } from '../shared/data-source.enum';
 // #endregion
@@ -13,6 +13,6 @@ export const AuthGuard: CanActivateFn = async () => {
   const router = inject(Router);
   await app.authenticationReady;
   if (app.$dataSource() === DataSource.Local || app.$currentUser()) return true;
-  return router.createUrlTree(['/', PAGE_ROUTES.LOGIN_PAGE_ROOT]);
+  return router.createUrlTree(['/', PageRoute.Login]);
 };
 // #endregion

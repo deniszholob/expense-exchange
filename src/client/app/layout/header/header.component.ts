@@ -1,19 +1,11 @@
 // #region Imports
-import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { NgComponentOutlet, NgOptimizedImage } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import {
-  LucideChartNoAxesCombined,
-  LucideCode2,
-  LucideDatabase,
-  LucideReceipt,
-  LucideUsersRound,
-} from '@lucide/angular';
-import { PAGE_ROUTES } from 'src/client/app/app.info';
+import { getPageRouteInfo, PageRoute } from 'src/client/app/app.info';
+import type { PageRouteInfo } from 'src/client/app/app.info';
 import { AppService } from 'src/client/app/app.service';
-import { Link } from 'src/client/app/shared/link/link.model';
-import { toWordCase } from 'src/client/app/utils';
-import { UserRole } from '../../../../util/user-role.enum';
+import { UserRole } from 'src/client/api/generated/expense-exchange-api.schemas';
 import { DataSource } from '../../shared/data-source.enum';
 import { UserMonogramPipe } from '../../shared/user-monogram.pipe';
 // #endregion
@@ -24,42 +16,36 @@ import { UserMonogramPipe } from '../../shared/user-monogram.pipe';
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-header',
   templateUrl: './header.component.html',
-  // styles: [':host{display:contents}'], // Makes component host as if it was not there, can offer less css headaches. Use @HostBinding class approach for easier overrides.
-  // host: { class: 'contents' },
+  host: { class: 'contents' },
   imports: [
-    CommonModule,
+    NgComponentOutlet,
     NgOptimizedImage,
     UserMonogramPipe,
     RouterModule,
-    LucideChartNoAxesCombined,
-    LucideCode2,
-    LucideDatabase,
-    LucideReceipt,
-    LucideUsersRound,
   ],
 })
 export class HeaderComponent {
   protected readonly UserRole = UserRole;
   protected readonly DataSource = DataSource;
-  protected readonly PAGE_ROUTES = PAGE_ROUTES;
+  protected readonly PageRoute = PageRoute;
   protected readonly $links = computed(() => {
     const isLoggedIn =
       this.appService.$currentUser() !== undefined ||
       this.appService.$dataSource() === DataSource.Local;
-    const links = this.router.config.flatMap((route): Link[] => {
-      if (!route.path) return [];
+    const links = this.router.config.flatMap((route): PageRouteInfo[] => {
+      if (!route.path || route.redirectTo) return [];
       if (
         new Set<string>([
-          PAGE_ROUTES.SETTINGS_PAGE_ROOT,
-          PAGE_ROUTES.LOGIN_PAGE_ROOT,
-          PAGE_ROUTES.PROFILE_PAGE_ROOT,
+          PageRoute.Settings,
+          PageRoute.Login,
+          PageRoute.Profile,
         ]).has(route.path ?? '')
       ) {
         return [];
       }
       if (route.canActivate && !isLoggedIn) return [];
       if (
-        route.path === PAGE_ROUTES.USER_MANAGEMENT_PAGE_ROOT &&
+        route.path === PageRoute.Users &&
         this.appService.$dataSource() !== DataSource.Local &&
         this.appService.$currentUser()?.role !== UserRole.Admin
       )
@@ -68,16 +54,17 @@ export class HeaderComponent {
         this.appService.$dataSource() !== DataSource.Local &&
         this.appService.$currentUser()?.role === UserRole.Admin &&
         new Set<string>([
-          PAGE_ROUTES.DASHBOARD_PAGE_ROOT,
-          PAGE_ROUTES.GROUP_PAGE_ROOT,
-          PAGE_ROUTES.EXPENSES_PAGE_ROOT,
+          PageRoute.Dashboard,
+          PageRoute.Group,
+          PageRoute.Transactions,
         ]).has(route.path ?? '')
       )
         return [];
-      return [routeStringToLink(route.path ?? '')];
+      const routeInfo = getPageRouteInfo(route.path);
+      return routeInfo ? [routeInfo] : [];
     });
     return links.sort(
-      (left, right) => utilityOrder(left.id) - utilityOrder(right.id),
+      (left, right) => (left.utilityOrder ?? 0) - (right.utilityOrder ?? 0),
     );
   });
 
@@ -85,22 +72,6 @@ export class HeaderComponent {
     protected readonly appService: AppService,
     private readonly router: Router,
   ) {}
-}
-
-function routeStringToLink(route: string): Link {
-  return {
-    id: route,
-    displayAs:
-      route === PAGE_ROUTES.GROUP_PAGE_ROOT
-        ? 'Group'
-        : toWordCase(route.replace('_', ' ')),
-  };
-}
-
-function utilityOrder(id: string): number {
-  if (id === 'data') return 10;
-  if (id === 'dev') return 11;
-  return 0;
 }
 
 // #endregion

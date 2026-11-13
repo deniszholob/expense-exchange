@@ -1,6 +1,6 @@
 // #region Imports
 import type { Meta, StoryObj } from '@storybook/angular-vite';
-import { MOCK_GroupMembers } from 'src/client/app/expense-api.mock';
+import { MOCK_GroupMember_Array } from 'src/client/api/mocks/transaction-api.mock';
 import { MultiSelectComponent } from './multi-select.component';
 // #endregion
 
@@ -8,8 +8,8 @@ import { MultiSelectComponent } from './multi-select.component';
 const meta: Meta<MultiSelectComponent> = {
   component: MultiSelectComponent,
   args: {
-    $options: MOCK_GroupMembers,
-    value: [MOCK_GroupMembers[0]?.id ?? ''],
+    $options: MOCK_GroupMember_Array,
+    value: [MOCK_GroupMember_Array[0]?.id ?? ''],
   },
 };
 export default meta;

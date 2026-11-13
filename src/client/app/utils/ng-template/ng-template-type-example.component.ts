@@ -55,7 +55,7 @@ type MyImplicitContext = NgTemplateContextImplicit<string>;
     >
     </ng-container>
   `,
-  styles: [':host{display:contents}'],
+  host: { class: 'contents' },
   imports: [CommonModule, NgTemplateTypedDirective],
 })
 export class NgTemplateTypeExampleComponent {
