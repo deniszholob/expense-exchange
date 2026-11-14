@@ -21,17 +21,17 @@ export function createTransactionSchemas<T extends string>(
     name: z.string().trim().min(1),
     postDate: z.iso.date(),
     completeDate: z.iso.date(),
-    targetUserId: z
+    targetParticipantId: z
       .string()
       .min(1)
       .describe(
-        'The user who paid for an expense or received income/refund funds.',
+        'The participant who paid for an expense or received income/refund funds.',
       ),
-    beneficiaryUserIds: z
+    beneficiaryParticipantIds: z
       .array(z.string().min(1))
       .min(1)
       .describe(
-        'Explicit list of users who benefit from the transaction; includes targetUserId only when they benefit.',
+        'Explicit list of participants who benefit from the transaction; includes the target participant only when they benefit.',
       ),
     note: z.string().optional(),
     linkedTransactionId: z.string().min(1).optional(),
@@ -46,13 +46,13 @@ export function createTransactionSchemas<T extends string>(
           path: ['linkedTransactionId'],
         });
       if (
-        new Set(transaction.beneficiaryUserIds).size !==
-        transaction.beneficiaryUserIds.length
+        new Set(transaction.beneficiaryParticipantIds).size !==
+        transaction.beneficiaryParticipantIds.length
       )
         context.addIssue({
           code: 'custom',
           message: 'A beneficiary can only be listed once',
-          path: ['beneficiaryUserIds'],
+          path: ['beneficiaryParticipantIds'],
         });
     },
   );

@@ -22,12 +22,12 @@ export interface TransactionDto {
    * The user who paid for an expense or received income/refund funds.
    * @minLength 1
    */
-  targetUserId: string;
+  targetParticipantId: string;
   /**
-   * Explicit list of users who benefit from the transaction; includes targetUserId only when they benefit.
+   * Explicit list of participants who benefit from the transaction; includes the target participant only when they benefit.
    * @minItems 1
    */
-  beneficiaryUserIds: string[];
+  beneficiaryParticipantIds: string[];
   note?: string;
   /** @minLength 1 */
   linkedTransactionId?: string;
@@ -49,12 +49,12 @@ export interface CreateTransactionDto {
    * The user who paid for an expense or received income/refund funds.
    * @minLength 1
    */
-  targetUserId: string;
+  targetParticipantId: string;
   /**
-   * Explicit list of users who benefit from the transaction; includes targetUserId only when they benefit.
+   * Explicit list of participants who benefit from the transaction; includes the target participant only when they benefit.
    * @minItems 1
    */
-  beneficiaryUserIds: string[];
+  beneficiaryParticipantIds: string[];
   note?: string;
   /** @minLength 1 */
   linkedTransactionId?: string;
@@ -126,3 +126,122 @@ export interface ProfileUpdateDto {
   username: string;
   password?: string;
 }
+
+export enum RecurringTransactionType {
+  Expense = 'Expense',
+  Income = 'Income',
+}
+export interface RecurringPriceDto {
+  effectiveDate: string;
+  payDate?: string;
+  /** @exclusiveMinimum 0 */
+  amount?: number;
+}
+
+export enum RecurrenceCadence {
+  Weekly = 'Weekly',
+  Biweekly = 'Biweekly',
+  Monthly = 'Monthly',
+  Biannual = 'Biannual',
+  Yearly = 'Yearly',
+}
+export interface RecurringRuleDto {
+  type: RecurringTransactionType;
+  /** @minLength 1 */
+  name: string;
+  prices: RecurringPriceDto[];
+  /** @minLength 1 */
+  targetParticipantId: string;
+  /** @minItems 1 */
+  beneficiaryParticipantIds: string[];
+  cadence: RecurrenceCadence;
+  endDate?: string;
+  isAutopay: boolean;
+  note?: string;
+  /** @minLength 1 */
+  id: string;
+  /** @minLength 1 */
+  ownerUserId: string;
+}
+
+export interface CreateRecurringRuleDto {
+  type: RecurringTransactionType;
+  /** @minLength 1 */
+  name: string;
+  prices: RecurringPriceDto[];
+  /** @minLength 1 */
+  targetParticipantId: string;
+  /** @minItems 1 */
+  beneficiaryParticipantIds: string[];
+  cadence: RecurrenceCadence;
+  endDate?: string;
+  isAutopay: boolean;
+  note?: string;
+}
+
+export interface UpdateRecurringRuleDto {
+  type: RecurringTransactionType;
+  /** @minLength 1 */
+  name: string;
+  prices: RecurringPriceDto[];
+  /** @minLength 1 */
+  targetParticipantId: string;
+  /** @minItems 1 */
+  beneficiaryParticipantIds: string[];
+  cadence: RecurrenceCadence;
+  endDate?: string;
+  isAutopay: boolean;
+  note?: string;
+}
+
+export interface RecurringOccurrenceDto {
+  /** @minLength 1 */
+  id: string;
+  /** @minLength 1 */
+  ruleId: string;
+  /** @minLength 1 */
+  ownerUserId: string;
+  type: RecurringTransactionType;
+  /** @minLength 1 */
+  name: string;
+  /** @exclusiveMinimum 0 */
+  amount?: number;
+  /** @minLength 1 */
+  targetParticipantId: string;
+  /** @minItems 1 */
+  beneficiaryParticipantIds: string[];
+  statementDate: string;
+  payDate: string;
+  isPaid: boolean;
+  isAutopay: boolean;
+  isAmountVariable: boolean;
+  note?: string;
+}
+
+export interface MarkRecurringOccurrencePaidDto {
+  /** @exclusiveMinimum 0 */
+  amount: number;
+  payDate: string;
+}
+
+export interface ExternalParticipantDto {
+  /** @minLength 1 */
+  id: string;
+  /** @minLength 1 */
+  name: string;
+}
+
+export interface CreateExternalParticipantDto {
+  /** @minLength 1 */
+  name: string;
+}
+
+export interface UpdateExternalParticipantDto {
+  /** @minLength 1 */
+  name: string;
+}
+
+export type RecurringControllerDeleteRuleParams = {
+  /** Permanently delete this rule’s occurrence history. */
+  deleteHistory?: boolean;
+};

@@ -17,6 +17,10 @@
       </p>
     </div>
 
+    @if ($actionError(); as error) {
+      <p class="text-finance-negative text-sm" role="alert">{{ error }}</p>
+    }
+
     <details class="bg-finance-raised rounded-control border-finance-border border p-4">
       <summary class="text-finance-text cursor-pointer font-medium">
         Transaction entry examples
@@ -105,17 +109,17 @@
         [$label]="$isExpense() ? 'Expense date' : $isRefund() ? 'Date initiated' : 'Statement date'"
         [$required]="true"
       >
-        <input id="postDate" [formField]="$form.postDate" type="date" />
+        <app-date-input id="postDate" [$id]="'postDate'" [formField]="$form.postDate" />
       </app-form-field>
 
       <app-form-field
-        [$id]="'targetUserId'"
+        [$id]="'targetParticipantId'"
         [$label]="$isExpense() ? 'Paid by' : 'Received by'"
         [$required]="true"
       >
-        <select id="targetUserId" [formField]="$form.targetUserId">
-          @for (user of groupMembers(); track user.id) {
-            <option [value]="user.id">{{ user.name }}</option>
+        <select id="targetParticipantId" [formField]="$form.targetParticipantId">
+          @for (participant of participants(); track participant.id) {
+            <option [value]="participant.id">{{ participantLabel(participant) }}</option>
           }
         </select>
       </app-form-field>
@@ -125,15 +129,19 @@
         [$label]="$isExpense() ? 'Date paid' : $isRefund() ? 'Date refunded' : 'Date received'"
         [$required]="true"
       >
-        <input id="completeDate" [formField]="$form.completeDate" type="date" />
+        <app-date-input id="completeDate" [$id]="'completeDate'" [formField]="$form.completeDate" />
       </app-form-field>
 
       <div class="grid grid-cols-1 items-start gap-5 sm:col-span-2 sm:grid-cols-2">
         <div class="flex flex-col gap-5">
-          <app-form-field [$id]="'beneficiaryUserIds'" [$label]="'Benefits'" [$required]="true">
+          <app-form-field
+            [$id]="'beneficiaryParticipantIds'"
+            [$label]="'Benefits'"
+            [$required]="true"
+          >
             <app-multi-select
-              id="beneficiaryUserIds"
-              [formField]="$form.beneficiaryUserIds"
+              id="beneficiaryParticipantIds"
+              [formField]="$form.beneficiaryParticipantIds"
               [$options]="$shareOptions()"
             />
             <span class="text-finance-muted text-xs">

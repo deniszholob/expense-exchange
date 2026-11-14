@@ -29,6 +29,7 @@ import type { AuthenticatedRequest } from '../guards/auth.guard.js';
 import { AuthService } from '../auth/auth.service.js';
 import { GroupMemberGuard } from '../guards/group-member.guard.js';
 import { GroupMemberService } from '../group-member/group-member.service.js';
+import { ExternalParticipantService } from '../external-participant/external-participant.service.js';
 import { CreateTransactionDto, TransactionDto } from './transaction.dto.js';
 import { TransactionService } from './transaction.service.js';
 // #endregion
@@ -41,6 +42,7 @@ export class TransactionController {
   public constructor(
     private readonly transactions: TransactionService,
     private readonly groupMembers: GroupMemberService,
+    private readonly externalParticipants: ExternalParticipantService,
     private readonly auth: AuthService,
   ) {}
 
@@ -95,9 +97,10 @@ export class TransactionController {
   private async validateGroupParticipants(
     input: CreateTransaction,
   ): Promise<void> {
-    const [members, accounts] = await Promise.all([
+    const [members, accounts, externalParticipants] = await Promise.all([
       this.groupMembers.getMembers(),
       this.auth.listAccounts(),
+      this.externalParticipants.getParticipants(),
     ]);
     const adminIds = new Set(
       accounts
@@ -107,15 +110,16 @@ export class TransactionController {
     const memberIds = new Set(
       members
         .filter((member) => !adminIds.has(member.id))
-        .map((member) => member.id),
+        .map((member) => member.id)
+        .concat(externalParticipants.map((participant) => participant.id)),
     );
     if (
-      [input.targetUserId, ...input.beneficiaryUserIds].some(
+      [input.targetParticipantId, ...input.beneficiaryParticipantIds].some(
         (id) => !memberIds.has(id),
       )
     )
       throw new BadRequestException(
-        'Transactions can only include current group members',
+        'Transactions can only include current group participants',
       );
   }
 }

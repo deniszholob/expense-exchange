@@ -165,8 +165,8 @@ export class UserManagementPageComponent {
       .exportLocalStore()
       .transactions.some(
         (transaction) =>
-          transaction.targetUserId === id ||
-          transaction.beneficiaryUserIds.includes(id),
+          transaction.targetParticipantId === id ||
+          transaction.beneficiaryParticipantIds.includes(id),
       );
     if (inGroup || referenced) {
       this.$error.set(

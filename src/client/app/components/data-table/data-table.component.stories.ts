@@ -5,6 +5,7 @@ import {
   moduleMetadata,
 } from '@storybook/angular-vite';
 import type { Meta, StoryObj } from '@storybook/angular-vite';
+import { TableColumnPin } from './data-table.model';
 import type { ColDef, TableBaseData } from './data-table.model';
 import { DataTableComponent } from './data-table.component';
 // #endregion
@@ -29,7 +30,13 @@ const MOCK_ExampleRow_Array: readonly ExampleRow[] = Array.from(
 );
 
 const EXAMPLE_ROW_COLUMNS: readonly ColDef<ExampleRow>[] = [
-  { key: 'name', label: 'Name', sortable: true },
+  {
+    key: 'name',
+    label: 'Name',
+    sortable: true,
+    pinned: TableColumnPin.Left,
+    width: '14rem',
+  },
   {
     key: 'amount',
     label: 'Amount',
@@ -72,7 +79,7 @@ const meta: Meta<ComponentWithCustomControls> = {
     docs: {
       description: {
         component:
-          'A generic data table with configurable columns, cell templates, row actions, sorting, and pagination.',
+          'A generic data table with configurable columns, cell templates, row actions, optional row reordering, sorting, and pagination.',
       },
     },
     layout: 'fullscreen',
@@ -88,8 +95,10 @@ const meta: Meta<ComponentWithCustomControls> = {
   ],
   argTypes: {
     addRequested: { action: 'addRequested' },
+    viewRequested: { action: 'viewRequested' },
     editRequested: { action: 'editRequested' },
     deleteRequested: { action: 'deleteRequested' },
+    rowsReordered: { action: 'rowsReordered' },
   },
   args: {
     $data: MOCK_ExampleRow_Array,
@@ -99,8 +108,10 @@ const meta: Meta<ComponentWithCustomControls> = {
     $addActionLabel: 'Add record',
     $emptyMessage: 'No example records.',
     $showAddAction: true,
+    $showViewAction: true,
     $showEditAction: true,
     $showDeleteAction: true,
+    $actionsPinned: TableColumnPin.Right,
     $striped: true,
   },
 };
@@ -108,11 +119,27 @@ export default meta;
 
 export const DataTable: StoryObj<ComponentWithCustomControls> = {};
 
+export const ReorderableRows: StoryObj<ComponentWithCustomControls> = {
+  args: {
+    $title: 'Reorderable records',
+    $enableRowReordering: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Enable row reordering to show a drag handle. Drag rows to reorder them, or focus the handle and use the up/down arrow keys. Listen to rowsReordered to persist the new order in the parent.',
+      },
+    },
+  },
+};
+
 export const FormattedCells: StoryObj<ComponentWithCustomControls> = {
   args: {
     $title: 'Formatted cells',
     $columns: FORMATTED_CELL_COLUMNS,
     $showAddAction: false,
+    $showViewAction: false,
     $showEditAction: false,
     $showDeleteAction: false,
   },
@@ -136,6 +163,7 @@ export const CustomCellRenderer: StoryObj<ComponentWithCustomControls> = {
         ]"
         [$title]="'Custom cell renderer'"
         [$showAddAction]="false"
+        [$showViewAction]="false"
         [$showEditAction]="false"
         [$showDeleteAction]="false"
       />
@@ -150,6 +178,7 @@ export const Empty: StoryObj<ComponentWithCustomControls> = {
 export const WithoutRowActions: StoryObj<ComponentWithCustomControls> = {
   args: {
     $showAddAction: false,
+    $showViewAction: false,
     $showEditAction: false,
     $showDeleteAction: false,
   },

@@ -1,6 +1,6 @@
 <app-page-layout>
   @if (appService.$dataSource() === DataSource.Local) {
-    <section class="surface-card mx-auto flex w-full flex-col gap-5 p-5 sm:p-6">
+    <section class="section-container surface-card flex flex-col gap-5 p-5 sm:p-6">
       <div>
         <h2 class="text-lg font-semibold">Users</h2>
         <p class="text-finance-muted mt-1 text-sm">
@@ -75,7 +75,7 @@
     </section>
   } @else {
     <div
-      class="grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(18rem,0.7fr)_minmax(0,1.3fr)]"
+      class="section-container grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(18rem,0.7fr)_minmax(0,1.3fr)]"
     >
       <section
         class="surface-card flex flex-col gap-4 p-5 sm:p-6"

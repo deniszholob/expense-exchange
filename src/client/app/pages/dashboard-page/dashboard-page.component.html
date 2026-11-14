@@ -1,5 +1,5 @@
-<app-page-layout>
-  <div class="flex flex-col gap-6">
+<app-page-layout [$fillHeight]="true">
+  <div class="section-container flex min-h-0 flex-1 flex-col gap-6">
     <!-- <div
       class="rounded-card from-finance-accent-soft to-finance-surface flex flex-wrap items-center justify-between gap-4 border border-sky-400/15 bg-gradient-to-r p-5 sm:p-7"
     >
@@ -19,8 +19,8 @@
       </a>
     </div> -->
 
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-      <article class="stat-card">
+    <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-3">
+      <article class="stat-card min-w-0 lg:col-span-1">
         <div class="flex flex-wrap items-center justify-between gap-2">
           <span class="eyebrow">NET CASH FLOW · {{ $rangeLabel() | uppercase }}</span>
           <app-segmented-control
@@ -65,142 +65,179 @@
           </div>
         </div>
       </article>
-      <article class="stat-card">
-        <span class="eyebrow">EXPENSES</span>
-        <strong class="text-3xl font-semibold tracking-tight tabular-nums">
-          {{ $expenseCount() }}
-        </strong>
-        <span class="text-finance-muted text-xs">Transactions paid in selected range</span>
-      </article>
-      <article class="stat-card">
-        <span class="eyebrow">PEOPLE</span>
-        <strong class="text-3xl font-semibold tracking-tight tabular-nums">
-          {{ $groupMembers().length }}
-        </strong>
-        <span class="text-finance-muted text-xs">Profiles sharing expenses</span>
-      </article>
-    </div>
-
-    <section class="surface-card overflow-hidden" aria-labelledby="monthly-balance-heading">
-      <div class="px-5 pt-4 sm:px-6">
-        <h2 class="font-semibold" id="monthly-balance-heading">Group balance</h2>
-        <p class="text-finance-muted mt-1 text-xs">
-          See who paid for each person and how the group balances out.
-        </p>
-      </div>
-      @if ($rangeSummary().transactionCount === 0) {
-        <p class="text-finance-muted px-5 py-8 text-center text-sm sm:px-6">
-          No transactions match this date range.
-        </p>
-      } @else {
-        <div class="grid gap-6 p-5 sm:p-6 lg:grid-cols-2">
-          <div>
-            <h3 class="text-sm font-semibold">Who owes whom</h3>
-            @if ($rangeSummary().obligations.length === 0) {
-              <p class="text-finance-muted mt-3 text-sm">
-                Everyone is settled for {{ $rangeLabel() }}.
-              </p>
-            } @else {
-              <ul class="divide-finance-border mt-2 divide-y">
-                @for (obligation of $rangeSummary().obligations; track $index) {
-                  <li class="flex items-center justify-between gap-3 py-3">
-                    <span class="text-sm">
-                      <strong class="font-medium">{{ obligation.debtor.name }}</strong>
-                      owes
-                      <strong class="font-medium">{{ obligation.creditor.name }}</strong>
-                    </span>
-                    <strong
-                      class="shrink-0 text-sm tabular-nums"
-                      [class.text-finance-positive]="obligation.creditor.id === $currentUser()?.id"
-                      [class.text-finance-negative]="obligation.debtor.id === $currentUser()?.id"
-                    >
-                      @if (obligation.creditor.id === $currentUser()?.id) {
-                        +{{ obligation.amount | currency }}
-                      } @else if (obligation.debtor.id === $currentUser()?.id) {
-                        −{{ obligation.amount | currency }}
-                      } @else {
-                        {{ obligation.amount | currency }}
-                      }
-                    </strong>
-                  </li>
-                }
-              </ul>
-            }
-          </div>
-          <div>
-            <h3 class="text-sm font-semibold">Who paid for whom</h3>
-            <div class="mt-2 overflow-x-auto">
-              <table class="w-full text-left text-sm">
-                <thead class="text-finance-muted text-xs uppercase">
-                  <tr>
-                    <th class="py-2 pr-3 font-medium">Paid by</th>
-                    <th class="py-2 pr-3 font-medium">Paid for</th>
-                    <th class="py-2 text-right font-medium">Share</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-finance-border divide-y">
-                  @for (
-                    share of $rangeSummary().paidForShares;
-                    track share.paidBy.id + share.paidFor.id
-                  ) {
-                    <tr>
-                      <td class="py-2 pr-3">{{ share.paidBy.name }}</td>
-                      <td class="py-2 pr-3">{{ share.paidFor.name }}</td>
-                      <td class="text-finance-negative py-2 text-right font-medium tabular-nums">
-                        −{{ share.amount | currency }}
-                      </td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      }
-    </section>
-
-    <section class="surface-card overflow-hidden">
-      <div
-        class="border-finance-border flex items-center justify-between gap-4 border-b px-5 py-4 sm:px-6"
+      <section
+        class="surface-card min-w-0 overflow-hidden lg:col-span-2"
+        aria-labelledby="monthly-balance-heading"
       >
-        <div>
-          <h2 class="font-semibold">Recent activity</h2>
+        <div class="px-5 pt-4 sm:px-6">
+          <h2 class="font-semibold" id="monthly-balance-heading">Group balance</h2>
           <p class="text-finance-muted mt-1 text-xs">
-            The latest transactions added to your ledger
+            See who paid for each person and how the group balances out.
           </p>
         </div>
-        <a class="link text-sm no-underline" routerLink="/transactions">View all</a>
+        @if ($rangeSummary().activityCount === 0) {
+          <p class="text-finance-muted px-5 py-8 text-center text-sm sm:px-6">
+            No transactions or recurring payments match this date range.
+          </p>
+        } @else {
+          <div class="grid gap-6 p-5 sm:p-6 md:grid-cols-2">
+            <div>
+              <h3 class="text-sm font-semibold">Who owes whom</h3>
+              @if ($rangeSummary().obligations.length === 0) {
+                <p class="text-finance-muted mt-3 text-sm">
+                  Everyone is settled for {{ $rangeLabel() }}.
+                </p>
+              } @else {
+                <ul class="divide-finance-border mt-2 divide-y">
+                  @for (obligation of $rangeSummary().obligations; track $index) {
+                    <li class="flex items-center justify-between gap-3 py-3">
+                      <span class="text-sm">
+                        <span class="participant-badge" [title]="obligation.debtor.name">
+                          <span class="truncate">{{ obligation.debtor.name }}</span>
+                        </span>
+                        <span class="text-finance-muted mx-1">owes</span>
+                        <span class="participant-badge" [title]="obligation.creditor.name">
+                          <span class="truncate">{{ obligation.creditor.name }}</span>
+                        </span>
+                      </span>
+                      <strong
+                        class="shrink-0 text-sm tabular-nums"
+                        [class.text-finance-positive]="
+                          obligation.creditor.id === $currentUser()?.id
+                        "
+                        [class.text-finance-negative]="obligation.debtor.id === $currentUser()?.id"
+                      >
+                        @if (obligation.creditor.id === $currentUser()?.id) {
+                          +{{ obligation.amount | currency }}
+                        } @else if (obligation.debtor.id === $currentUser()?.id) {
+                          −{{ obligation.amount | currency }}
+                        } @else {
+                          {{ obligation.amount | currency }}
+                        }
+                      </strong>
+                    </li>
+                  }
+                </ul>
+              }
+            </div>
+            <div>
+              <h3 class="text-sm font-semibold">Who paid for whom</h3>
+              <div class="mt-2 overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                  <thead class="text-finance-muted text-xs uppercase">
+                    <tr>
+                      <th class="py-2 pr-3 font-medium">Paid by</th>
+                      <th class="py-2 pr-3 font-medium">Paid for</th>
+                      <th class="py-2 text-right font-medium">Share</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-finance-border divide-y">
+                    @for (
+                      share of $rangeSummary().paidForShares;
+                      track share.paidBy.id + share.paidFor.id
+                    ) {
+                      <tr>
+                        <td class="py-2 pr-3">
+                          <span class="participant-badge" [title]="share.paidBy.name">
+                            <span class="truncate">{{ share.paidBy.name }}</span>
+                          </span>
+                        </td>
+                        <td class="py-2 pr-3">
+                          <span class="participant-badge" [title]="share.paidFor.name">
+                            <span class="truncate">{{ share.paidFor.name }}</span>
+                          </span>
+                        </td>
+                        <td class="text-finance-negative py-2 text-right font-medium tabular-nums">
+                          −{{ share.amount | currency }}
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        }
+      </section>
+    </div>
+
+    <section
+      class="surface-card flex min-h-0 flex-1 flex-col overflow-hidden"
+      aria-labelledby="cash-flow-activity-heading"
+    >
+      <div class="border-finance-border shrink-0 border-b px-5 py-4 sm:px-6">
+        <div class="flex flex-wrap items-center gap-2">
+          <h2 class="font-semibold" id="cash-flow-activity-heading">Cash flow activity</h2>
+          <span
+            class="border-finance-border bg-finance-raised text-finance-muted inline-flex min-w-6 items-center justify-center rounded-full border px-1.5 py-0.5 text-xs tabular-nums"
+            >{{ $rangeCashFlowActivities().length }}</span
+          >
+        </div>
+        <p class="text-finance-muted mt-1 text-xs">
+          @if ($spendingScope() === TransactionScope.MyShare) {
+            Entries included in your share of the cash flow for {{ $rangeLabel() }}.
+          } @else {
+            All group entries included in the cash flow for {{ $rangeLabel() }}.
+          }
+        </p>
       </div>
-      @if ($recentTransactions().length === 0) {
-        <div class="text-finance-muted px-5 py-10 text-center text-sm">
-          Your recent transactions will appear here.
+      @if ($rangeCashFlowActivities().length === 0) {
+        <div
+          class="text-finance-muted grid min-h-0 flex-1 place-items-center px-5 py-10 text-center text-sm"
+        >
+          No cash flow entries match this date range.
         </div>
       } @else {
-        <ul class="divide-finance-border divide-y">
-          @for (transaction of $recentTransactions(); track transaction.id) {
-            <li class="flex flex-wrap items-center justify-between gap-3 px-5 py-4 sm:px-6">
+        <ul class="divide-finance-border min-h-0 flex-1 divide-y overflow-y-auto">
+          @for (activity of $rangeCashFlowActivities(); track activity.id) {
+            <li class="flex flex-wrap items-center justify-between gap-3 px-5 py-3 sm:px-6">
               <div class="flex min-w-0 items-center gap-3">
-                <span
-                  class="bg-finance-raised rounded-card grid size-10 shrink-0 place-items-center text-sky-300"
+                <time
+                  class="bg-finance-raised rounded-card flex size-12 shrink-0 flex-col items-center justify-center leading-none"
+                  [attr.datetime]="activity.activityDate"
+                  [attr.aria-label]="activity.activityDate | date: 'longDate'"
                 >
-                  <svg class="size-4" lucideReceipt aria-hidden="true"></svg>
-                </span>
+                  <span class="text-xs font-semibold tabular-nums">
+                    {{ activity.activityDate | date: 'd' }}
+                  </span>
+                  <span class="text-finance-muted mt-0.5 text-[0.55rem] font-semibold uppercase">
+                    {{ activity.activityDate | date: 'MMM' }}
+                  </span>
+                  <span class="text-finance-muted mt-0.5 text-[0.55rem] tabular-nums">
+                    {{ activity.activityDate | date: 'yyyy' }}
+                  </span>
+                </time>
                 <div class="min-w-0">
-                  <p class="truncate text-sm font-medium">{{ transaction.name }}</p>
+                  <p class="flex min-w-0 items-center gap-2 text-sm font-medium">
+                    <span class="truncate">{{ activity.name }}</span>
+                    @if (activity.isRecurring) {
+                      <span
+                        class="shrink-0 rounded-sm border border-amber-400/30 bg-amber-400/10 px-1.5 py-0.5 text-[0.6rem] font-semibold tracking-wide text-amber-300 uppercase"
+                        >Recurring</span
+                      >
+                    } @else {
+                      <span
+                        class="shrink-0 rounded-sm border border-sky-400/30 bg-sky-400/10 px-1.5 py-0.5 text-[0.6rem] font-semibold tracking-wide text-sky-300 uppercase"
+                        >One-time</span
+                      >
+                    }
+                  </p>
                   <p class="text-finance-muted mt-1 text-xs">
-                    {{ transaction.type === TransactionType.Expense ? 'Paid by' : 'Received by' }}
-                    {{ transaction.targetName }} ·
-                    {{ transaction.completeDate | date: 'mediumDate' }}
+                    {{ activity.type === TransactionType.Expense ? 'Paid by' : 'Received by' }}
+                    <span class="participant-badge" [title]="activity.targetName">
+                      <span class="truncate">{{ activity.targetName }}</span>
+                    </span>
                   </p>
                 </div>
               </div>
               <strong
                 class="text-sm font-semibold tabular-nums"
-                [class.text-finance-negative]="transaction.type === TransactionType.Expense"
-                [class.text-finance-positive]="transaction.type !== TransactionType.Expense"
+                [class.text-finance-negative]="activity.type === TransactionType.Expense"
+                [class.text-finance-positive]="activity.type === TransactionType.Income"
+                [class.text-amber-300]="activity.type === TransactionType.Refund"
               >
-                {{ transaction.type === TransactionType.Expense ? '−' : '+'
-                }}{{ transaction.amount | currency }}
+                {{ activity.type === TransactionType.Expense ? '−' : '+'
+                }}{{ activity.amount | currency }}
               </strong>
             </li>
           }

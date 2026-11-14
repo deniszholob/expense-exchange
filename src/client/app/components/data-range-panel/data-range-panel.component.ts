@@ -15,6 +15,7 @@ import {
   formatDataRangeLabel,
   isDateRangeValid,
 } from 'src/client/app/shared/date-range/date-range.util';
+import { DateInputComponent } from '../forms/date-input/date-input.component';
 // #endregion
 
 // #region Constants
@@ -40,7 +41,7 @@ const MONTH_OPTIONS = [
   selector: 'app-data-range-panel',
   templateUrl: './data-range-panel.component.html',
   host: { class: 'contents' },
-  imports: [FormFieldComponent],
+  imports: [FormFieldComponent, DateInputComponent],
 })
 export class DataRangePanelComponent {
   public readonly $range = model.required<DateRange>();
@@ -106,12 +107,6 @@ export class DataRangePanelComponent {
   protected readonly $rangeLabel = computed(() =>
     formatDataRangeLabel(this.$range()),
   );
-  protected readonly $startDateDisplay = computed(() =>
-    formatIsoSlashDate(this.$range().startDate),
-  );
-  protected readonly $endDateDisplay = computed(() =>
-    formatIsoSlashDate(this.$range().endDate),
-  );
   protected readonly $rangeValid = computed(() =>
     isDateRangeValid(this.$range()),
   );
@@ -172,45 +167,12 @@ export class DataRangePanelComponent {
     );
   }
 
-  protected updateStartDate(event: Event): void {
-    const input = event.currentTarget;
-    if (input instanceof HTMLInputElement) {
-      this.updateDate('startDate', input.value);
-    }
+  protected updateStartDateValue(value: string): void {
+    this.updateDate('startDate', value);
   }
 
-  protected updateStartDateText(event: Event): void {
-    this.updateDateText('startDate', event);
-  }
-
-  protected updateEndDate(event: Event): void {
-    const input = event.currentTarget;
-    if (input instanceof HTMLInputElement) {
-      this.updateDate('endDate', input.value);
-    }
-  }
-
-  protected updateEndDateText(event: Event): void {
-    this.updateDateText('endDate', event);
-  }
-
-  protected openDatePicker(event: MouseEvent, picker: HTMLInputElement): void {
-    const target = event.currentTarget;
-    if (!(target instanceof HTMLInputElement)) return;
-
-    const clickX = event.clientX - target.getBoundingClientRect().left;
-    const valueWidth =
-      target.value.length *
-      Number.parseFloat(getComputedStyle(target).fontSize) *
-      0.55;
-    const textEnd = 12 + valueWidth;
-    if ((target.value && clickX <= textEnd) || (!target.value && clickX < 24))
-      return;
-
-    if (typeof picker.showPicker === 'function') {
-      event.preventDefault();
-      picker.showPicker();
-    }
+  protected updateEndDateValue(value: string): void {
+    this.updateDate('endDate', value);
   }
 
   protected clearStartDate(): void {
@@ -229,36 +191,5 @@ export class DataRangePanelComponent {
       ),
     );
   }
-
-  private updateDateText(field: 'startDate' | 'endDate', event: Event): void {
-    const input = event.currentTarget;
-    if (!(input instanceof HTMLInputElement)) return;
-    const normalizedDate = normalizeIsoSlashDate(input.value);
-    if (normalizedDate !== undefined) {
-      this.updateDate(field, normalizedDate);
-      return;
-    }
-    input.value =
-      field === 'startDate' ? this.$startDateDisplay() : this.$endDateDisplay();
-  }
-}
-// #endregion
-
-// #region Helpers
-function normalizeIsoSlashDate(value: string): string | undefined {
-  if (!value) return '';
-  const match = /^(\d{4})\/(\d{2})\/(\d{2})$/.exec(value);
-  if (!match) return undefined;
-  const [, year, month, day] = match;
-  const normalizedDate = `${year}-${month}-${day}`;
-  const parsedDate = new Date(`${normalizedDate}T00:00:00Z`);
-  return !Number.isNaN(parsedDate.getTime()) &&
-    parsedDate.toISOString().slice(0, 10) === normalizedDate
-    ? normalizedDate
-    : undefined;
-}
-
-function formatIsoSlashDate(value: string): string {
-  return value.replaceAll('-', '/');
 }
 // #endregion

@@ -7,19 +7,37 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { RouterModule } from '@angular/router';
-import { LucideReceipt } from '@lucide/angular';
 import { SegmentedControlComponent } from 'src/client/app/components/forms/segmented-control/segmented-control.component';
 import { PageLayoutComponent } from 'src/client/app/layout';
 import { AppService } from 'src/client/app/app.service';
-import { TransactionType } from 'src/client/api/generated/expense-exchange-api.schemas';
+import {
+  RecurringTransactionType,
+  TransactionType,
+} from 'src/client/api/generated/expense-exchange-api.schemas';
 import { DataRangeService } from 'src/client/app/shared/data-range.service';
+import { RecurringStateService } from 'src/client/app/shared/recurring-state.service';
 import {
   TransactionScope,
   TRANSACTION_SCOPE_INFO_OPTIONS,
 } from 'src/client/app/shared/transaction-scope.enum';
-import { formatDataRangeLabel } from '../../shared/date-range/date-range.util';
+import {
+  formatDataRangeLabel,
+  isDateWithinRange,
+} from '../../shared/date-range/date-range.util';
 import { createDashboardRangeSummary } from './dashboard-range-summary.model';
+// #endregion
+
+// #region Models
+interface DashboardActivity {
+  readonly id: string;
+  readonly isRecurring: boolean;
+  readonly type: TransactionType | RecurringTransactionType;
+  readonly name: string;
+  readonly amount: number;
+  readonly targetParticipantId: string;
+  readonly beneficiaryParticipantIds: readonly string[];
+  readonly activityDate: string;
+}
 // #endregion
 
 // #region Component
@@ -28,20 +46,16 @@ import { createDashboardRangeSummary } from './dashboard-range-summary.model';
   selector: 'app-dashboard-page',
   templateUrl: './dashboard-page.component.html',
   host: { class: 'contents' },
-  imports: [
-    CommonModule,
-    PageLayoutComponent,
-    RouterModule,
-    SegmentedControlComponent,
-    LucideReceipt,
-  ],
+  imports: [CommonModule, PageLayoutComponent, SegmentedControlComponent],
 })
 export class DashboardPageComponent {
   private readonly appService = inject(AppService);
   private readonly dataRangeService = inject(DataRangeService);
+  private readonly recurringState = inject(RecurringStateService);
+  protected readonly $participants = this.appService.$participants;
   protected readonly $groupMembers = this.appService.$groupMembers;
   protected readonly $currentUser = this.appService.$currentUser;
-  protected readonly $spendingScope = signal(TransactionScope.Group);
+  protected readonly $spendingScope = signal(TransactionScope.MyShare);
   protected readonly $scopeOptions = computed(() =>
     TRANSACTION_SCOPE_INFO_OPTIONS.map(({ id, display }) => ({
       value: id,
@@ -57,7 +71,8 @@ export class DashboardPageComponent {
   protected readonly $rangeSummary = computed(() =>
     createDashboardRangeSummary(
       this.appService.$transactions(),
-      this.$groupMembers(),
+      this.recurringState.$occurrences(),
+      this.$participants(),
       this.dataRangeService.$dataRange(),
       this.$currentUser()?.id,
     ),
@@ -69,25 +84,64 @@ export class DashboardPageComponent {
       this.$groupMembers().some((user) => user.id === userId)
     );
   });
-  protected readonly $recentTransactions = computed(() => {
-    const members = new Map(
-      this.$groupMembers().map((member) => [member.id, member.name]),
+  protected readonly $cashFlowActivities = computed(() => {
+    const participants = new Map(
+      this.$participants().map((participant) => [
+        participant.id,
+        participant.name,
+      ]),
     );
-    return [...this.appService.$transactions()]
-      .sort((first, second) =>
-        second.completeDate.localeCompare(first.completeDate),
-      )
-      .slice(0, 5)
+    const transactions: DashboardActivity[] = this.appService
+      .$transactions()
       .map((transaction) => ({
-        ...transaction,
+        id: `transaction:${transaction.id}`,
+        isRecurring: false,
+        type: transaction.type,
+        name: transaction.name,
+        amount: transaction.amount,
+        targetParticipantId: transaction.targetParticipantId,
+        beneficiaryParticipantIds: transaction.beneficiaryParticipantIds,
+        activityDate: transaction.completeDate,
+      }));
+    const recurringPayments: DashboardActivity[] = this.recurringState
+      .$occurrences()
+      .filter(
+        (occurrence) => occurrence.isPaid && occurrence.amount !== undefined,
+      )
+      .map((occurrence) => ({
+        id: `occurrence:${occurrence.id}`,
+        isRecurring: true,
+        type: occurrence.type,
+        name: occurrence.name,
+        amount: occurrence.amount ?? 0,
+        targetParticipantId: occurrence.targetParticipantId,
+        beneficiaryParticipantIds: occurrence.beneficiaryParticipantIds,
+        activityDate: occurrence.payDate,
+      }));
+    return [...transactions, ...recurringPayments]
+      .sort((first, second) =>
+        second.activityDate.localeCompare(first.activityDate),
+      )
+      .map((activity) => ({
+        ...activity,
         targetName:
-          members.get(transaction.targetUserId) ?? transaction.targetUserId,
+          participants.get(activity.targetParticipantId) ??
+          activity.targetParticipantId,
       }));
   });
+  protected readonly $rangeCashFlowActivities = computed(() => {
+    const range = this.dataRangeService.$dataRange();
+    const personId = this.$currentUser()?.id;
+    return this.$cashFlowActivities().filter(
+      (activity) =>
+        isDateWithinRange(activity.activityDate, range) &&
+        (this.$spendingScope() === TransactionScope.Group ||
+          (personId !== undefined &&
+            activity.beneficiaryParticipantIds.includes(personId))),
+    );
+  });
   protected readonly TransactionType = TransactionType;
-  protected readonly $expenseCount = computed(
-    () => this.$rangeSummary().expenseCount,
-  );
+  protected readonly TransactionScope = TransactionScope;
   protected readonly $trackedSpending = computed(() =>
     this.$spendingScope() === TransactionScope.MyShare
       ? this.$rangeSummary().personalSpending

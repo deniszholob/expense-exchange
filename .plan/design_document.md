@@ -144,13 +144,45 @@ Stored per transaction per pool referenced.
 
 ### RecurringRule
 
-Template that generates transactions on a schedule.
+Template that generates stored rule occurrences on a schedule. Rule occurrences
+remain separate from transactions and are not included in transaction lists or
+transaction-derived balance totals.
 
-- `id`, `ownerUserId`
-- `visibility`, `sharedWithUserIds`
-- schedule fields (cadence/interval/rrule-json)
-- `nextRunAt`
-- `templateTransaction` (includes funding + benefit shares)
+- `id`, `ownerUserId`, `type`, `name`
+- `prices: [{ effectiveDate, amount? }]`; the first effective date anchors the
+  schedule, and an omitted amount means the amount varies for that cycle onward
+- `targetUserId`, `beneficiaryUserIds`
+- `cadence`: weekly, every two weeks, monthly, twice a year, or yearly
+- optional `endDate`; no occurrences are created after this date
+- the latest price effective on or before a statement date determines the
+  occurrence amount
+- `isAutopay`, optional `note`
+- server-only `nextStatementDate` cursor to materialize each cycle once
+
+### RuleOccurrence
+
+Snapshot of one recurring cycle. Occurrences are generated and persisted by the
+server when an authenticated client requests recurring occurrences; a
+background scheduler is not required. The server enforces one occurrence per
+rule and cycle date.
+
+- `id`, `ruleId`, `ownerUserId`, `cycleDate`
+- snapshots of transaction type, name, amount, payer/recipient, beneficiaries,
+  autopay, and note from the rule when the occurrence is created
+- `statementDate`, optional `completeDate`
+- fixed-price autopay occurrences are marked complete on their statement date
+  without verifying an external payment
+- manual or variable-amount occurrences remain open until a user records an
+  amount and payment date; payment date must be on or after statement date
+- ending or deleting a rule stops future cycles and preserves created
+  occurrences
+
+The UI shows open occurrences in a separate attention list and popup. Popup
+dismissal is held in memory only: unresolved items are announced again after a
+page refresh/reopen and checked again on the next local day while the app stays
+open. Each beneficiary sees notifications when their client is open and signed
+in. A later realtime synchronization feature will make cross-user edits visible
+without waiting for reload or the next occurrence refresh.
 
 ---
 
@@ -366,11 +398,24 @@ All endpoints are scoped to the authenticated user.
 
 ## Recurring
 
-- `GET /recurring`
-- `POST /recurring`
-- `PATCH /recurring/:id`
-- `DELETE /recurring/:id`
-- `POST /recurring/run` (admin/internal; or run via scheduler)
+- `GET /recurring/rules`
+- `POST /recurring/rules`
+- `PUT /recurring/rules/:id` (schedule edits re-anchor from the updated start date; fully automated rules rebase past occurrences automatically, while other rules ask the user whether history should also be updated)
+- `DELETE /recurring/rules/:id` (stops future generation and preserves history)
+- `GET /recurring/occurrences` (idempotently materializes due occurrences)
+- `PUT /recurring/occurrences/:id/paid`
+
+Monthly, twice-yearly, and yearly schedules retain the original day anchor. If
+the day does not exist in a shorter month, use that month's final day and resume
+the original day in the next month where it exists. Twice-yearly means every
+six months. Occurrences are stored in a separate recurring JSON store and never
+converted into transaction records. Fully automated rules (fixed amount and
+autopay) rebase past occurrences to the edited schedule and rule values. For
+other rules, the client asks before applying edits to past occurrences; declining
+keeps their snapshots, while confirming preserves recorded amounts and payment
+dates where compatible and applies the updated schedule and rule details. An
+edit is rejected if a new statement date would fall after its recorded payment
+date. Future occurrences always follow the updated start date and cadence.
 
 ## Export/Import
 
@@ -604,11 +649,16 @@ Below is a relational schema that matches the entities.
 
 - id (uuid pk)
 - owner_user_id (fk)
-- visibility
-- shared_with_user_ids (uuid[] or join table)
-- schedule_json (jsonb)
-- next_run_at
-- template_json (jsonb)
+- transaction type, template fields, cadence, start/end dates, payment delay,
+  autopay state, next statement cursor
+
+### rule_occurrences
+
+- id (uuid pk)
+- recurring_rule_id (fk)
+- cycle_date (unique with recurring_rule_id)
+- immutable occurrence field snapshots, statement/expected-payment dates, and
+  optional completion date
 
 ## Indexing
 

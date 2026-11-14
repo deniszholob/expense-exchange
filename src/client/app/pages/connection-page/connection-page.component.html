@@ -1,5 +1,5 @@
 <app-page-layout>
-  <section class="surface-card mx-auto flex w-full flex-col gap-5 p-5 sm:p-6">
+  <section class="section-container surface-card flex flex-col gap-5 p-5 sm:p-6">
     <div>
       <h2 class="text-lg font-semibold">Choose a data source</h2>
       <p class="text-finance-muted mt-1 text-sm">
@@ -148,7 +148,7 @@
     (!$authStatusReady() || !$apiHealthy() || $setupRequired())
   ) {
     <section
-      class="surface-card mx-auto mt-5 flex w-full flex-col gap-4 p-5 sm:p-6"
+      class="section-container surface-card mt-5 flex flex-col gap-4 p-5 sm:p-6"
       aria-labelledby="data-auth-heading"
     >
       @if (!$authStatusReady()) {

@@ -1,6 +1,8 @@
 export * from './auth/auth.service';
+export * from './external-participants/external-participants.service';
 export * from './group-members/group-members.service';
 export * from './health/health.service';
+export * from './recurring/recurring.service';
 export * from './transactions/transactions.service';
 export type {
   OrvalHttpResourceOptions,
@@ -13,6 +15,8 @@ export {
   toResourceState,
 } from './auth/auth.resource';
 export * from './auth/auth.resource';
+export * from './external-participants/external-participants.resource';
 export * from './group-members/group-members.resource';
 export * from './health/health.resource';
+export * from './recurring/recurring.resource';
 export * from './transactions/transactions.resource';

@@ -62,23 +62,10 @@
         [$value]="$range().startDate"
         (clearRequested)="clearStartDate()"
       >
-        <input
-          [id]="$idPrefix() + '-start'"
-          [value]="$startDateDisplay()"
-          (change)="updateStartDateText($event)"
-          (click)="openDatePicker($event, startDatePicker)"
-          inputmode="numeric"
-          placeholder="yyyy/mm/dd"
-          type="text"
-        />
-        <input
-          class="pointer-events-none absolute top-0 right-0 size-px opacity-0"
-          #startDatePicker
+        <app-date-input
+          [$id]="$idPrefix() + '-start'"
           [value]="$range().startDate"
-          (change)="updateStartDate($event)"
-          aria-hidden="true"
-          tabindex="-1"
-          type="date"
+          (valueChange)="updateStartDateValue($event)"
         />
       </app-form-field>
       <app-form-field
@@ -87,23 +74,10 @@
         [$value]="$range().endDate"
         (clearRequested)="clearEndDate()"
       >
-        <input
-          [id]="$idPrefix() + '-end'"
-          [value]="$endDateDisplay()"
-          (change)="updateEndDateText($event)"
-          (click)="openDatePicker($event, endDatePicker)"
-          inputmode="numeric"
-          placeholder="yyyy/mm/dd"
-          type="text"
-        />
-        <input
-          class="pointer-events-none absolute top-0 right-0 size-px opacity-0"
-          #endDatePicker
+        <app-date-input
+          [$id]="$idPrefix() + '-end'"
           [value]="$range().endDate"
-          (change)="updateEndDate($event)"
-          aria-hidden="true"
-          tabindex="-1"
-          type="date"
+          (valueChange)="updateEndDateValue($event)"
         />
       </app-form-field>
     </div>

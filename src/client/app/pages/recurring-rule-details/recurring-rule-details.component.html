@@ -1,0 +1,241 @@
+<app-page-layout>
+  @if (appService.$dataSource() !== DataSource.RemoteApi) {
+    <section class="surface-card mx-auto w-full max-w-3xl p-5 sm:p-6" role="status">
+      <h2 class="font-semibold">Recurring rules need a server</h2>
+      <p class="text-finance-muted mt-2 text-sm">
+        Recurring occurrences are created and shared by the self-hosted API. Select Remote API to
+        manage them.
+      </p>
+    </section>
+  } @else if (recurringState.$error(); as error) {
+    <section class="surface-card mx-auto w-full max-w-3xl p-5 sm:p-6" role="alert">
+      <h2 class="font-semibold">Unable to load recurring data</h2>
+      <p class="text-finance-negative mt-2 text-sm">{{ error }}</p>
+      <button class="btn-secondary mt-4" (click)="cancel()" type="button">Back to recurring</button>
+    </section>
+  } @else if ($isEditing() && !$rule() && !$notFound()) {
+    <section class="surface-card mx-auto w-full max-w-3xl p-5 sm:p-6" role="status">
+      <p class="text-finance-muted text-sm">Loading recurring rule…</p>
+    </section>
+  } @else if ($notFound()) {
+    <section class="surface-card mx-auto w-full max-w-3xl p-5 sm:p-6" role="alert">
+      <h2 class="font-semibold">Recurring rule not found</h2>
+      <p class="text-finance-muted mt-2 text-sm">
+        This rule may have been removed or may not be available to you.
+      </p>
+      <button class="btn-secondary mt-4" (click)="cancel()" type="button">Back to recurring</button>
+    </section>
+  } @else {
+    <section class="surface-card mx-auto flex w-full max-w-5xl flex-col gap-5 p-5 sm:p-6">
+      <header>
+        <h1 class="text-xl font-semibold">
+          {{ $isEditing() ? 'Edit recurring rule' : 'Add a recurring rule' }}
+        </h1>
+        <p class="text-finance-muted mt-1 text-sm">
+          Define a schedule for recurring income or expenses.
+        </p>
+      </header>
+
+      @if ($actionError(); as error) {
+        <p class="text-finance-negative text-sm" role="alert">{{ error }}</p>
+      }
+
+      @if ($isEditing() && $existingOccurrenceCount() > 0) {
+        <aside
+          class="rounded-control border border-amber-300/30 bg-amber-300/10 p-3 text-sm text-amber-100"
+          role="note"
+        >
+          <strong>Changes affect existing occurrences.</strong>
+          <span class="ml-1">
+            Price, frequency, date, and autopay edits can add or remove past entries, replace
+            amounts or pay dates, and change paid status. Saving asks you to confirm before applying
+            them.
+          </span>
+        </aside>
+      }
+
+      <form
+        class="border-finance-border flex flex-col gap-5 border-t pt-5"
+        (submit)="saveRule($event)"
+      >
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <app-form-field
+            [$id]="'recurring-type'"
+            [$label]="'Type'"
+            [$required]="true"
+            [$clearable]="false"
+          >
+            <app-segmented-control
+              id="recurring-type"
+              [formField]="$ruleForm.type"
+              [$label]="'Recurring transaction type'"
+              [$options]="$typeOptions"
+              [$stretch]="true"
+            />
+          </app-form-field>
+          <app-form-field [$id]="'recurring-name'" [$label]="'Name'" [$required]="true">
+            <input
+              id="recurring-name"
+              [formField]="$ruleForm.name"
+              placeholder="e.g. Electricity bill"
+              autocomplete="off"
+            />
+          </app-form-field>
+          <app-form-field
+            [$id]="'recurring-cadence'"
+            [$label]="$existingOccurrenceCount() > 0 ? 'Frequency · affects history' : 'Frequency'"
+            [$required]="true"
+          >
+            <select id="recurring-cadence" [formField]="$ruleForm.cadence">
+              @for (option of $cadenceOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </app-form-field>
+          <app-form-field
+            [$id]="'recurring-autopay'"
+            [$label]="$existingOccurrenceCount() > 0 ? 'Autopay · affects history' : 'Autopay'"
+            [$clearable]="false"
+          >
+            <app-segmented-control
+              id="recurring-autopay"
+              [formField]="$ruleForm.isAutopay"
+              [$label]="'Autopay'"
+              [$options]="$autopayOptions"
+              [$stretch]="true"
+            />
+            <p class="text-finance-muted text-xs">
+              Fixed-price autopay occurrences are marked paid on their expected pay date.
+            </p>
+          </app-form-field>
+          <div class="sm:col-span-2">
+            <app-form-field
+              [$id]="'recurring-prices'"
+              [$label]="$existingOccurrenceCount() > 0 ? 'Prices · affects history' : 'Prices'"
+              [$clearable]="false"
+            >
+              <div
+                class="rounded-control border-finance-border bg-finance-surface flex min-w-0 flex-col gap-3 border p-3"
+              >
+                @for (price of $ruleValue().prices; track $index; let index = $index) {
+                  <div
+                    class="rounded-control border-finance-border grid items-end gap-3 border p-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_auto]"
+                  >
+                    <app-form-field [$id]="'recurring-price-amount-' + index" [$label]="'Amount'">
+                      <div class="relative">
+                        <span
+                          class="text-finance-muted pointer-events-none absolute top-1/2 left-3 -translate-y-1/2"
+                          >$</span
+                        >
+                        <input
+                          class="pl-7 text-left tabular-nums"
+                          [id]="'recurring-price-amount-' + index"
+                          [formField]="$ruleForm.prices[index]!.amount"
+                          step="0.01"
+                          type="number"
+                        />
+                      </div>
+                    </app-form-field>
+                    <app-form-field
+                      [$id]="'recurring-price-date-' + index"
+                      [$label]="'Effective date'"
+                      [$required]="true"
+                    >
+                      <app-date-input
+                        [$id]="'recurring-price-date-' + index"
+                        [formField]="$ruleForm.prices[index]!.effectiveDate"
+                      />
+                    </app-form-field>
+                    <app-form-field
+                      [$id]="'recurring-price-pay-date-' + index"
+                      [$label]="'Pay date (defaults to effective date)'"
+                    >
+                      <app-date-input
+                        [$id]="'recurring-price-pay-date-' + index"
+                        [formField]="$ruleForm.prices[index]!.payDate"
+                        [$min]="price.effectiveDate"
+                      />
+                    </app-form-field>
+                    @if ($ruleValue().prices.length > 1) {
+                      <button
+                        class="btn-icon btn-icon-delete rounded-control"
+                        [attr.aria-label]="'Remove price effective ' + price.effectiveDate"
+                        (click)="removePrice(index)"
+                        type="button"
+                      >
+                        <svg class="size-4" lucideTrash2 aria-hidden="true"></svg>
+                      </button>
+                    }
+                  </div>
+                }
+                <button class="btn-primary self-start" (click)="addPrice()" type="button">
+                  <svg class="size-4" lucidePlus aria-hidden="true"></svg> Add price
+                </button>
+              </div>
+              <p class="text-finance-muted text-xs">
+                Each effective date sets the amount and expected pay date for that price period.
+                Leave an amount blank when it varies.
+              </p>
+            </app-form-field>
+          </div>
+          <app-form-field
+            [$id]="'recurring-target-participant'"
+            [$label]="
+              $ruleValue().type === RecurringTransactionType.Expense ? 'Paid by' : 'Received by'
+            "
+            [$required]="true"
+          >
+            <select id="recurring-target-participant" [formField]="$ruleForm.targetParticipantId">
+              <option value="">Select a participant</option>
+              @for (participant of appService.$participants(); track participant.id) {
+                <option [value]="participant.id">
+                  {{ participant.name
+                  }}{{ participant.id.startsWith('external:') ? ' (External)' : '' }}
+                </option>
+              }
+            </select>
+          </app-form-field>
+          <app-form-field
+            [$id]="'recurring-end-date'"
+            [$label]="
+              $existingOccurrenceCount() > 0 ? 'End date · affects history' : 'End date (optional)'
+            "
+          >
+            <app-date-input [$id]="'recurring-end-date'" [formField]="$ruleForm.endDate" />
+          </app-form-field>
+          <app-form-field
+            [$id]="'recurring-beneficiaries'"
+            [$label]="'Benefits'"
+            [$required]="true"
+          >
+            <app-multi-select
+              id="recurring-beneficiaries"
+              [formField]="$ruleForm.beneficiaryParticipantIds"
+              [$options]="$memberOptions()"
+            />
+          </app-form-field>
+          <app-form-field [$id]="'recurring-note'" [$label]="'Note'">
+            <textarea
+              id="recurring-note"
+              [formField]="$ruleForm.note"
+              rows="2"
+              placeholder="Optional details"
+            ></textarea>
+          </app-form-field>
+        </div>
+        <div
+          class="border-finance-border flex flex-col-reverse gap-2 border-t pt-4 sm:flex-row sm:justify-end"
+        >
+          <button class="btn-secondary" (click)="cancel()" type="button">Cancel</button>
+          <button class="btn-primary" type="submit">
+            @if ($isEditing()) {
+              <svg class="size-4" lucideCheck aria-hidden="true"></svg> Save rule
+            } @else {
+              <svg class="size-4" lucidePlus aria-hidden="true"></svg> Add rule
+            }
+          </button>
+        </div>
+      </form>
+    </section>
+  }
+</app-page-layout>

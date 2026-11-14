@@ -1,9 +1,9 @@
 <ng-template #typeCell let-row="row">
   <span
-    class="rounded-control border-finance-border inline-flex border px-2 py-1 text-xs"
-    [class.text-finance-negative]="row.kind === TransactionType.Expense"
-    [class.text-finance-positive]="row.kind === TransactionType.Income"
-    [class.text-amber-300]="row.kind === TransactionType.Refund"
+    class="transaction-type-badge"
+    [class.transaction-type-badge-expense]="row.kind === TransactionType.Expense"
+    [class.transaction-type-badge-income]="row.kind === TransactionType.Income"
+    [class.transaction-type-badge-refund]="row.kind === TransactionType.Refund"
   >
     {{ row.kind }}
   </span>
@@ -18,6 +18,22 @@
   >
     {{ row.kind === TransactionType.Expense ? '−' : '+' }}{{ row.amount | currency }}
   </span>
+</ng-template>
+
+<ng-template #partyCell let-row="row">
+  <span class="participant-badge" [title]="row.party.name">
+    <span class="truncate">{{ row.party.name }}</span>
+  </span>
+</ng-template>
+
+<ng-template #beneficiariesCell let-row="row">
+  <div class="flex max-w-64 flex-wrap gap-1.5">
+    @for (beneficiary of row.beneficiaries; track beneficiary.id) {
+      <span class="participant-badge" [title]="beneficiary.name">
+        <span class="truncate">{{ beneficiary.name }}</span>
+      </span>
+    }
+  </div>
 </ng-template>
 
 <app-data-table

@@ -5,6 +5,7 @@ import {
   LucideDatabase,
   LucideLogIn,
   LucideReceipt,
+  LucideRepeat,
   LucideSettings,
   LucideUserRound,
   LucideUsersRound,
@@ -21,6 +22,7 @@ export enum PageRoute {
   Data = 'data',
   Group = 'group',
   Users = 'users',
+  Recurring = 'recurring',
   Transactions = 'transactions',
   Settings = 'settings',
 }
@@ -70,6 +72,11 @@ export const PAGE_ROUTE_INFO: Record<PageRoute, PageRouteInfo> = {
     display: 'Users',
     icon: LucideUsersRound,
   },
+  [PageRoute.Recurring]: {
+    id: PageRoute.Recurring,
+    display: 'Recurring',
+    icon: LucideRepeat,
+  },
   [PageRoute.Transactions]: {
     id: PageRoute.Transactions,
     display: 'Transactions',
@@ -98,6 +105,7 @@ export const ROUTE_KEYWORDS = {
   ROOT: '',
   NEW_ITEM: 'new',
   DETAIL_ITEM: ':id',
+  OCCURRENCES: 'occurences',
   FILTER: '?filter',
 } as const;
 // #endregion

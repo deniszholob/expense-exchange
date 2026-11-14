@@ -7,8 +7,14 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { FormField, form, required } from '@angular/forms/signals';
-import { LucideTrash2, LucideUsersRound } from '@lucide/angular';
+import { FormField, form, minLength, required } from '@angular/forms/signals';
+import {
+  LucideCheck,
+  LucidePencil,
+  LucideTrash2,
+  LucideUsersRound,
+  LucideX,
+} from '@lucide/angular';
 import { firstValueFrom } from 'rxjs';
 import {
   UserRole,
@@ -29,6 +35,10 @@ interface GroupMemberViewModel {
   displayName: string;
   username?: string;
 }
+
+interface ExternalParticipantFormValue {
+  name: string;
+}
 // #endregion
 
 // #region Component
@@ -43,6 +53,9 @@ interface GroupMemberViewModel {
     FormField,
     FormFieldComponent,
     LucideTrash2,
+    LucidePencil,
+    LucideCheck,
+    LucideX,
     LucideUsersRound,
     UserMonogramPipe,
   ],
@@ -80,6 +93,23 @@ export class GroupPageComponent {
       .filter((user) => !memberIds.has(user.id));
   });
   protected readonly $error = signal<string | undefined>(undefined);
+  protected readonly $externalParticipantData =
+    signal<ExternalParticipantFormValue>({ name: '' });
+  protected readonly $externalParticipantForm = form(
+    this.$externalParticipantData,
+    (path) => {
+      required(path.name);
+      minLength(path.name, 1);
+    },
+  );
+  protected readonly $editingExternalParticipantId = signal<string | undefined>(
+    undefined,
+  );
+  protected readonly $externalParticipants =
+    this.appService.$externalParticipants;
+  protected readonly $externalParticipantError = signal<string | undefined>(
+    undefined,
+  );
 
   public constructor() {
     void this.appService.authenticationReady.then(() => this.loadAccounts());
@@ -122,8 +152,8 @@ export class GroupPageComponent {
             .exportLocalStore()
             .transactions.some(
               (transaction) =>
-                transaction.targetUserId === id ||
-                transaction.beneficiaryUserIds.includes(id),
+                transaction.targetParticipantId === id ||
+                transaction.beneficiaryParticipantIds.includes(id),
             )
         ) {
           this.$error.set('This person is referenced by an expense.');
@@ -142,6 +172,51 @@ export class GroupPageComponent {
         error instanceof Error
           ? error.message
           : 'Unable to remove group member.',
+      );
+    }
+  }
+
+  protected async saveExternalParticipant(event: Event): Promise<void> {
+    event.preventDefault();
+    if (this.$externalParticipantForm().invalid()) return;
+    const { name } = this.$externalParticipantData();
+    try {
+      const editingId = this.$editingExternalParticipantId();
+      if (editingId)
+        await this.appService.updateExternalParticipant(editingId, name);
+      else await this.appService.createExternalParticipant(name);
+      this.$externalParticipantData.set({ name: '' });
+      this.$editingExternalParticipantId.set(undefined);
+      this.$externalParticipantError.set(undefined);
+    } catch (error: unknown) {
+      this.$externalParticipantError.set(
+        error instanceof Error
+          ? error.message
+          : 'Unable to save external participant.',
+      );
+    }
+  }
+
+  protected editExternalParticipant(id: string, name: string): void {
+    this.$editingExternalParticipantId.set(id);
+    this.$externalParticipantData.set({ name });
+    this.$externalParticipantError.set(undefined);
+  }
+
+  protected cancelExternalParticipantEdit(): void {
+    this.$editingExternalParticipantId.set(undefined);
+    this.$externalParticipantData.set({ name: '' });
+  }
+
+  protected async deleteExternalParticipant(id: string): Promise<void> {
+    try {
+      await this.appService.deleteExternalParticipant(id);
+      this.$externalParticipantError.set(undefined);
+    } catch (error: unknown) {
+      this.$externalParticipantError.set(
+        error instanceof Error
+          ? error.message
+          : 'Unable to delete external participant.',
       );
     }
   }

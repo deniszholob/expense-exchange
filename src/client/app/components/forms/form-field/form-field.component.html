@@ -27,7 +27,7 @@
     }
     @if ($clearable() && $hasValue()) {
       <button
-        class="form-field-clear-button text-finance-muted rounded-control absolute top-2 grid size-6 min-h-0 place-items-center p-1 transition-colors hover:bg-rose-500/15 hover:text-rose-300 focus-visible:ring-2 focus-visible:ring-rose-400"
+        class="btn-clear form-field-clear-button absolute top-2"
         [attr.aria-label]="'Clear ' + $label()"
         (click)="clearValue()"
         type="button"

@@ -25,13 +25,18 @@ export interface TransactionRow {
   readonly amount: number;
   readonly name: string;
   readonly description: string;
-  readonly party: string;
-  readonly beneficiaries: string;
+  readonly party: TransactionParticipantBadge;
+  readonly beneficiaries: readonly TransactionParticipantBadge[];
   readonly date: string;
   readonly recordedDate: string;
   readonly rangeDate: string;
-  readonly memberUserIds: readonly string[];
+  readonly participantIds: readonly string[];
   readonly canManage: boolean;
+}
+
+export interface TransactionParticipantBadge {
+  readonly id: string;
+  readonly name: string;
 }
 // #endregion
 
@@ -58,6 +63,14 @@ export class TransactionTableComponent {
   protected readonly $amountCell =
     viewChild.required<TemplateRef<CellTemplateContext<TransactionRow>>>(
       'amountCell',
+    );
+  protected readonly $partyCell =
+    viewChild.required<TemplateRef<CellTemplateContext<TransactionRow>>>(
+      'partyCell',
+    );
+  protected readonly $beneficiariesCell =
+    viewChild.required<TemplateRef<CellTemplateContext<TransactionRow>>>(
+      'beneficiariesCell',
     );
   protected readonly $columns = computed<readonly ColDef<TransactionRow>[]>(
     () => [
@@ -89,13 +102,16 @@ export class TransactionTableComponent {
         key: 'party',
         label: 'Paid / received by',
         sortable: true,
-        cellClass: 'truncate',
+        cellTemplate: this.$partyCell(),
+        sortValue: (row) => row.party.name,
       },
       {
         key: 'beneficiaries',
         label: 'Beneficiaries',
         sortable: true,
-        cellClass: 'text-finance-muted truncate',
+        cellTemplate: this.$beneficiariesCell(),
+        sortValue: (row) =>
+          row.beneficiaries.map(({ name }) => name).join(', '),
       },
       {
         key: 'date',

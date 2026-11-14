@@ -1,0 +1,26 @@
+<div class="relative w-full">
+  <input
+    #textInput
+    [id]="$id()"
+    [value]="$text()"
+    [attr.aria-invalid]="$text() && !$nativeValue() ? 'true' : null"
+    (input)="updateText($event)"
+    (click)="openPickerOnEmptySpace($event, nativePicker)"
+    inputmode="numeric"
+    autocomplete="off"
+    placeholder="yyyy/mm/dd"
+    spellcheck="false"
+    type="text"
+  />
+  <input
+    class="pointer-events-none absolute inset-0 size-full opacity-0"
+    #nativePicker
+    [value]="$nativeValue()"
+    [min]="$min() ?? null"
+    [max]="$max() ?? null"
+    (change)="updateFromPicker($event)"
+    aria-hidden="true"
+    tabindex="-1"
+    type="date"
+  />
+</div>

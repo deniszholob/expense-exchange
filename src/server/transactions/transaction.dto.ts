@@ -29,15 +29,15 @@ export class CreateTransactionDto implements CreateTransaction {
     description:
       'The user who paid for an expense or received income/refund funds.',
   })
-  public targetUserId!: string;
+  public targetParticipantId!: string;
 
   @ApiProperty({
     type: [String],
     minItems: 1,
     description:
-      'Explicit list of users who benefit from the transaction; includes targetUserId only when they benefit.',
+      'Explicit list of participants who benefit from the transaction; includes the target participant only when they benefit.',
   })
-  public beneficiaryUserIds!: string[];
+  public beneficiaryParticipantIds!: string[];
 
   @ApiPropertyOptional()
   public note?: string;

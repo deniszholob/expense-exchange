@@ -84,6 +84,22 @@
     @apply border-sky-400 ring-2 ring-sky-400/30 outline-none;
   }
 
+  input:disabled,
+  select:disabled,
+  textarea:disabled {
+    @apply border-finance-border bg-finance-surface text-finance-muted cursor-not-allowed shadow-none;
+  }
+
+  input[type='checkbox']:disabled,
+  input[type='radio']:disabled {
+    @apply cursor-not-allowed opacity-50;
+  }
+
+  input:read-only:not([type='checkbox']):not([type='radio']),
+  textarea:read-only {
+    @apply border-finance-border bg-finance-surface text-finance-muted cursor-default shadow-none;
+  }
+
   option {
     @apply bg-finance-raised text-finance-text;
   }
@@ -95,16 +111,36 @@
   ::selection {
     @apply bg-sky-400/30 text-white;
   }
-
-  dt {
-    @apply float-left clear-left font-bold after:content-[':'];
-  }
 }
 
 /** The components layer is for class-based styles that you want to be able to override with utilities. */
 @layer components {
   .section {
     @apply flex flex-col gap-5;
+  }
+
+  .transaction-type-badge {
+    @apply inline-flex rounded-full border px-2 py-0.5 text-[0.65rem];
+  }
+
+  .transaction-type-badge-expense {
+    @apply border-rose-300/20 bg-rose-300/10 text-rose-200;
+  }
+
+  .transaction-type-badge-income {
+    @apply border-emerald-300/20 bg-emerald-300/10 text-emerald-200;
+  }
+
+  .transaction-type-badge-refund {
+    @apply border-amber-300/20 bg-amber-300/10 text-amber-200;
+  }
+
+  .btn-clear {
+    @apply text-finance-muted rounded-control grid size-6 min-h-0 place-items-center p-1 transition-colors hover:bg-rose-500/15 hover:text-rose-300 focus-visible:ring-2 focus-visible:ring-rose-400;
+  }
+
+  .toast-dismiss-button {
+    @apply size-9;
   }
 
   .form-field-clear-button {
@@ -121,12 +157,26 @@
     padding-left: 2.25rem;
   }
 
+  .form-field-control:has(:is(input, select, textarea):disabled)
+    :is(.form-field-clear-button, .form-field-password-toggle),
+  .form-field-control:has(
+      input:read-only:not([type='checkbox']):not([type='radio']),
+      textarea:read-only
+    )
+    :is(.form-field-clear-button, .form-field-password-toggle) {
+    display: none;
+  }
+
   .container-fixed {
     @apply mx-auto flex w-full max-w-screen-2xl flex-col gap-5 px-4 sm:px-6 lg:px-8;
   }
 
   .container-fluid {
     @apply flex w-full flex-col gap-5 px-4 sm:px-6 lg:px-8;
+  }
+
+  .section-container {
+    @apply mx-auto w-full max-w-screen-2xl;
   }
 
   .link {
@@ -143,6 +193,15 @@
 
   .btn-icon {
     @apply size-10 p-2;
+  }
+
+  .btn-icon-view,
+  .btn-icon-edit {
+    @apply text-finance-muted hover:bg-finance-raised hover:text-sky-300;
+  }
+
+  .btn-icon-delete {
+    @apply text-finance-muted hover:bg-rose-500/10 hover:text-rose-300;
   }
 
   .btn-primary {
@@ -166,7 +225,7 @@
   }
 
   .table-base {
-    @apply rounded-card border-finance-border bg-finance-surface min-w-full border-separate border-spacing-0 overflow-hidden border text-sm;
+    @apply rounded-card border-finance-border bg-finance-surface min-w-full border-separate border-spacing-0 border text-sm;
   }
 
   .table-base th {
@@ -187,6 +246,22 @@
 
   .table-base tbody tr:nth-child(even) {
     @apply bg-white/[0.02];
+  }
+
+  .table-base th.table-cell-pinned {
+    @apply bg-finance-raised z-20;
+  }
+
+  .table-base td.table-cell-pinned {
+    @apply bg-finance-surface z-10 transition-colors duration-150;
+  }
+
+  .table-base tbody tr:nth-child(even) td.table-cell-pinned {
+    background-color: color-mix(
+      in srgb,
+      var(--color-finance-surface) 98%,
+      white 2%
+    );
   }
 
   .surface-card {
@@ -216,6 +291,10 @@
   .profile-monogram-admin {
     @apply bg-violet-500/20 text-violet-200;
   }
+
+  .participant-badge {
+    @apply inline-flex max-w-40 items-center rounded-full bg-sky-500/20 px-1.5 py-0.5 align-middle text-[0.65rem] leading-3 text-sky-100;
+  }
 }
 
 :focus-visible {
@@ -225,6 +304,51 @@
 
 /** The utilities layer is for small, single-purpose classes that should always take precedence over any other styles. */
 @layer utilities {
+  .table-base
+    tbody.cdk-drop-list-dragging
+    tr.cdk-drag:not(.cdk-drag-placeholder) {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+
+  .table-base tr.cdk-drag-preview {
+    background: var(--color-finance-raised);
+    box-shadow: 0 8px 24px rgb(0 0 0 / 35%);
+    opacity: 0.96;
+  }
+
+  .table-base tr.cdk-drag-placeholder {
+    background: color-mix(
+      in srgb,
+      var(--color-finance-raised) 70%,
+      transparent
+    );
+    outline: 1px dashed var(--color-finance-border);
+    outline-offset: -1px;
+    opacity: 0.55;
+  }
+
+  .table-base tbody tr td.table-cell-pinned.table-row-striped-strong {
+    background-color: color-mix(
+      in srgb,
+      var(--color-finance-surface) 70%,
+      var(--color-finance-raised) 30%
+    );
+  }
+
+  .table-base tbody tr:hover td.table-cell-pinned {
+    @apply bg-finance-hover;
+  }
+
+  .table-base .table-pinned-edge-right {
+    border-right: 1px solid var(--color-finance-border);
+    box-shadow: 5px 0 8px -5px rgb(0 0 0 / 80%);
+  }
+
+  .table-base .table-pinned-edge-left {
+    border-left: 1px solid var(--color-finance-border);
+    box-shadow: -5px 0 8px -5px rgb(0 0 0 / 80%);
+  }
+
   .flex-full-no-shrink {
     flex: 0 1 100%;
   }

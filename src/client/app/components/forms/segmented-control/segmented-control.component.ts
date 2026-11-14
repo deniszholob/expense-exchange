@@ -9,8 +9,10 @@ import type { FormValueControl } from '@angular/forms/signals';
 // #endregion
 
 // #region Types
-export interface SegmentedControlOption {
-  readonly value: string;
+export interface SegmentedControlOption<
+  TValue extends string | boolean = string,
+> {
+  readonly value: TValue;
   readonly label: string;
   readonly disabled?: boolean;
 }
@@ -23,10 +25,12 @@ export interface SegmentedControlOption {
   templateUrl: './segmented-control.component.html',
   host: { class: 'contents' },
 })
-export class SegmentedControlComponent implements FormValueControl<string> {
-  public readonly value = model.required<string>();
+export class SegmentedControlComponent<
+  TValue extends string | boolean = string,
+> implements FormValueControl<TValue> {
+  public readonly value = model.required<TValue>();
   public readonly $options =
-    input.required<readonly SegmentedControlOption[]>();
+    input.required<readonly SegmentedControlOption<TValue>[]>();
   public readonly $label = input.required<string>();
   public readonly $stretch = input(false);
 }

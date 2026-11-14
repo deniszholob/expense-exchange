@@ -85,4 +85,111 @@
       </ul>
     }
   </section>
+
+  <section
+    class="surface-card mx-auto mt-5 flex w-full max-w-3xl flex-col gap-5 p-5 sm:p-6"
+    aria-labelledby="external-participants-heading"
+  >
+    <div class="flex items-center justify-between gap-3">
+      <div>
+        <h2 class="text-lg font-semibold" id="external-participants-heading">
+          External participants
+        </h2>
+        <p class="text-finance-muted mt-1 text-sm">
+          Save people who share costs but do not have an account.
+        </p>
+      </div>
+      <span
+        class="border-finance-border bg-finance-raised text-finance-muted rounded-full border px-3 py-1 text-xs font-medium"
+      >
+        {{ $externalParticipants().length }}
+      </span>
+    </div>
+
+    <form
+      class="flex flex-col items-end gap-3 sm:flex-row"
+      (submit)="saveExternalParticipant($event)"
+    >
+      <div class="w-full min-w-0 flex-1">
+        <app-form-field
+          [$id]="'external-participant-name'"
+          [$label]="
+            $editingExternalParticipantId() ? 'Participant name' : 'Add external participant'
+          "
+          [$required]="true"
+        >
+          <input
+            id="external-participant-name"
+            [formField]="$externalParticipantForm.name"
+            [placeholder]="'e.g. Alice'"
+            autocomplete="off"
+            type="text"
+          />
+        </app-form-field>
+      </div>
+      <div class="flex w-full gap-2 sm:w-auto">
+        <button class="btn-primary flex-1 sm:flex-none" type="submit">
+          <svg class="size-4" lucideCheck aria-hidden="true"></svg>
+          {{ $editingExternalParticipantId() ? 'Save name' : 'Add person' }}
+        </button>
+        @if ($editingExternalParticipantId()) {
+          <button
+            class="btn-secondary"
+            (click)="cancelExternalParticipantEdit()"
+            type="button"
+            aria-label="Cancel editing participant"
+          >
+            <svg class="size-4" lucideX aria-hidden="true"></svg>
+          </button>
+        }
+      </div>
+    </form>
+
+    @if ($externalParticipantError(); as error) {
+      <p class="text-finance-negative text-sm" role="alert">{{ error }}</p>
+    }
+
+    @if ($externalParticipants().length === 0) {
+      <div class="empty-state border-dashed shadow-none">
+        <p class="font-medium">No external participants yet</p>
+        <p class="text-finance-muted text-sm">
+          Add a person to include them in a transaction or recurring rule.
+        </p>
+      </div>
+    } @else {
+      <ul class="divide-finance-border divide-y">
+        @for (participant of $externalParticipants(); track participant.id) {
+          <li class="flex items-center justify-between gap-3 py-3 first:pt-0 last:pb-0">
+            <div class="flex min-w-0 items-center gap-3">
+              <span class="profile-monogram size-10 shrink-0 text-sm" aria-hidden="true">
+                {{ participant.name | userMonogram }}
+              </span>
+              <div class="min-w-0">
+                <p class="truncate font-medium">{{ participant.name }}</p>
+                <p class="text-finance-muted text-xs">External</p>
+              </div>
+            </div>
+            <div class="flex shrink-0 items-center gap-2">
+              <button
+                class="btn-icon"
+                [attr.aria-label]="'Rename ' + participant.name"
+                (click)="editExternalParticipant(participant.id, participant.name)"
+                type="button"
+              >
+                <svg class="size-4" lucidePencil aria-hidden="true"></svg>
+              </button>
+              <button
+                class="btn-icon btn-danger"
+                [attr.aria-label]="'Delete ' + participant.name"
+                (click)="deleteExternalParticipant(participant.id)"
+                type="button"
+              >
+                <svg class="size-4" lucideTrash2 aria-hidden="true"></svg>
+              </button>
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  </section>
 </app-page-layout>

@@ -18,6 +18,14 @@ import { TransactionJsonAdapter } from './transactions/transaction.json.adapter.
 import { TransactionService } from './transactions/transaction.service.js';
 import { GroupMemberRepository } from './group-member/group-member.repository.js';
 import { GroupMemberJsonAdapter } from './group-member/group-member.json.adapter.js';
+import { RecurringController } from './recurring/recurring.controller.js';
+import { RecurringService } from './recurring/recurring.service.js';
+import { RecurringRepository } from './recurring/recurring.repository.js';
+import { RecurringJsonAdapter } from './recurring/recurring.json.adapter.js';
+import { ExternalParticipantsController } from './external-participant/external-participant.controller.js';
+import { ExternalParticipantService } from './external-participant/external-participant.service.js';
+import { ExternalParticipantRepository } from './external-participant/external-participant.repository.js';
+import { ExternalParticipantJsonAdapter } from './external-participant/external-participant.json.adapter.js';
 // #endregion
 
 // #region Module
@@ -28,17 +36,26 @@ import { GroupMemberJsonAdapter } from './group-member/group-member.json.adapter
     TransactionController,
     GroupMembersController,
     AuthController,
+    RecurringController,
+    ExternalParticipantsController,
   ],
   providers: [
     TransactionService,
     GroupMemberService,
     AuthService,
+    RecurringService,
+    ExternalParticipantService,
     AuthGuard,
     AdminGuard,
     GroupMemberGuard,
     { provide: TransactionRepository, useClass: TransactionJsonAdapter },
     { provide: GroupMemberRepository, useClass: GroupMemberJsonAdapter },
     { provide: AuthRepository, useClass: AuthJsonAdapter },
+    { provide: RecurringRepository, useClass: RecurringJsonAdapter },
+    {
+      provide: ExternalParticipantRepository,
+      useClass: ExternalParticipantJsonAdapter,
+    },
   ],
 })
 export class AppModule {}

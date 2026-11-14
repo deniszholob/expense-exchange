@@ -24,8 +24,8 @@ export class TransactionService {
       (transaction) =>
         transaction.type === TransactionType.Expense ||
         transaction.ownerUserId === userId ||
-        transaction.targetUserId === userId ||
-        transaction.beneficiaryUserIds.includes(userId),
+        transaction.targetParticipantId === userId ||
+        transaction.beneficiaryParticipantIds.includes(userId),
     );
   }
 

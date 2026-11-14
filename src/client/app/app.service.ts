@@ -15,11 +15,14 @@ import { authControllerListLoginAccountsResource } from 'src/client/api/generate
 import { HealthService } from 'src/client/api/generated/health/health.service';
 import { transactionControllerGetTransactionsResource } from 'src/client/api/generated/transactions/transactions.resource';
 import { groupMembersControllerGetMembersResource } from 'src/client/api/generated/group-members/group-members.resource';
+import { externalParticipantsControllerGetParticipantsResource } from 'src/client/api/generated/external-participants/external-participants.resource';
+import { ExternalParticipantsService } from 'src/client/api/generated/external-participants/external-participants.service';
 import {
   UserRole,
   type AuthUserDto,
   type LoginAccountDto,
   type GroupMemberDto,
+  type ExternalParticipantDto,
   type TransactionDto,
 } from 'src/client/api/generated/expense-exchange-api.schemas';
 import { DATA_SOURCE_INFO, DataSource } from './shared/data-source.enum';
@@ -36,6 +39,9 @@ const DATA_SOURCE_STORAGE_KEY = 'expense-exchange.data-source';
 @Injectable({ providedIn: 'root' })
 export class AppService {
   private readonly authApi = inject(AuthApiService);
+  private readonly externalParticipantsApi = inject(
+    ExternalParticipantsService,
+  );
   private readonly healthApi = inject(HealthService);
   private readonly injector = inject(Injector);
   private remoteConnectionCheckId = 0;
@@ -47,6 +53,9 @@ export class AppService {
   >(undefined);
   private readonly $loginAccountsResource = signal<
     HttpResourceRef<LoginAccountDto[]> | undefined
+  >(undefined);
+  private readonly $externalParticipantsResource = signal<
+    HttpResourceRef<ExternalParticipantDto[]> | undefined
   >(undefined);
 
   private readonly $localStore = signal(readLocalStore());
@@ -64,6 +73,16 @@ export class AppService {
   public readonly $availableLocalUsers = computed(
     () => this.$localStore().availableUsers,
   );
+  public readonly $externalParticipants = computed(() => {
+    if (this.$dataSource() === DataSource.Local)
+      return this.$localStore().externalParticipants;
+    const resource = this.$externalParticipantsResource();
+    return resource?.hasValue() ? resource.value() : [];
+  });
+  public readonly $participants = computed(() => [
+    ...this.$groupMembers(),
+    ...this.$externalParticipants(),
+  ]);
   public readonly $loginAccounts = computed(() => {
     const resource = this.$loginAccountsResource();
     return resource?.hasValue() ? resource.value() : [];
@@ -82,12 +101,14 @@ export class AppService {
   public readonly $apiLoading = computed(
     () =>
       this.$groupMembersResource()?.isLoading() === true ||
-      this.$transactionsResource()?.isLoading() === true,
+      this.$transactionsResource()?.isLoading() === true ||
+      this.$externalParticipantsResource()?.isLoading() === true,
   );
   public readonly $apiError = computed(
     () =>
       this.$groupMembersResource()?.error() ??
-      this.$transactionsResource()?.error(),
+      this.$transactionsResource()?.error() ??
+      this.$externalParticipantsResource()?.error(),
   );
 
   public readonly $dataSource = signal(readDataSource());
@@ -110,6 +131,7 @@ export class AppService {
         this.$currentUser.set(undefined);
         this.$groupMembersResource.set(undefined);
         this.$transactionsResource.set(undefined);
+        this.$externalParticipantsResource.set(undefined);
       });
   }
 
@@ -178,6 +200,7 @@ export class AppService {
     this.$currentUser.set(undefined);
     this.$groupMembersResource.set(undefined);
     this.$transactionsResource.set(undefined);
+    this.$externalParticipantsResource.set(undefined);
     this.$loginAccountsResource.set(undefined);
     try {
       await firstValueFrom(
@@ -270,13 +293,89 @@ export class AppService {
     }));
   }
 
+  public async createExternalParticipant(name: string): Promise<void> {
+    const trimmedName = name.trim();
+    if (!trimmedName) return;
+    if (this.$dataSource() === DataSource.Local) {
+      const participant: ExternalParticipantDto = {
+        id: `external:${crypto.randomUUID()}`,
+        name: trimmedName,
+      };
+      this.updateLocalStore((store) => ({
+        ...store,
+        externalParticipants: [...store.externalParticipants, participant],
+      }));
+      return;
+    }
+    await firstValueFrom(
+      this.externalParticipantsApi.externalParticipantsControllerCreateParticipant(
+        {
+          name: trimmedName,
+        },
+      ),
+    );
+    this.refreshExternalParticipants();
+  }
+
+  public async updateExternalParticipant(
+    id: string,
+    name: string,
+  ): Promise<void> {
+    const trimmedName = name.trim();
+    if (!trimmedName) return;
+    if (this.$dataSource() === DataSource.Local) {
+      this.updateLocalStore((store) => ({
+        ...store,
+        externalParticipants: store.externalParticipants.map((participant) =>
+          participant.id === id
+            ? { ...participant, name: trimmedName }
+            : participant,
+        ),
+      }));
+      return;
+    }
+    await firstValueFrom(
+      this.externalParticipantsApi.externalParticipantsControllerUpdateParticipant(
+        id,
+        { name: trimmedName },
+      ),
+    );
+    this.refreshExternalParticipants();
+  }
+
+  public async deleteExternalParticipant(id: string): Promise<void> {
+    if (this.$dataSource() === DataSource.Local) {
+      const referenced = this.$localStore().transactions.some(
+        (transaction) =>
+          transaction.targetParticipantId === id ||
+          transaction.beneficiaryParticipantIds.includes(id),
+      );
+      if (referenced)
+        throw new Error('This participant is used by a transaction.');
+      this.updateLocalStore((store) => ({
+        ...store,
+        externalParticipants: store.externalParticipants.filter(
+          (participant) => participant.id !== id,
+        ),
+      }));
+      return;
+    }
+    await firstValueFrom(
+      this.externalParticipantsApi.externalParticipantsControllerDeleteParticipant(
+        id,
+      ),
+    );
+    this.refreshExternalParticipants();
+  }
+
   public loadLocalStore(value: unknown): boolean {
     const parsed = LocalStoreSchema.safeParse(value);
     if (!parsed.success) return false;
     this.updateLocalStore(() => ({
-      version: parsed.data.version,
+      version: 3,
       users: parsed.data.users,
       availableUsers: parsed.data.availableUsers ?? parsed.data.users,
+      externalParticipants: parsed.data.externalParticipants ?? [],
       transactions: parsed.data.transactions,
     }));
     return true;
@@ -286,9 +385,10 @@ export class AppService {
   }
   public clearLocalStore(): void {
     this.updateLocalStore(() => ({
-      version: 2,
+      version: 3,
       users: [],
       availableUsers: [],
+      externalParticipants: [],
       transactions: [],
     }));
   }
@@ -308,6 +408,7 @@ export class AppService {
     this.$authStatusReady.set(source === DataSource.Local);
     this.$groupMembersResource.set(undefined);
     this.$transactionsResource.set(undefined);
+    this.$externalParticipantsResource.set(undefined);
     this.$loginAccountsResource.set(undefined);
     if (source === DataSource.Local) {
       this.$currentUser.set(LOCAL_AUTH_USER);
@@ -332,6 +433,12 @@ export class AppService {
     else if (this.$currentUser()) this.ensureRemoteResources();
   }
 
+  public refreshExternalParticipants(): void {
+    const resource = this.$externalParticipantsResource();
+    if (resource) resource.reload();
+    else if (this.$currentUser()) this.ensureRemoteResources();
+  }
+
   private async loadAuthenticationState(): Promise<void> {
     if (
       !this.$dataSourceConfigured() ||
@@ -342,7 +449,12 @@ export class AppService {
   }
 
   private ensureRemoteResources(): void {
-    if (this.$groupMembersResource() && this.$transactionsResource()) return;
+    if (
+      this.$groupMembersResource() &&
+      this.$transactionsResource() &&
+      this.$externalParticipantsResource()
+    )
+      return;
     runInInjectionContext(this.injector, () => {
       if (!this.$groupMembersResource())
         this.$groupMembersResource.set(
@@ -351,6 +463,12 @@ export class AppService {
       if (!this.$transactionsResource())
         this.$transactionsResource.set(
           transactionControllerGetTransactionsResource({ defaultValue: [] }),
+        );
+      if (!this.$externalParticipantsResource())
+        this.$externalParticipantsResource.set(
+          externalParticipantsControllerGetParticipantsResource({
+            defaultValue: [],
+          }),
         );
     });
   }
@@ -374,9 +492,10 @@ export class AppService {
 
 // #region Helpers
 export interface LocalStore {
-  version: 2;
+  version: 3;
   users: GroupMemberDto[];
   availableUsers: GroupMemberDto[];
+  externalParticipants: ExternalParticipantDto[];
   transactions: TransactionDto[];
 }
 
@@ -389,9 +508,12 @@ const LOCAL_AUTH_USER: AuthUserDto = {
   role: UserRole.User,
 };
 const LocalStoreSchema = z.object({
-  version: z.literal(2),
+  version: z.union([z.literal(2), z.literal(3)]),
   users: z.array(z.object({ id: z.string(), name: z.string() })),
   availableUsers: z
+    .array(z.object({ id: z.string(), name: z.string() }))
+    .optional(),
+  externalParticipants: z
     .array(z.object({ id: z.string(), name: z.string() }))
     .optional(),
   transactions: z.array(LocalTransactionSchema),
@@ -404,21 +526,29 @@ function readLocalStore(): LocalStore {
       const parsed: unknown = JSON.parse(serialized);
       const result = LocalStoreSchema.safeParse(parsed);
       if (result.success) {
-        return {
-          version: result.data.version,
+        const store: LocalStore = {
+          version: 3,
           users: result.data.users,
           availableUsers: result.data.availableUsers ?? result.data.users,
+          externalParticipants: result.data.externalParticipants ?? [],
           transactions: result.data.transactions,
         };
+        if (result.data.version !== 3)
+          window.localStorage.setItem(
+            LOCAL_DATA_STORAGE_KEY,
+            JSON.stringify(store),
+          );
+        return store;
       }
     }
   } catch {
     /* Use a clean local store when browser storage is unavailable or invalid. */
   }
   return {
-    version: 2,
+    version: 3,
     users: [],
     availableUsers: [],
+    externalParticipants: [],
     transactions: [],
   };
 }

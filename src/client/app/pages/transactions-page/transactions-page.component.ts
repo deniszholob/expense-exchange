@@ -40,6 +40,10 @@ import {
 } from 'src/client/app/shared/transaction-scope.enum';
 import { DataRangeService } from 'src/client/app/shared/data-range.service';
 import { isDateWithinRange } from 'src/client/app/shared/date-range/date-range.util';
+import {
+  getSessionFormDraftKey,
+  removeSessionFormDraft,
+} from 'src/client/app/shared/session-form-draft';
 // #endregion
 
 // #region Component
@@ -108,14 +112,17 @@ export class TransactionsPageComponent extends DetailsPageDirective {
       .filter((item) => item.type === TransactionType.Expense),
   );
   protected readonly $transactionRows = computed(() => {
-    const members = new Map(
-      this.appService.$groupMembers().map((member) => [member.id, member.name]),
+    const participants = new Map(
+      this.appService
+        .$participants()
+        .map((participant) => [participant.id, participant]),
     );
     const transactions = this.appService.$transactions();
     const currentUserId = this.appService.$currentUser()?.id;
     const rows: TransactionRow[] = transactions.map((transaction) => {
-      const targetName =
-        members.get(transaction.targetUserId) ?? transaction.targetUserId;
+      const targetParticipant = participants.get(
+        transaction.targetParticipantId,
+      );
       const linkedName = transaction.linkedTransactionId
         ? transactions.find(
             (candidate) => candidate.id === transaction.linkedTransactionId,
@@ -134,16 +141,22 @@ export class TransactionsPageComponent extends DetailsPageDirective {
         ]
           .filter(Boolean)
           .join(' · '),
-        party: targetName,
-        beneficiaries: transaction.beneficiaryUserIds
-          .map((userId) => members.get(userId) ?? userId)
-          .join(', '),
+        party: {
+          id: transaction.targetParticipantId,
+          name: targetParticipant?.name ?? transaction.targetParticipantId,
+        },
+        beneficiaries: transaction.beneficiaryParticipantIds.map(
+          (participantId) => ({
+            id: participantId,
+            name: participants.get(participantId)?.name ?? participantId,
+          }),
+        ),
         date: transaction.postDate,
         recordedDate: transaction.completeDate,
         rangeDate: transaction.completeDate,
-        memberUserIds: [
-          transaction.targetUserId,
-          ...transaction.beneficiaryUserIds,
+        participantIds: [
+          transaction.targetParticipantId,
+          ...transaction.beneficiaryParticipantIds,
         ],
         canManage:
           transaction.type === TransactionType.Expense ||
@@ -167,7 +180,7 @@ export class TransactionsPageComponent extends DetailsPageDirective {
         (row) =>
           scope !== TransactionScope.MyShare ||
           (currentUserId !== undefined &&
-            row.memberUserIds.includes(currentUserId)),
+            row.participantIds.includes(currentUserId)),
       )
       .sort((first, second) =>
         second.recordedDate.localeCompare(first.recordedDate),
@@ -281,7 +294,17 @@ export class TransactionsPageComponent extends DetailsPageDirective {
         );
         this.appService.refreshTransactions();
       }
-      this.router.navigate(['..'], { relativeTo: this.activatedRoute });
+      const userId = this.appService.$currentUser()?.id;
+      const draftKey = userId
+        ? getSessionFormDraftKey(
+            'transaction',
+            this.appService.$dataSource(),
+            userId,
+            existing?.id ?? `new-${this.$newTransactionType()}`,
+          )
+        : undefined;
+      await this.router.navigate(['..'], { relativeTo: this.activatedRoute });
+      if (draftKey) removeSessionFormDraft(draftKey);
     } catch (error: unknown) {
       console.error('Unable to save transaction', error);
     }

@@ -2,7 +2,7 @@
   @switch ($pageState()) {
     @case (DetailsPageState.LOADING) {
       <div
-        class="surface-card text-finance-muted flex min-h-48 items-center justify-center gap-3"
+        class="section-container surface-card text-finance-muted flex min-h-48 items-center justify-center gap-3"
         role="status"
       >
         <span
@@ -13,7 +13,7 @@
     }
 
     @case (DetailsPageState.NO_PARAMS) {
-      <div class="flex min-h-0 flex-1 flex-col gap-4">
+      <div class="section-container flex min-h-0 flex-1 flex-col gap-4">
         <div class="flex shrink-0 items-end gap-4">
           <div class="shrink-0">
             <app-form-field
@@ -61,15 +61,16 @@
         [transaction]="$transaction()"
         [expenses]="$expenseTransactions()"
         [initialType]="$newTransactionType()"
+        [$dataSource]="appService.$dataSource()"
         [currentUser]="this.appService.$currentUser()"
-        [groupMembers]="this.appService.$groupMembers()"
+        [participants]="this.appService.$participants()"
         (save)="onSaveTransaction($event)"
         (cancelRequested)="onCancelTransaction()"
       />
     }
     @case (DetailsPageState.ERROR) {
       <div
-        class="rounded-card border border-rose-400/30 bg-rose-500/10 p-5 text-rose-200"
+        class="section-container rounded-card border border-rose-400/30 bg-rose-500/10 p-5 text-rose-200"
         role="alert"
       >
         <ul class="list-inside list-disc">

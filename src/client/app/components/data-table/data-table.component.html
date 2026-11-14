@@ -33,18 +33,44 @@
       }
       <thead>
         <tr>
-          @for (column of $columns(); track column.key) {
+          @if ($enableRowReordering()) {
+            <th
+              class="table-cell-pinned table-reorder-handle border-finance-border w-10 max-w-10 min-w-10 border-r px-0 text-center"
+              [class.table-pinned-edge-right]="
+                !$hasLeftPinnedColumns() && $actionsPinned() !== TableColumnPin.Left
+              "
+              [style.position]="'sticky'"
+              [style.left]="'0px'"
+              [style.width]="'2.5rem'"
+              [style.min-width]="'2.5rem'"
+              [style.max-width]="'2.5rem'"
+              aria-label="Reorder rows"
+            ></th>
+          }
+          @for (layout of $columnLayout(); track layout.definition.key) {
+            @let column = layout.definition;
             <th
               [class]="column.headerClass ?? ''"
+              [class.table-cell-pinned]="column.pinned"
+              [class.border-r]="layout.pinnedEdge === TableColumnPin.Right"
+              [class.border-l]="layout.pinnedEdge === TableColumnPin.Left"
+              [class.table-pinned-edge-right]="layout.pinnedEdge === TableColumnPin.Right"
+              [class.table-pinned-edge-left]="layout.pinnedEdge === TableColumnPin.Left"
+              [class.border-finance-border]="layout.pinnedEdge"
+              [style.position]="column.pinned ? 'sticky' : null"
+              [style.left]="column.pinned === TableColumnPin.Left ? layout.pinnedOffset : null"
+              [style.right]="column.pinned === TableColumnPin.Right ? layout.pinnedOffset : null"
+              [style.width]="column.pinned ? (column.width ?? '12rem') : null"
+              [style.min-width]="column.pinned ? (column.width ?? '12rem') : null"
               [attr.aria-sort]="
                 $sortState()?.key === column.key
-                  ? $sortState()?.direction === 'asc'
+                  ? $sortState()?.direction === SortDirection.Ascending
                     ? 'ascending'
                     : 'descending'
                   : null
               "
             >
-              @if (column.sortable) {
+              @if (column.sortable && !$enableRowReordering()) {
                 <button
                   class="text-finance-muted hover:text-finance-text inline-flex min-h-0 items-center gap-1 px-0 py-0 text-xs font-semibold tracking-wide uppercase transition-colors focus-visible:ring-2 focus-visible:ring-sky-400"
                   [attr.aria-label]="'Sort by ' + column.label"
@@ -53,7 +79,7 @@
                 >
                   {{ column.label }}
                   @if ($sortState()?.key === column.key) {
-                    @if ($sortState()?.direction === 'asc') {
+                    @if ($sortState()?.direction === SortDirection.Ascending) {
                       <svg class="size-3.5 text-sky-300" lucideArrowUp aria-hidden="true"></svg>
                     } @else {
                       <svg class="size-3.5 text-sky-300" lucideArrowDown aria-hidden="true"></svg>
@@ -68,19 +94,95 @@
             </th>
           }
           @if ($hasRowActions()) {
-            <th class="w-28 text-right">Actions</th>
+            <th
+              class="w-28 text-right"
+              [class.table-cell-pinned]="$actionsPinned()"
+              [class.border-r]="$actionsPinned() === TableColumnPin.Left"
+              [class.table-pinned-edge-right]="$actionsPinned() === TableColumnPin.Left"
+              [class.border-l]="
+                $actionsPinned() === TableColumnPin.Right && !$hasRightPinnedColumns()
+              "
+              [class.table-pinned-edge-left]="
+                $actionsPinned() === TableColumnPin.Right && !$hasRightPinnedColumns()
+              "
+              [class.border-finance-border]="$actionsPinned()"
+              [style.position]="$actionsPinned() ? 'sticky' : null"
+              [style.left]="
+                $actionsPinned() === TableColumnPin.Left ? $actionsPinnedOffset() : null
+              "
+              [style.right]="
+                $actionsPinned() === TableColumnPin.Right ? $actionsPinnedOffset() : null
+              "
+              [style.width]="$actionsPinned() ? $actionsWidth() : null"
+              [style.min-width]="$actionsPinned() ? $actionsWidth() : null"
+            >
+              Actions
+            </th>
           }
         </tr>
       </thead>
-      <tbody>
+      <tbody
+        [cdkDropListData]="$dropListRows()"
+        [cdkDropListDisabled]="!$enableRowReordering()"
+        (cdkDropListDropped)="dropRow($event)"
+        cdkDropList
+      >
         @if ($data().length > 0) {
           @for (row of $renderRows(); track row.id; let rowIndex = $index) {
             <tr
               class="hover:bg-finance-hover"
+              [cdkDragData]="row.data"
+              [cdkDragDisabled]="!$enableRowReordering()"
+              [cdkDragPreviewContainer]="'parent'"
               [class.bg-finance-raised/30]="$striped() && rowIndex % 2 === 1"
+              cdkDrag
             >
+              @if ($enableRowReordering()) {
+                <td
+                  class="table-cell-pinned table-reorder-handle border-finance-border w-10 max-w-10 min-w-10 border-r p-0 text-center"
+                  [class.table-pinned-edge-right]="
+                    !$hasLeftPinnedColumns() && $actionsPinned() !== TableColumnPin.Left
+                  "
+                  [class.table-row-striped-strong]="$striped() && rowIndex % 2 === 1"
+                  [style.position]="'sticky'"
+                  [style.left]="'0px'"
+                  [style.width]="'2.5rem'"
+                  [style.min-width]="'2.5rem'"
+                  [style.max-width]="'2.5rem'"
+                >
+                  <button
+                    class="btn-icon rounded-control text-finance-muted hover:bg-finance-raised hover:text-finance-text size-8 cursor-grab p-1 active:cursor-grabbing"
+                    [attr.aria-label]="'Reorder row ' + (row.rowIndex + 1)"
+                    (keydown.arrowup)="moveRowWithKeyboard(row.rowIndex, -1, $event)"
+                    (keydown.arrowdown)="moveRowWithKeyboard(row.rowIndex, 1, $event)"
+                    cdkDragHandle
+                    type="button"
+                  >
+                    <svg class="size-4" lucideGripVertical aria-hidden="true"></svg>
+                  </button>
+                </td>
+              }
               @for (cell of row.cells; track cell.column.key) {
-                <td [class]="cell.column.cellClass ?? ''" [attr.title]="cell.tooltip ?? null">
+                <td
+                  [class]="cell.column.cellClass ?? ''"
+                  [class.table-cell-pinned]="cell.column.pinned"
+                  [class.border-r]="cell.pinnedEdge === TableColumnPin.Right"
+                  [class.border-l]="cell.pinnedEdge === TableColumnPin.Left"
+                  [class.table-pinned-edge-right]="cell.pinnedEdge === TableColumnPin.Right"
+                  [class.table-pinned-edge-left]="cell.pinnedEdge === TableColumnPin.Left"
+                  [class.border-finance-border]="cell.pinnedEdge"
+                  [class.table-row-striped-strong]="$striped() && rowIndex % 2 === 1"
+                  [style.position]="cell.column.pinned ? 'sticky' : null"
+                  [style.left]="
+                    cell.column.pinned === TableColumnPin.Left ? cell.pinnedOffset : null
+                  "
+                  [style.right]="
+                    cell.column.pinned === TableColumnPin.Right ? cell.pinnedOffset : null
+                  "
+                  [style.width]="cell.column.pinned ? (cell.column.width ?? '12rem') : null"
+                  [style.min-width]="cell.column.pinned ? (cell.column.width ?? '12rem') : null"
+                  [attr.title]="cell.tooltip ?? null"
+                >
                   @if (cell.column.cellTemplate; as cellTemplate) {
                     <ng-container
                       [ngTemplateOutlet]="cellTemplate"
@@ -97,11 +199,42 @@
                 </td>
               }
               @if ($hasRowActions()) {
-                <td>
+                <td
+                  [class.table-cell-pinned]="$actionsPinned()"
+                  [class.border-r]="$actionsPinned() === TableColumnPin.Left"
+                  [class.table-pinned-edge-right]="$actionsPinned() === TableColumnPin.Left"
+                  [class.border-l]="
+                    $actionsPinned() === TableColumnPin.Right && !$hasRightPinnedColumns()
+                  "
+                  [class.table-pinned-edge-left]="
+                    $actionsPinned() === TableColumnPin.Right && !$hasRightPinnedColumns()
+                  "
+                  [class.border-finance-border]="$actionsPinned()"
+                  [class.table-row-striped-strong]="$striped() && rowIndex % 2 === 1"
+                  [style.position]="$actionsPinned() ? 'sticky' : null"
+                  [style.left]="
+                    $actionsPinned() === TableColumnPin.Left ? $actionsPinnedOffset() : null
+                  "
+                  [style.right]="
+                    $actionsPinned() === TableColumnPin.Right ? $actionsPinnedOffset() : null
+                  "
+                  [style.width]="$actionsPinned() ? $actionsWidth() : null"
+                  [style.min-width]="$actionsPinned() ? $actionsWidth() : null"
+                >
                   <div class="flex justify-end gap-1">
+                    @if (row.canView) {
+                      <button
+                        class="btn-icon btn-icon-view rounded-control"
+                        [attr.aria-label]="'View row ' + (row.rowIndex + 1)"
+                        (click)="requestView(row)"
+                        type="button"
+                      >
+                        <svg class="size-4" lucideEye aria-hidden="true"></svg>
+                      </button>
+                    }
                     @if (row.canEdit) {
                       <button
-                        class="btn-icon rounded-control text-finance-muted hover:bg-finance-raised hover:text-sky-300"
+                        class="btn-icon btn-icon-edit rounded-control"
                         [attr.aria-label]="'Edit row ' + (row.rowIndex + 1)"
                         (click)="requestEdit(row)"
                         type="button"
@@ -111,7 +244,7 @@
                     }
                     @if (row.canDelete) {
                       <button
-                        class="btn-icon rounded-control text-finance-muted hover:bg-rose-500/10 hover:text-rose-300"
+                        class="btn-icon btn-icon-delete rounded-control"
                         [attr.aria-label]="'Delete row ' + (row.rowIndex + 1)"
                         (click)="requestDelete(row)"
                         type="button"
@@ -145,12 +278,13 @@
         <span>Rows per page</span>
         <select
           class="rounded-control border-finance-border bg-finance-raised text-finance-text w-16 shrink-0 border px-2 py-1 focus:border-sky-400 focus:ring-2 focus:ring-sky-400/30"
-          [value]="$pageSize()"
           (change)="setPageSize($event)"
           aria-label="Rows per page"
         >
           @for (pageSize of $pageSizeOptions; track pageSize) {
-            <option [value]="pageSize">{{ pageSize === 'all' ? 'All' : pageSize }}</option>
+            <option [value]="pageSize" [selected]="pageSize === $pageSize()">
+              {{ pageSize === 'all' ? 'All' : pageSize }}
+            </option>
           }
         </select>
       </label>

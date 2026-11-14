@@ -31,8 +31,8 @@ export const MOCK_Transaction: TransactionDto = {
   amount: 64.25,
   postDate: '2026-01-10',
   completeDate: '2026-01-10',
-  targetUserId: MOCK_GroupMember.id,
-  beneficiaryUserIds: MOCK_GroupMember_Array.map((member) => member.id),
+  targetParticipantId: MOCK_GroupMember.id,
+  beneficiaryParticipantIds: MOCK_GroupMember_Array.map((member) => member.id),
   note: 'Weekly groceries',
 };
 export const MOCK_Transaction_Array: TransactionDto[] = [MOCK_Transaction];

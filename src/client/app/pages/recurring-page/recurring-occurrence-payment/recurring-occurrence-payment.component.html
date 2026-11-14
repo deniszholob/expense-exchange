@@ -1,0 +1,61 @@
+<form
+  class="grid min-w-0 grid-cols-1 items-end gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]"
+  (submit)="confirmPayment($event)"
+>
+  <app-form-field
+    [$id]="'occurrence-amount-' + $occurrence().id"
+    [$label]="'Amount paid'"
+    [$required]="true"
+  >
+    <div class="relative">
+      <span class="text-finance-muted pointer-events-none absolute top-1/2 left-3 -translate-y-1/2"
+        >$</span
+      >
+      <input
+        class="pl-7 text-left tabular-nums"
+        [id]="'occurrence-amount-' + $occurrence().id"
+        [formField]="$paymentForm.amount"
+        [readOnly]="!$isAmountEditable()"
+        type="number"
+        step="0.01"
+      />
+    </div>
+  </app-form-field>
+  <app-form-field
+    [$id]="'occurrence-pay-date-' + $occurrence().id"
+    [$label]="$occurrence().isAutopay ? 'Scheduled pay date' : 'Pay date'"
+    [$required]="true"
+  >
+    @if ($isPayDateEditable()) {
+      <app-date-input
+        [$id]="'occurrence-pay-date-' + $occurrence().id"
+        [formField]="$paymentForm.payDate"
+        [$min]="$occurrence().statementDate"
+        [$max]="$today()"
+      />
+    } @else {
+      <input
+        [id]="'occurrence-pay-date-' + $occurrence().id"
+        [value]="$occurrence().payDate"
+        readonly
+        type="text"
+      />
+    }
+  </app-form-field>
+  <div class="flex shrink-0 items-center gap-2">
+    @if ($isEditing()) {
+      <button
+        class="btn-secondary"
+        [disabled]="$isSubmitting()"
+        (click)="cancelRequested.emit()"
+        type="button"
+      >
+        Cancel
+      </button>
+    }
+    <button class="btn-primary" [disabled]="$isSubmitting() || !$canConfirm()" type="submit">
+      <svg class="size-4" lucideCheck aria-hidden="true"></svg>
+      {{ $isEditing() ? 'Save changes' : $occurrence().isAutopay ? 'Save amount' : 'Confirm paid' }}
+    </button>
+  </div>
+</form>

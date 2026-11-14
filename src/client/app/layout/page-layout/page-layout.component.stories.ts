@@ -28,13 +28,23 @@ const meta: Meta<ComponentWithCustomControls> = {
     // someControl: { control: { disable: true } }
   },
   args: {
-    title: 'Page Layout',
+    $fillHeight: false,
   },
 };
 export default meta;
 
 export const PageLayout: StoryObj<ComponentWithCustomControls> = {
-  render: (args) => ({ props: args }),
+  render: (args) => ({
+    props: args,
+    template: `
+      <app-page-layout [$fillHeight]="$fillHeight">
+      <section class="section-container surface-card p-5">
+          <h2 class="font-semibold">Page content</h2>
+          <p class="text-finance-muted mt-2 text-sm">Page layouts span the available width; sections can set their own limits.</p>
+        </section>
+      </app-page-layout>
+    `,
+  }),
   // play: async ({ canvasElement }) => { const canvasElement = within(canvasElement) },
 };
 

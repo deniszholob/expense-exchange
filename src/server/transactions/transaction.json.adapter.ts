@@ -19,7 +19,7 @@ export class TransactionJsonAdapter extends TransactionRepository {
   private readonly store = new JsonStore(
     join(process.env['DATA_DIR'] ?? '.dist/data', 'transactions.json'),
     TransactionStoreSchema,
-    () => ({ version: 1, transactions: [] }),
+    () => ({ version: 2, transactions: [] }),
   );
 
   public async getTransactions(): Promise<Transaction[]> {

@@ -1,0 +1,355 @@
+<app-page-layout>
+  @if (appService.$dataSource() !== DataSource.RemoteApi) {
+    <section class="section-container surface-card p-5 sm:p-6" role="status">
+      <h2 class="font-semibold">Recurring rules need a server</h2>
+      <p class="text-finance-muted mt-2 text-sm">
+        Recurring occurrences are created and shared by the self-hosted API. Select Remote API to
+        manage them.
+      </p>
+    </section>
+  } @else {
+    <div class="section-container flex flex-col gap-5">
+      @if (recurringState.$isLoading()) {
+        <p class="text-finance-muted text-sm" role="status">Loading recurring data…</p>
+      }
+      @if (recurringState.$error(); as error) {
+        <p class="text-finance-negative text-sm" role="alert">{{ error }}</p>
+      }
+      @if ($rulePendingDeletion(); as rule) {
+        <section
+          class="surface-card flex flex-col gap-4 border-amber-300/30 p-5 sm:p-6"
+          role="group"
+          aria-labelledby="end-rule-heading"
+          aria-describedby="end-rule-description"
+        >
+          <div>
+            <h2 class="font-semibold" id="end-rule-heading">End {{ rule.name }}?</h2>
+            <p class="text-finance-muted mt-1 text-sm" id="end-rule-description">
+              Choose what to do with this rule’s existing occurrences and payment history. Deleting
+              history permanently removes its saved occurrence and payment records.
+            </p>
+          </div>
+          <div class="flex flex-wrap justify-end gap-2">
+            <button
+              class="btn-secondary"
+              [disabled]="$isDeletingRule()"
+              (click)="cancelRuleDeletion()"
+              type="button"
+            >
+              Cancel
+            </button>
+            <button
+              class="btn-primary"
+              [disabled]="$isDeletingRule()"
+              (click)="endRule(false)"
+              type="button"
+            >
+              End rule and preserve history
+            </button>
+            <button
+              class="btn-danger"
+              [disabled]="$isDeletingRule()"
+              (click)="endRule(true)"
+              type="button"
+            >
+              Delete rule and history
+            </button>
+          </div>
+        </section>
+      }
+      @if ($selectedOccurrenceRuleId() === undefined) {
+        <p class="text-finance-muted text-sm">Create scheduled income and expense occurrences.</p>
+
+        <ng-template #nameCell let-row="row">
+          <div class="flex min-w-0 items-center gap-2">
+            <span
+              class="shrink-0"
+              [class.text-finance-positive]="row.isDone"
+              [class.text-sky-300]="!row.isDone"
+              [attr.aria-label]="row.isDone ? 'Done' : 'In progress'"
+              [attr.title]="row.isDone ? 'Done' : 'In progress'"
+              role="img"
+            >
+              @if (row.isDone) {
+                <svg class="size-4" lucideCircleCheck aria-hidden="true"></svg>
+              } @else {
+                <svg class="size-4" lucideCircleDashed aria-hidden="true"></svg>
+              }
+            </span>
+            <span class="min-w-0 truncate">{{ row.name }}</span>
+            <span
+              class="border-finance-border bg-finance-raised text-finance-muted inline-flex min-w-6 shrink-0 items-center justify-center rounded-full border px-1.5 py-0.5 text-xs tabular-nums"
+              [attr.aria-label]="row.occurrenceCount + ' occurrences'"
+              title="Occurrences"
+            >
+              {{ row.occurrenceCount }}
+            </span>
+            @if (row.attentionCount > 0) {
+              <span
+                class="inline-flex min-w-6 shrink-0 items-center justify-center rounded-full border border-amber-300/30 bg-amber-300/10 px-1.5 py-0.5 text-xs font-semibold text-amber-200 tabular-nums"
+                [attr.aria-label]="row.attentionCount + ' occurrences need attention'"
+                title="Occurrences need attention"
+              >
+                {{ row.attentionCount }}
+              </span>
+            }
+          </div>
+        </ng-template>
+        <ng-template #typeCell let-row="row">
+          <span
+            class="transaction-type-badge"
+            [class.transaction-type-badge-expense]="row.type === RecurringTransactionType.Expense"
+            [class.transaction-type-badge-income]="row.type === RecurringTransactionType.Income"
+            >{{ row.type }}</span
+          >
+        </ng-template>
+        <ng-template #beneficiariesCell let-row="row">
+          <div class="flex max-w-64 flex-wrap gap-1.5">
+            @for (beneficiary of row.beneficiaries; track beneficiary.id) {
+              <span class="participant-badge" [title]="beneficiary.name">
+                <span class="truncate">{{ beneficiary.name }}</span>
+              </span>
+            }
+          </div>
+        </ng-template>
+        <ng-template #targetParticipantCell let-row="row">
+          <span class="participant-badge" [title]="row.targetParticipant">
+            <span class="truncate">{{ row.targetParticipant }}</span>
+          </span>
+        </ng-template>
+        <ng-template #pricesCell let-row="row">
+          <div class="flex min-w-48 flex-col">
+            @for (price of row.rule.prices; track price.effectiveDate; let index = $index) {
+              <div
+                class="border-finance-border flex items-center justify-between gap-3 py-1.5 whitespace-nowrap"
+                [class.border-t]="index > 0"
+              >
+                <time class="text-finance-muted text-xs tabular-nums">{{
+                  price.effectiveDate
+                }}</time>
+                @if (price.amount === undefined) {
+                  <span class="text-finance-muted text-sm">Variable</span>
+                } @else {
+                  <span
+                    class="font-medium tabular-nums"
+                    [class.text-finance-negative]="row.type === RecurringTransactionType.Expense"
+                    [class.text-finance-positive]="row.type === RecurringTransactionType.Income"
+                  >
+                    {{ row.type === RecurringTransactionType.Expense ? '−' : '+'
+                    }}{{ price.amount | currency }}
+                  </span>
+                }
+              </div>
+            }
+          </div>
+        </ng-template>
+        <app-data-table
+          [$data]="$ruleRows()"
+          [$columns]="$ruleColumns()"
+          [$title]="'Recurring rules'"
+          [$caption]="'Recurring rules'"
+          [$emptyMessage]="'No recurring rules have been added.'"
+          [$addActionLabel]="'Add rule'"
+          [$tableClass]="'min-w-[1050px] table-auto'"
+          [$actionsPinned]="$actionsPinSide"
+          [$actionsWidth]="'10rem'"
+          [$showViewAction]="true"
+          [$enableRowReordering]="true"
+          [$canViewRow]="canViewRuleOccurrences"
+          [$canEditRow]="canManageRule"
+          [$canDeleteRow]="canManageRule"
+          [$striped]="false"
+          (addRequested)="addRule()"
+          (viewRequested)="viewRuleOccurrencesRow($event)"
+          (rowsReordered)="updateRuleOrder($event)"
+          (editRequested)="editRuleRow($event)"
+          (deleteRequested)="endRuleRow($event)"
+        />
+      }
+
+      <section
+        class="surface-card flex flex-col gap-4 p-5 sm:p-6"
+        id="rule-occurrences"
+        aria-labelledby="occurrences-heading"
+      >
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <h2 class="text-lg font-semibold" id="occurrences-heading">
+              @if ($selectedOccurrenceRuleId()) {
+                {{ $selectedRuleName() }} occurrences
+              } @else {
+                Rule occurrences
+              }
+            </h2>
+            <p class="text-finance-muted mt-1 text-sm">
+              Occurrences are created by the server when their statement date arrives.
+            </p>
+          </div>
+          <div class="flex shrink-0 items-center gap-2">
+            @if ($selectedOccurrenceRuleId()) {
+              <button
+                class="btn-secondary min-h-8 px-2.5 py-1 text-xs"
+                (click)="clearOccurrenceRuleFilter()"
+                type="button"
+              >
+                Back to recurring rules
+              </button>
+            }
+            <span
+              class="rounded-full border border-amber-300/20 bg-amber-300/10 px-3 py-1 text-xs font-medium text-amber-200"
+            >
+              {{ $visibleAttentionCount() }} need attention
+            </span>
+          </div>
+        </div>
+
+        @if ($openOccurrenceGroups().length === 0) {
+          <div class="empty-state border-dashed shadow-none">
+            <svg class="text-finance-muted size-6" lucideCalendarClock aria-hidden="true"></svg>
+            <p class="font-medium">
+              {{
+                $selectedOccurrenceRuleId()
+                  ? 'No open occurrences for this rule'
+                  : 'No open occurrences'
+              }}
+            </p>
+            <p class="text-finance-muted text-sm">
+              {{
+                $selectedOccurrenceRuleId()
+                  ? 'This rule has no unpaid occurrences.'
+                  : 'Due rule occurrences will appear here.'
+              }}
+            </p>
+          </div>
+        } @else {
+          <ul class="flex flex-col gap-3">
+            @for (group of $openOccurrenceGroups(); track group.ruleId) {
+              <li>
+                <details
+                  class="group rounded-card border-finance-border bg-finance-raised border"
+                  [open]="
+                    $selectedOccurrenceRuleId() === group.ruleId || group.occurrences.length <= 3
+                  "
+                >
+                  <summary
+                    class="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 font-medium"
+                  >
+                    <span>{{ group.name }}</span>
+                    <span class="flex shrink-0 items-center gap-2">
+                      <span
+                        class="text-finance-muted border-finance-border rounded-full border px-2 py-0.5 text-xs"
+                      >
+                        {{ group.occurrences.length }} due
+                      </span>
+                      <svg
+                        class="text-finance-muted size-4 transition-transform group-open:rotate-180"
+                        lucideChevronDown
+                        aria-hidden="true"
+                      ></svg>
+                    </span>
+                  </summary>
+                  <ul class="divide-finance-border divide-y px-4">
+                    @for (item of group.occurrences; track item.occurrence.id) {
+                      @let occurrence = item.occurrence;
+                      <li
+                        class="grid grid-cols-1 gap-3 py-3 first:pt-0 last:pb-3 lg:grid-cols-[minmax(12rem,1fr)_minmax(0,1.5fr)] lg:items-center"
+                      >
+                        <div class="flex min-w-0 items-center gap-3 lg:translate-y-4">
+                          <span
+                            class="rounded-control mt-0.5 grid size-8 shrink-0 place-items-center bg-amber-300/10 text-amber-200"
+                          >
+                            <svg class="size-4" lucideCircleAlert aria-hidden="true"></svg>
+                          </span>
+                          <div class="min-w-0">
+                            <div
+                              class="text-finance-muted flex flex-wrap items-center gap-x-3 gap-y-1 text-sm"
+                            >
+                              <span>Statement {{ occurrence.statementDate }}</span>
+                              <span>Expected pay {{ occurrence.payDate }}</span>
+                              <span
+                                class="participant-badge"
+                                [title]="displayName(occurrence.targetParticipantId)"
+                              >
+                                <span class="truncate">
+                                  {{ displayName(occurrence.targetParticipantId) }}
+                                </span>
+                              </span>
+                              <span>{{ occurrenceState(occurrence) }}</span>
+                            </div>
+                          </div>
+                        </div>
+                        @if (item.isFullyAutomated) {
+                          <span class="text-finance-muted text-sm">Automated by rule</span>
+                        } @else {
+                          <app-recurring-occurrence-payment
+                            [$occurrence]="occurrence"
+                            [$today]="recurringState.$today()"
+                            [$isAmountEditable]="item.isAmountEditable"
+                            [$isPayDateEditable]="item.isPayDateEditable"
+                            [$isSubmitting]="$submittingOccurrenceId() === occurrence.id"
+                            (paymentConfirmed)="markPaid(occurrence, $event)"
+                          />
+                        }
+                      </li>
+                    }
+                  </ul>
+                </details>
+              </li>
+            }
+          </ul>
+        }
+
+        @if ($actionError(); as error) {
+          <p class="text-finance-negative text-sm" role="alert">{{ error }}</p>
+        }
+      </section>
+
+      @if ($completedOccurrences().length > 0) {
+        <details class="surface-card p-5 sm:p-6" [open]="$selectedOccurrenceRuleId() !== undefined">
+          <summary class="cursor-pointer font-semibold">
+            Completed occurrences ({{ $completedOccurrences().length }})
+          </summary>
+          <ul class="divide-finance-border mt-3 divide-y">
+            @for (item of $completedOccurrences(); track item.occurrence.id) {
+              @let occurrence = item.occurrence;
+              <li class="flex flex-col gap-3 py-3 text-sm">
+                <div class="flex items-center justify-between gap-3">
+                  <span class="min-w-0 truncate"
+                    >{{ occurrence.name }} · {{ occurrence.payDate }}</span
+                  >
+                  <div class="flex shrink-0 items-center gap-3">
+                    <strong class="tabular-nums">${{ occurrence.amount | number: '1.2-2' }}</strong>
+                    @if ($editingOccurrenceId() !== occurrence.id && !item.isFullyAutomated) {
+                      <button
+                        class="btn-icon btn-icon-edit rounded-control"
+                        [attr.aria-label]="
+                          'Edit payment for ' + occurrence.name + ' on ' + occurrence.statementDate
+                        "
+                        (click)="editOccurrence(occurrence)"
+                        type="button"
+                      >
+                        <svg class="size-4" lucidePencil aria-hidden="true"></svg>
+                      </button>
+                    }
+                  </div>
+                </div>
+                @if ($editingOccurrenceId() === occurrence.id) {
+                  <app-recurring-occurrence-payment
+                    [$occurrence]="occurrence"
+                    [$today]="recurringState.$today()"
+                    [$isEditing]="true"
+                    [$isAmountEditable]="item.isAmountEditable"
+                    [$isPayDateEditable]="item.isPayDateEditable"
+                    [$isSubmitting]="$submittingOccurrenceId() === occurrence.id"
+                    (paymentConfirmed)="markPaid(occurrence, $event)"
+                    (cancelRequested)="cancelOccurrenceEdit()"
+                  />
+                }
+              </li>
+            }
+          </ul>
+        </details>
+      }
+    </div>
+  }
+</app-page-layout>

@@ -8,6 +8,7 @@ import {
 import { FormFieldComponent } from './form-field.component';
 import { MultiSelectComponent } from '../multi-select/multi-select.component';
 import { SegmentedControlComponent } from '../segmented-control/segmented-control.component';
+import { DateInputComponent } from '../date-input/date-input.component';
 // #endregion
 
 // #region Stories
@@ -15,7 +16,11 @@ const meta: Meta<FormFieldComponent> = {
   component: FormFieldComponent,
   decorators: [
     moduleMetadata({
-      imports: [MultiSelectComponent, SegmentedControlComponent],
+      imports: [
+        MultiSelectComponent,
+        SegmentedControlComponent,
+        DateInputComponent,
+      ],
     }),
   ],
   parameters: {
@@ -59,7 +64,7 @@ export const FormField: StoryObj<FormFieldComponent> = {
           <input id="amount" type="number" value="64.25" />
         </app-form-field>
         <app-form-field [$id]="'date-paid'" [$label]="'Date paid'" [$required]="true" [$value]="'2026-11-12'">
-          <input id="date-paid" type="date" value="2026-11-12" />
+          <app-date-input [$id]="'date-paid'" [value]="'2026-11-12'" />
         </app-form-field>
         <app-form-field [$id]="'paid-by'" [$label]="'Paid by'" [$required]="true" [$value]="'alice'">
           <select id="paid-by">
@@ -94,6 +99,12 @@ export const FormField: StoryObj<FormFieldComponent> = {
         </app-form-field>
         <app-form-field [$id]="'note'" [$label]="'Note'" [$value]="'Weekly groceries'">
           <textarea id="note" rows="3">Weekly groceries</textarea>
+        </app-form-field>
+        <app-form-field [$id]="'locked-amount'" [$label]="'Fixed amount'" [$value]="64.25">
+          <input id="locked-amount" type="number" value="64.25" readonly />
+        </app-form-field>
+        <app-form-field [$id]="'disabled-field'" [$label]="'Unavailable field'" [$value]="'Unavailable'">
+          <input id="disabled-field" type="text" value="Unavailable" disabled />
         </app-form-field>
         <div class="flex flex-wrap gap-3 pt-2">
           <button class="btn-primary" type="button">Primary action</button>

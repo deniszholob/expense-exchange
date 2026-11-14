@@ -105,6 +105,40 @@ export const appRoutes: Route[] = [
     ],
     canActivate: [AuthGuard, UserGuard],
   },
+  {
+    path: PageRoute.Recurring,
+    children: [
+      {
+        path: ROUTE_KEYWORDS.ROOT,
+        loadComponent: () =>
+          import('./pages/recurring-page/recurring-page.component').then(
+            (module) => module.RecurringPageComponent,
+          ),
+      },
+      {
+        path: ROUTE_KEYWORDS.NEW_ITEM,
+        loadComponent: () =>
+          import('./pages/recurring-rule-details/recurring-rule-details.component').then(
+            (module) => module.RecurringRuleDetailsComponent,
+          ),
+      },
+      {
+        path: `${ROUTE_KEYWORDS.DETAIL_ITEM}/${ROUTE_KEYWORDS.OCCURRENCES}`,
+        loadComponent: () =>
+          import('./pages/recurring-page/recurring-page.component').then(
+            (module) => module.RecurringPageComponent,
+          ),
+      },
+      {
+        path: ROUTE_KEYWORDS.DETAIL_ITEM,
+        loadComponent: () =>
+          import('./pages/recurring-rule-details/recurring-rule-details.component').then(
+            (module) => module.RecurringRuleDetailsComponent,
+          ),
+      },
+    ],
+    canActivate: [AuthGuard, UserGuard],
+  },
   ...DEV_ROUTE,
   // ======================================================================== //
   // { path: '**', redirectTo: '', pathMatch: 'full' },
