@@ -4,11 +4,11 @@
     @for (account of $accounts(); track account.username) {
       <button
         class="rounded-control border-finance-border bg-finance-canvas/40 hover:border-finance-border-strong hover:bg-finance-raised flex w-full items-center gap-3 border p-3 text-left transition-colors"
-        [class.border-sky-400]="
-          $selectedUsername() === account.username && account.role !== 'Admin'
+        [class.border-finance-accent]="
+          $selectedUsername() === account.username && account.role !== UserRole.Admin
         "
-        [class.border-violet-400]="
-          $selectedUsername() === account.username && account.role === 'Admin'
+        [class.border-finance-muted]="
+          $selectedUsername() === account.username && account.role === UserRole.Admin
         "
         [attr.aria-pressed]="$selectedUsername() === account.username"
         (click)="select(account.username)"
@@ -16,7 +16,8 @@
       >
         <span
           class="profile-monogram size-9 text-sm"
-          [class.profile-monogram-admin]="account.role === 'Admin'"
+          [class.profile-monogram-admin]="account.role === UserRole.Admin"
+          [style.--user-color]="account.color | userColor"
           aria-hidden="true"
           >{{ account.username.slice(0, 1).toUpperCase() }}</span
         >

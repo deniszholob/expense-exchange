@@ -17,7 +17,7 @@
       }
       @if ($rulePendingDeletion(); as rule) {
         <section
-          class="surface-card flex flex-col gap-4 border-amber-300/30 p-5 sm:p-6"
+          class="surface-card flex flex-col gap-4 p-5 sm:p-6"
           role="group"
           aria-labelledby="end-rule-heading"
           aria-describedby="end-rule-description"
@@ -65,7 +65,7 @@
             <span
               class="shrink-0"
               [class.text-finance-positive]="row.isDone"
-              [class.text-sky-300]="!row.isDone"
+              [class.text-finance-accent-hover]="!row.isDone"
               [attr.aria-label]="row.isDone ? 'Done' : 'In progress'"
               [attr.title]="row.isDone ? 'Done' : 'In progress'"
               role="img"
@@ -106,14 +106,22 @@
         <ng-template #beneficiariesCell let-row="row">
           <div class="flex max-w-64 flex-wrap gap-1.5">
             @for (beneficiary of row.beneficiaries; track beneficiary.id) {
-              <span class="participant-badge" [title]="beneficiary.name">
+              <span
+                class="participant-badge"
+                [style.--user-color]="beneficiary.color | userColor"
+                [title]="beneficiary.name"
+              >
                 <span class="truncate">{{ beneficiary.name }}</span>
               </span>
             }
           </div>
         </ng-template>
         <ng-template #targetParticipantCell let-row="row">
-          <span class="participant-badge" [title]="row.targetParticipant">
+          <span
+            class="participant-badge"
+            [style.--user-color]="row.targetParticipantColor | userColor"
+            [title]="row.targetParticipant"
+          >
             <span class="truncate">{{ row.targetParticipant }}</span>
           </span>
         </ng-template>
@@ -226,7 +234,7 @@
             @for (group of $openOccurrenceGroups(); track group.ruleId) {
               <li>
                 <details
-                  class="group rounded-card border-finance-border bg-finance-raised border"
+                  class="group surface-card"
                   [open]="
                     $selectedOccurrenceRuleId() === group.ruleId || group.occurrences.length <= 3
                   "
@@ -268,10 +276,11 @@
                               <span>Expected pay {{ occurrence.payDate }}</span>
                               <span
                                 class="participant-badge"
-                                [title]="displayName(occurrence.targetParticipantId)"
+                                [style.--user-color]="item.targetColor | userColor"
+                                [title]="item.targetName"
                               >
                                 <span class="truncate">
-                                  {{ displayName(occurrence.targetParticipantId) }}
+                                  {{ item.targetName }}
                                 </span>
                               </span>
                               <span>{{ occurrenceState(occurrence) }}</span>

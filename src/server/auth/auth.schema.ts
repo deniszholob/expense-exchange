@@ -2,6 +2,7 @@
 import { z } from 'zod';
 import { AuthAccountSchema } from './auth-account.schema.js';
 import { UserRole } from './user-role.enum.js';
+import { UserColor } from './user-color.enum.js';
 // #endregion
 
 // #region Request Schemas
@@ -15,11 +16,13 @@ export const AuthUserSchema = z.object({
   name: z.string(),
   username: z.string().min(3),
   role: z.enum(UserRole),
+  color: z.enum(UserColor),
 });
 
 export const LoginAccountSchema = z.object({
   username: z.string().min(3),
   role: z.enum(UserRole),
+  color: z.enum(UserColor),
 });
 
 export const AuthStatusSchema = z.object({ setupRequired: z.boolean() });
@@ -54,6 +57,7 @@ export const UpdateProfileSchema = z
     name: z.string().trim().max(100).optional(),
     username: z.string().trim().min(3).max(64),
     password: z.string().max(200).optional(),
+    color: z.enum(UserColor).optional(),
   })
   .refine(
     (value) =>

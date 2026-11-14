@@ -1,15 +1,20 @@
 <app-page-layout>
   @if ($currentUser(); as currentUser) {
     <section class="surface-card mx-auto flex w-full max-w-xl flex-col gap-5 p-5 sm:p-7">
-      <div class="flex items-center gap-3">
+      <div class="flex items-center justify-between gap-4">
+        <app-user-identity
+          [$displayName]="$profileDisplayName()"
+          [$username]="$profileFields().username"
+          [$color]="$selectedColor()"
+          [$isAdmin]="currentUser.role === UserRole.Admin"
+        />
         <span
-          class="profile-monogram size-11 text-base"
-          [class.profile-monogram-admin]="currentUser.role === UserRole.Admin"
-          >{{ currentUser.name | userMonogram }}</span
+          class="participant-badge shrink-0"
+          [style.--user-color]="$selectedColor() | userColor"
+          [attr.aria-label]="'Badge preview for ' + $profileDisplayName()"
         >
-        <div>
-          <p class="font-semibold">{{ currentUser.name }}</p>
-        </div>
+          {{ $profileDisplayName() }}
+        </span>
       </div>
       @if ($dataSource() === DataSource.Local) {
         <div class="border-finance-border border-t pt-4">
@@ -29,19 +34,46 @@
           [$passwordLabel]="'New password'"
           [$passwordPlaceholder]="'Leave blank to keep current password'"
         />
-        @if ($error(); as error) {
-          <p class="text-finance-negative text-sm" role="alert">{{ error }}</p>
-        }
-        @if ($saved()) {
-          <p class="text-finance-positive text-sm" role="status">Profile updated.</p>
-        }
-        <div class="flex flex-wrap gap-2">
-          <button class="btn-primary" (click)="saveProfile()" type="button">Save changes</button>
+      }
+      @if (currentUser.role === UserRole.Admin) {
+        <p class="text-finance-muted text-sm">Administrator monograms use gray.</p>
+      } @else {
+        <fieldset class="border-finance-border flex flex-col gap-3 border-t pt-4">
+          <legend class="font-medium">Profile color</legend>
+          <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
+            @for (color of $userColorOptions; track color) {
+              <button
+                class="rounded-control border-finance-border bg-finance-raised inline-flex w-full items-center gap-2 border px-3 py-2 text-sm transition-colors"
+                [class.border-finance-accent]="$selectedColor() === color"
+                [attr.aria-pressed]="$selectedColor() === color"
+                [style.--user-color]="color | userColor"
+                (click)="selectColor(color)"
+                type="button"
+              >
+                <span
+                  class="size-3 rounded-full"
+                  [style.background-color]="color | userColor"
+                ></span>
+                {{ USER_COLOR_INFO[color].label }}
+              </button>
+            }
+          </div>
+        </fieldset>
+      }
+      @if ($error(); as error) {
+        <p class="text-finance-negative text-sm" role="alert">{{ error }}</p>
+      }
+      @if ($saved()) {
+        <p class="text-finance-positive text-sm" role="status">Profile updated.</p>
+      }
+      <div class="flex flex-wrap gap-2">
+        <button class="btn-primary" (click)="saveProfile()" type="button">Save changes</button>
+        @if ($dataSource() !== DataSource.Local) {
           <button class="btn-danger" (click)="signOut()" type="button">
             <svg class="size-4" lucideLogOut aria-hidden="true"></svg>Sign out
           </button>
-        </div>
-      }
+        }
+      </div>
     </section>
   } @else {
     <section class="surface-card mx-auto w-full max-w-xl p-5">

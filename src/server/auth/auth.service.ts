@@ -8,6 +8,7 @@ import {
 } from 'node:crypto';
 import { promisify } from 'node:util';
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   UnauthorizedException,
@@ -17,6 +18,7 @@ import { AuthRepository } from './auth.repository.js';
 import type { AuthAccount } from './auth-account.schema.js';
 import type { AuthUser, LoginAccount } from './auth.schema.js';
 import { UserRole } from './user-role.enum.js';
+import { UserColor } from './user-color.enum.js';
 // #endregion
 
 // #region Types and Constants
@@ -61,6 +63,7 @@ export class AuthService {
         name: resolvedName,
         username: normalizeUsername(username),
         role: UserRole.Admin,
+        color: UserColor.Gray,
         passwordHash: await hashPassword(password),
       };
       store.accounts.push(account);
@@ -73,9 +76,10 @@ export class AuthService {
   }
 
   public async listLoginAccounts(): Promise<LoginAccount[]> {
-    return (await this.readAccounts()).accounts.map(({ username, role }) => ({
-      username,
-      role,
+    return (await this.readAccounts()).accounts.map((account) => ({
+      username: account.username,
+      role: account.role,
+      color: account.role === UserRole.Admin ? UserColor.Gray : account.color,
     }));
   }
 
@@ -105,6 +109,7 @@ export class AuthService {
         name: name?.trim() || normalizedUsername,
         username: normalizedUsername,
         role: UserRole.User,
+        color: getNextUserColor(store.accounts),
         passwordHash: await hashPassword(password),
       };
       store.accounts.push(account);
@@ -201,6 +206,7 @@ export class AuthService {
     name: string | undefined,
     username: string,
     password: string,
+    color: UserColor | undefined,
   ): Promise<AuthUser> {
     return this.updateAccounts(async (store) => {
       const account = store.accounts.find((entry) => entry.id === userId);
@@ -214,6 +220,12 @@ export class AuthService {
         throw new ConflictException('Username is already in use');
       account.username = normalized;
       if (name !== undefined) account.name = name.trim() || normalized;
+      if (account.role === UserRole.User && color === UserColor.Gray)
+        throw new BadRequestException(
+          'Regular users cannot use the administrator color',
+        );
+      if (account.role === UserRole.User && color !== undefined)
+        account.color = color;
       if (password.length > 0)
         account.passwordHash = await hashPassword(password);
       return publicUser(account);
@@ -287,7 +299,32 @@ function publicUser(account: AuthAccount): AuthUser {
     name: account.name.trim() || account.username,
     username: account.username,
     role: account.role,
+    color: account.role === UserRole.Admin ? UserColor.Gray : account.color,
   };
+}
+
+function getNextUserColor(accounts: readonly AuthAccount[]): UserColor {
+  const choices = [
+    UserColor.Blue,
+    UserColor.Cyan,
+    UserColor.Emerald,
+    UserColor.Amber,
+    UserColor.Rose,
+    UserColor.Violet,
+  ];
+  const colorCounts = new Map<UserColor, number>(
+    choices.map((color) => [color, 0]),
+  );
+  for (const account of accounts) {
+    if (account.role !== UserRole.User) continue;
+    const count = colorCounts.get(account.color);
+    if (count !== undefined) colorCounts.set(account.color, count + 1);
+  }
+  return choices.reduce((leastUsed, color) =>
+    (colorCounts.get(color) ?? 0) < (colorCounts.get(leastUsed) ?? 0)
+      ? color
+      : leastUsed,
+  );
 }
 function normalizeUsername(username: string): string {
   return username.trim().toLowerCase();

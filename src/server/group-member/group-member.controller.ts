@@ -58,7 +58,11 @@ export class GroupMembersController {
         return {
           ...member,
           ...(account
-            ? { name: account.name, username: account.username }
+            ? {
+                name: account.name,
+                username: account.username,
+                color: account.color,
+              }
             : {}),
         };
       });
@@ -80,10 +84,15 @@ export class GroupMembersController {
     const members = await this.members.getMembers();
     if (members.some((member) => member.id === input.data.accountId))
       throw new BadRequestException('This account is already in the group');
-    return this.members.addMember(
+    const member = await this.members.addMember(
       { name: account.name || account.username },
       account.id,
     );
+    return {
+      ...member,
+      username: account.username,
+      color: account.color,
+    };
   }
 
   @Delete(':id')

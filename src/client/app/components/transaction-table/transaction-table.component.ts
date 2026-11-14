@@ -9,13 +9,17 @@ import {
   viewChild,
 } from '@angular/core';
 import type { TemplateRef } from '@angular/core';
-import { TransactionType } from 'src/client/api/generated/expense-exchange-api.schemas';
+import {
+  TransactionType,
+  type UserColor,
+} from 'src/client/api/generated/expense-exchange-api.schemas';
 import { DataTableComponent } from 'src/client/app/components/data-table/data-table.component';
 import type {
   CellTemplateContext,
   ColDef,
   TableRowAction,
 } from 'src/client/app/components/data-table/data-table.model';
+import { UserColorPipe } from 'src/client/app/shared/user-color.pipe';
 // #endregion
 
 // #region Models
@@ -37,6 +41,7 @@ export interface TransactionRow {
 export interface TransactionParticipantBadge {
   readonly id: string;
   readonly name: string;
+  readonly color?: UserColor;
 }
 // #endregion
 
@@ -46,7 +51,7 @@ export interface TransactionParticipantBadge {
   selector: 'app-transaction-table',
   templateUrl: './transaction-table.component.html',
   host: { class: 'contents' },
-  imports: [CurrencyPipe, DataTableComponent],
+  imports: [CurrencyPipe, DataTableComponent, UserColorPipe],
 })
 export class TransactionTableComponent {
   protected readonly TransactionType = TransactionType;

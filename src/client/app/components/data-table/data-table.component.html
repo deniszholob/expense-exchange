@@ -72,7 +72,7 @@
             >
               @if (column.sortable && !$enableRowReordering()) {
                 <button
-                  class="text-finance-muted hover:text-finance-text inline-flex min-h-0 items-center gap-1 px-0 py-0 text-xs font-semibold tracking-wide uppercase transition-colors focus-visible:ring-2 focus-visible:ring-sky-400"
+                  class="text-finance-muted hover:text-finance-text focus-visible:ring-finance-accent inline-flex min-h-0 items-center gap-1 px-0 py-0 text-xs font-semibold tracking-wide uppercase transition-colors focus-visible:ring-2"
                   [attr.aria-label]="'Sort by ' + column.label"
                   (click)="sort(column)"
                   type="button"
@@ -80,9 +80,17 @@
                   {{ column.label }}
                   @if ($sortState()?.key === column.key) {
                     @if ($sortState()?.direction === SortDirection.Ascending) {
-                      <svg class="size-3.5 text-sky-300" lucideArrowUp aria-hidden="true"></svg>
+                      <svg
+                        class="text-finance-accent-hover size-3.5"
+                        lucideArrowUp
+                        aria-hidden="true"
+                      ></svg>
                     } @else {
-                      <svg class="size-3.5 text-sky-300" lucideArrowDown aria-hidden="true"></svg>
+                      <svg
+                        class="text-finance-accent-hover size-3.5"
+                        lucideArrowDown
+                        aria-hidden="true"
+                      ></svg>
                     }
                   } @else {
                     <svg class="size-3.5 opacity-60" lucideArrowDownUp aria-hidden="true"></svg>
@@ -130,7 +138,6 @@
         @if ($data().length > 0) {
           @for (row of $renderRows(); track row.id; let rowIndex = $index) {
             <tr
-              class="hover:bg-finance-hover"
               [cdkDragData]="row.data"
               [cdkDragDisabled]="!$enableRowReordering()"
               [cdkDragPreviewContainer]="'parent'"
@@ -277,7 +284,7 @@
       <label class="inline-flex shrink-0 items-center gap-2 whitespace-nowrap">
         <span>Rows per page</span>
         <select
-          class="rounded-control border-finance-border bg-finance-raised text-finance-text w-16 shrink-0 border px-2 py-1 focus:border-sky-400 focus:ring-2 focus:ring-sky-400/30"
+          class="rounded-control border-finance-border bg-finance-raised text-finance-text focus:border-finance-accent focus:ring-finance-accent/30 w-16 shrink-0 border px-2 py-1 focus:ring-2"
           (change)="setPageSize($event)"
           aria-label="Rows per page"
         >

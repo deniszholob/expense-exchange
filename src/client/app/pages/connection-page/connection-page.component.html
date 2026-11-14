@@ -11,7 +11,7 @@
       @for (source of DATA_SOURCE_INFO_OPTIONS; track source.id) {
         <label
           class="rounded-control border-finance-border bg-finance-canvas/40 hover:border-finance-border-strong hover:bg-finance-raised flex cursor-pointer items-start gap-3 border p-4"
-          [class.border-sky-400]="$draftDataSource() === source.id"
+          [class.border-finance-accent]="$draftDataSource() === source.id"
           [class.bg-finance-accent-soft]="$draftDataSource() === source.id"
         >
           <input

@@ -25,6 +25,7 @@ import {
   type MarkRecurringOccurrencePaidDto,
   type RecurringOccurrenceDto,
   type RecurringRuleDto,
+  type UserColor,
 } from 'src/client/api/generated/expense-exchange-api.schemas';
 import { DataTableComponent } from 'src/client/app/components/data-table/data-table.component';
 import { TableColumnPin } from 'src/client/app/components/data-table/data-table.model';
@@ -42,6 +43,8 @@ import { DataSource } from 'src/client/app/shared/data-source.enum';
 import { getHttpErrorMessage } from 'src/client/app/shared/http-error-message';
 import { RecurringStateService } from 'src/client/app/shared/recurring-state.service';
 import { RecurringOccurrencePaymentComponent } from 'src/client/app/pages/recurring-page/recurring-occurrence-payment/recurring-occurrence-payment.component';
+import { UserColorPipe } from 'src/client/app/shared/user-color.pipe';
+import { getParticipantColor } from 'src/client/app/shared/user-color-info';
 // #endregion
 
 // #region Types and Constants
@@ -51,6 +54,7 @@ interface RecurringRuleRow extends TableBaseData {
   readonly prices: string;
   readonly cadence: string;
   readonly targetParticipant: string;
+  readonly targetParticipantColor?: UserColor;
   readonly paymentMode: string;
   readonly beneficiaries: readonly RecurringBeneficiary[];
   readonly activePeriod: string;
@@ -64,6 +68,7 @@ interface RecurringRuleRow extends TableBaseData {
 interface RecurringBeneficiary {
   readonly id: string;
   readonly name: string;
+  readonly color?: UserColor;
 }
 
 interface OpenOccurrenceGroup {
@@ -74,6 +79,8 @@ interface OpenOccurrenceGroup {
 
 interface RecurringOccurrenceView {
   readonly occurrence: RecurringOccurrenceDto;
+  readonly targetName: string;
+  readonly targetColor?: UserColor;
   readonly isAmountEditable: boolean;
   readonly isPayDateEditable: boolean;
   readonly isFullyAutomated: boolean;
@@ -107,6 +114,7 @@ const RECURRING_RULE_ORDER_STORAGE_KEY =
     LucideChevronDown,
     LucideCircleAlert,
     LucidePencil,
+    UserColorPipe,
   ],
 })
 export class RecurringPageComponent {
@@ -150,7 +158,17 @@ export class RecurringPageComponent {
       .sort((first, second) =>
         first.statementDate.localeCompare(second.statementDate),
       )
-      .map(toOccurrenceView);
+      .map((occurrence) => {
+        const view = toOccurrenceView(occurrence);
+        const participant = this.appService
+          .$participants()
+          .find((item) => item.id === occurrence.targetParticipantId);
+        return {
+          ...view,
+          targetName: participant?.name ?? occurrence.targetParticipantId,
+          targetColor: getParticipantColor(participant),
+        };
+      });
 
     for (const item of openOccurrences) {
       const group = groups.get(item.occurrence.ruleId) ?? [];
@@ -174,7 +192,17 @@ export class RecurringPageComponent {
           (!selectedRuleId || occurrence.ruleId === selectedRuleId),
       )
       .sort((first, second) => second.payDate.localeCompare(first.payDate))
-      .map(toOccurrenceView);
+      .map((occurrence) => {
+        const view = toOccurrenceView(occurrence);
+        const participant = this.appService
+          .$participants()
+          .find((item) => item.id === occurrence.targetParticipantId);
+        return {
+          ...view,
+          targetName: participant?.name ?? occurrence.targetParticipantId,
+          targetColor: getParticipantColor(participant),
+        };
+      });
   });
   protected readonly $ruleRows = computed<readonly RecurringRuleRow[]>(() => {
     const occurrenceCountByRule = new Map<string, number>();
@@ -205,10 +233,20 @@ export class RecurringPageComponent {
         .join('; '),
       cadence: CADENCE_LABELS[rule.cadence],
       targetParticipant: this.displayName(rule.targetParticipantId),
+      targetParticipantColor: getParticipantColor(
+        this.appService
+          .$participants()
+          .find((item) => item.id === rule.targetParticipantId),
+      ),
       paymentMode: rule.isAutopay ? 'Autopay' : 'Manual payment',
       beneficiaries: rule.beneficiaryParticipantIds.map((participantId) => ({
         id: participantId,
         name: this.displayName(participantId),
+        color: getParticipantColor(
+          this.appService
+            .$participants()
+            .find((item) => item.id === participantId),
+        ),
       })),
       activePeriod: rule.endDate
         ? `${rule.prices[0]!.effectiveDate} – ${rule.endDate}`
@@ -485,7 +523,7 @@ function getLocalDate(): string {
 
 function toOccurrenceView(
   occurrence: RecurringOccurrenceDto,
-): RecurringOccurrenceView {
+): Omit<RecurringOccurrenceView, 'targetName' | 'targetColor'> {
   return {
     occurrence,
     isAmountEditable: occurrence.isAmountVariable,

@@ -21,7 +21,9 @@ import {
 import { firstValueFrom } from 'rxjs';
 import {
   UserRole,
+  UserColor,
   type AuthUserDto,
+  type GroupMemberDto,
 } from 'src/client/api/generated/expense-exchange-api.schemas';
 import { AuthService } from 'src/client/api/generated/auth/auth.service';
 import { AppService } from 'src/client/app/app.service';
@@ -30,6 +32,9 @@ import { PageLayoutComponent } from 'src/client/app/layout';
 import { FormFieldComponent } from '../../components/forms/form-field/form-field.component';
 import { AccountFieldsComponent } from '../../components/forms/account-fields/account-fields.component';
 import { getHttpErrorMessage } from '../../shared/http-error-message';
+import { UserColorPipe } from '../../shared/user-color.pipe';
+import { UserMonogramPipe } from '../../shared/user-monogram.pipe';
+import { USER_COLOR_OPTIONS } from '../../shared/user-color-info';
 // #endregion
 
 // #region Component
@@ -47,6 +52,8 @@ import { getHttpErrorMessage } from '../../shared/http-error-message';
     LucidePencil,
     LucideTrash2,
     LucideUserRoundPlus,
+    UserColorPipe,
+    UserMonogramPipe,
   ],
 })
 export class UserManagementPageComponent {
@@ -54,9 +61,13 @@ export class UserManagementPageComponent {
   protected readonly appService = inject(AppService);
   protected readonly DataSource = DataSource;
   protected readonly UserRole = UserRole;
+  protected readonly $userColorOptions = USER_COLOR_OPTIONS;
   protected readonly $accounts = signal<AuthUserDto[]>([]);
   protected readonly $localUsers = this.appService.$availableLocalUsers;
-  protected readonly $localUserData = signal({ name: '' });
+  protected readonly $localUserData = signal<{
+    name: string;
+    color: UserColor | '';
+  }>({ name: '', color: '' });
   protected readonly $localUserForm = form(this.$localUserData, (path) =>
     required(path.name),
   );
@@ -133,18 +144,23 @@ export class UserManagementPageComponent {
     if (this.$localUserForm().invalid()) return;
     const name = this.$localUserData().name.trim();
     if (!name) return;
-    this.appService.upsertLocalAvailableUser({ id: crypto.randomUUID(), name });
-    this.$localUserData.set({ name: '' });
+    const color = this.$localUserData().color;
+    this.appService.upsertLocalAvailableUser({
+      id: crypto.randomUUID(),
+      name,
+      ...(color ? { color } : {}),
+    });
+    this.$localUserData.set({ name: '', color: '' });
   }
 
-  protected startEditingLocalUser(id: string, name: string): void {
-    this.$editingLocalId.set(id);
-    this.$localUserData.set({ name });
+  protected startEditingLocalUser(user: GroupMemberDto): void {
+    this.$editingLocalId.set(user.id);
+    this.$localUserData.set({ name: user.name, color: user.color ?? '' });
   }
 
   protected cancelLocalEditing(): void {
     this.$editingLocalId.set(undefined);
-    this.$localUserData.set({ name: '' });
+    this.$localUserData.set({ name: '', color: '' });
   }
 
   protected saveLocalUser(id: string, event: Event): void {
@@ -152,9 +168,14 @@ export class UserManagementPageComponent {
     if (this.$localUserForm().invalid()) return;
     const name = this.$localUserData().name.trim();
     if (!name) return;
-    this.appService.upsertLocalAvailableUser({ id, name });
+    const color = this.$localUserData().color;
+    this.appService.upsertLocalAvailableUser({
+      id,
+      name,
+      ...(color ? { color } : {}),
+    });
     this.$editingLocalId.set(undefined);
-    this.$localUserData.set({ name: '' });
+    this.$localUserData.set({ name: '', color: '' });
   }
 
   protected deleteLocalUser(id: string): void {

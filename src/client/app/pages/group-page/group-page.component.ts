@@ -26,6 +26,7 @@ import { AppService } from 'src/client/app/app.service';
 import { DataSource } from 'src/client/app/shared/data-source.enum';
 import { PageLayoutComponent } from 'src/client/app/layout';
 import { FormFieldComponent } from '../../components/forms/form-field/form-field.component';
+import { UserIdentityComponent } from '../../components/user-identity/user-identity.component';
 import { UserMonogramPipe } from '../../shared/user-monogram.pipe';
 // #endregion
 
@@ -34,6 +35,7 @@ interface GroupMemberViewModel {
   id: string;
   displayName: string;
   username?: string;
+  color?: AuthUserDto['color'];
 }
 
 interface ExternalParticipantFormValue {
@@ -57,6 +59,7 @@ interface ExternalParticipantFormValue {
     LucideCheck,
     LucideX,
     LucideUsersRound,
+    UserIdentityComponent,
     UserMonogramPipe,
   ],
 })
@@ -72,6 +75,7 @@ export class GroupPageComponent {
       id: member.id,
       displayName: member.name || 'Unknown user',
       username: member.username,
+      color: member.color,
     })),
   );
   private readonly $selection = signal({ accountId: '' });

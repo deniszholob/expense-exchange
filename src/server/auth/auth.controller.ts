@@ -200,7 +200,7 @@ export class AuthController {
   @Post('profile')
   @ApiBody({ type: ProfileUpdateDto })
   @ApiOperation({
-    summary: 'Update the signed-in display name, username, or password',
+    summary: 'Update the signed-in profile name, username, password, or color',
   })
   @ApiOkResponse({ type: AuthUserDto })
   public async updateProfile(
@@ -220,6 +220,7 @@ export class AuthController {
       input.data.name,
       input.data.username,
       input.data.password ?? '',
+      input.data.color,
     );
   }
 

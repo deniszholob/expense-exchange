@@ -17,6 +17,7 @@ import { getEarliestDate } from 'src/client/app/shared/date-range/date-range.uti
 import { UserRole } from 'src/client/api/generated/expense-exchange-api.schemas';
 import { DataSource } from '../../shared/data-source.enum';
 import { UserMonogramPipe } from '../../shared/user-monogram.pipe';
+import { UserColorPipe } from '../../shared/user-color.pipe';
 // #endregion
 
 // #region Implementation
@@ -31,6 +32,7 @@ import { UserMonogramPipe } from '../../shared/user-monogram.pipe';
     NgOptimizedImage,
     DataRangeControlComponent,
     UserMonogramPipe,
+    UserColorPipe,
     RouterModule,
   ],
 })

@@ -9,11 +9,11 @@
 >
   @for (option of $options(); track option.value) {
     <button
-      class="rounded-control min-h-8 px-3 py-1.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:outline-none"
+      class="rounded-control focus-visible:ring-finance-accent min-h-8 px-3 py-1.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none"
       [class.flex-1]="$stretch()"
       [class.text-center]="$stretch()"
-      [class.bg-sky-400/15]="value() === option.value"
-      [class.text-sky-200]="value() === option.value"
+      [class.bg-finance-accent/15]="value() === option.value"
+      [class.text-finance-accent-hover]="value() === option.value"
       [class.text-finance-muted]="value() !== option.value"
       [class.hover:bg-finance-hover]="value() !== option.value"
       [disabled]="option.disabled ?? false"

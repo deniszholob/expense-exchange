@@ -60,10 +60,20 @@ export interface CreateTransactionDto {
   linkedTransactionId?: string;
 }
 
+export enum UserColor {
+  Blue = 'Blue',
+  Cyan = 'Cyan',
+  Emerald = 'Emerald',
+  Amber = 'Amber',
+  Rose = 'Rose',
+  Violet = 'Violet',
+  Gray = 'Gray',
+}
 export interface GroupMemberDto {
   id: string;
   name: string;
   username?: string;
+  color?: UserColor;
 }
 
 export interface AddGroupMemberDto {
@@ -81,6 +91,7 @@ export enum UserRole {
 export interface LoginAccountDto {
   username: string;
   role: UserRole;
+  color: UserColor;
 }
 
 export interface AuthUserDto {
@@ -88,6 +99,7 @@ export interface AuthUserDto {
   name: string;
   username: string;
   role: UserRole;
+  color: UserColor;
 }
 
 export interface CreateAuthAccountDto {
@@ -125,6 +137,7 @@ export interface ProfileUpdateDto {
   name?: string;
   username: string;
   password?: string;
+  color?: UserColor;
 }
 
 export enum RecurringTransactionType {

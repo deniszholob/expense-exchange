@@ -13,6 +13,7 @@ import { AppService } from 'src/client/app/app.service';
 import {
   RecurringTransactionType,
   TransactionType,
+  type UserColor,
 } from 'src/client/api/generated/expense-exchange-api.schemas';
 import { DataRangeService } from 'src/client/app/shared/data-range.service';
 import { RecurringStateService } from 'src/client/app/shared/recurring-state.service';
@@ -25,6 +26,8 @@ import {
   isDateWithinRange,
 } from '../../shared/date-range/date-range.util';
 import { createDashboardRangeSummary } from './dashboard-range-summary.model';
+import { UserColorPipe } from '../../shared/user-color.pipe';
+import { getParticipantColor } from '../../shared/user-color-info';
 // #endregion
 
 // #region Models
@@ -35,6 +38,7 @@ interface DashboardActivity {
   readonly name: string;
   readonly amount: number;
   readonly targetParticipantId: string;
+  readonly targetColor?: UserColor;
   readonly beneficiaryParticipantIds: readonly string[];
   readonly activityDate: string;
 }
@@ -46,7 +50,12 @@ interface DashboardActivity {
   selector: 'app-dashboard-page',
   templateUrl: './dashboard-page.component.html',
   host: { class: 'contents' },
-  imports: [CommonModule, PageLayoutComponent, SegmentedControlComponent],
+  imports: [
+    CommonModule,
+    PageLayoutComponent,
+    SegmentedControlComponent,
+    UserColorPipe,
+  ],
 })
 export class DashboardPageComponent {
   private readonly appService = inject(AppService);
@@ -86,10 +95,7 @@ export class DashboardPageComponent {
   });
   protected readonly $cashFlowActivities = computed(() => {
     const participants = new Map(
-      this.$participants().map((participant) => [
-        participant.id,
-        participant.name,
-      ]),
+      this.$participants().map((participant) => [participant.id, participant]),
     );
     const transactions: DashboardActivity[] = this.appService
       .$transactions()
@@ -125,8 +131,11 @@ export class DashboardPageComponent {
       .map((activity) => ({
         ...activity,
         targetName:
-          participants.get(activity.targetParticipantId) ??
+          participants.get(activity.targetParticipantId)?.name ??
           activity.targetParticipantId,
+        targetColor: getParticipantColor(
+          participants.get(activity.targetParticipantId),
+        ),
       }));
   });
   protected readonly $rangeCashFlowActivities = computed(() => {

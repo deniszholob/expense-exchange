@@ -1,0 +1,16 @@
+<div class="flex min-w-0 items-center gap-3">
+  <span
+    class="profile-monogram size-10 shrink-0 text-sm"
+    [class.profile-monogram-admin]="$isAdmin()"
+    [style.--user-color]="$color() | userColor"
+    aria-hidden="true"
+  >
+    {{ $displayName() | userMonogram }}
+  </span>
+  <div class="min-w-0">
+    <p class="truncate font-medium">{{ $displayName() }}</p>
+    @if ($username()) {
+      <p class="text-finance-muted truncate text-xs">@{{ $username() }}</p>
+    }
+  </div>
+</div>

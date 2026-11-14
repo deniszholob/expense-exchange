@@ -1,5 +1,6 @@
 // #region Imports
 import { z } from 'zod';
+import { UserColor } from '../auth/user-color.enum.js';
 // #endregion
 
 // #region Schemas
@@ -10,6 +11,7 @@ const GroupMemberSchema = z.object({
 
 export const GroupMemberDtoSchema = GroupMemberSchema.extend({
   username: z.string().optional(),
+  color: z.enum(UserColor).optional(),
 });
 
 export const GroupMemberProfileSchema = z.object({ name: z.string() });

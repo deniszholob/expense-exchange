@@ -21,7 +21,11 @@
 </ng-template>
 
 <ng-template #partyCell let-row="row">
-  <span class="participant-badge" [title]="row.party.name">
+  <span
+    class="participant-badge"
+    [style.--user-color]="row.party.color | userColor"
+    [title]="row.party.name"
+  >
     <span class="truncate">{{ row.party.name }}</span>
   </span>
 </ng-template>
@@ -29,7 +33,11 @@
 <ng-template #beneficiariesCell let-row="row">
   <div class="flex max-w-64 flex-wrap gap-1.5">
     @for (beneficiary of row.beneficiaries; track beneficiary.id) {
-      <span class="participant-badge" [title]="beneficiary.name">
+      <span
+        class="participant-badge"
+        [style.--user-color]="beneficiary.color | userColor"
+        [title]="beneficiary.name"
+      >
         <span class="truncate">{{ beneficiary.name }}</span>
       </span>
     }

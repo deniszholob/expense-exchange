@@ -2,6 +2,7 @@
 import {
   RecurringTransactionType,
   TransactionType,
+  type UserColor,
 } from 'src/client/api/generated/expense-exchange-api.schemas';
 import type {
   RecurringOccurrenceDto,
@@ -15,6 +16,7 @@ import { isDateWithinRange } from '../../shared/date-range/date-range.util';
 interface DashboardParticipant {
   id: string;
   name: string;
+  color?: UserColor;
 }
 
 export interface DashboardPaidForShare {

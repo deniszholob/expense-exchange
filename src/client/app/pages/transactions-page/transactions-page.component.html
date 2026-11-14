@@ -6,7 +6,7 @@
         role="status"
       >
         <span
-          class="size-5 animate-spin rounded-full border-2 border-sky-400/30 border-t-sky-300"
+          class="border-finance-accent/30 border-t-finance-accent-hover size-5 animate-spin rounded-full border-2"
         ></span>
         Loading transaction…
       </div>
@@ -69,10 +69,7 @@
       />
     }
     @case (DetailsPageState.ERROR) {
-      <div
-        class="section-container rounded-card border border-rose-400/30 bg-rose-500/10 p-5 text-rose-200"
-        role="alert"
-      >
+      <div class="section-container surface-card p-5 text-rose-200" role="alert">
         <ul class="list-inside list-disc">
           @for (error of $errors(); track $index) {
             <li>{{ error }}</li>

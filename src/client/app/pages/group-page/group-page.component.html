@@ -61,17 +61,11 @@
       <ul class="divide-finance-border divide-y">
         @for (member of $groupMemberRows(); track member.id) {
           <li class="flex items-center justify-between gap-3 py-3 first:pt-0 last:pb-0">
-            <div class="flex min-w-0 items-center gap-3">
-              <span class="profile-monogram size-10 shrink-0 text-sm" aria-hidden="true">
-                {{ member.displayName | userMonogram }}
-              </span>
-              <div class="min-w-0">
-                <p class="truncate font-medium">{{ member.displayName }}</p>
-                @if (member.username) {
-                  <p class="text-finance-muted truncate text-xs">@{{ member.username }}</p>
-                }
-              </div>
-            </div>
+            <app-user-identity
+              [$displayName]="member.displayName"
+              [$username]="member.username"
+              [$color]="member.color"
+            />
             <button
               class="btn-icon btn-danger shrink-0"
               [attr.aria-label]="'Remove ' + member.displayName + ' from group'"

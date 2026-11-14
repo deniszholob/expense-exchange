@@ -7,7 +7,7 @@
           Manage the local people list. Add group members separately from the Group tab.
         </p>
       </div>
-      <form class="flex max-w-xl items-end gap-3" (submit)="addLocalUser($event)">
+      <form class="flex max-w-3xl flex-wrap items-end gap-3" (submit)="addLocalUser($event)">
         <app-form-field
           class="min-w-0 flex-1"
           [$id]="'local-user-name'"
@@ -15,6 +15,14 @@
           [$required]="true"
           ><input id="local-user-name" [formField]="$localUserForm.name" autocomplete="off"
         /></app-form-field>
+        <app-form-field class="w-full sm:w-48" [$id]="'local-user-color'" [$label]="'Badge color'">
+          <select id="local-user-color" [formField]="$localUserForm.color">
+            <option value="">Automatic</option>
+            @for (color of $userColorOptions; track color) {
+              <option [value]="color">{{ color }}</option>
+            }
+          </select>
+        </app-form-field>
         <button class="btn-primary mb-0.5 shrink-0" type="submit">
           <svg class="size-4" lucideUserRoundPlus aria-hidden="true"></svg>Add user
         </button>
@@ -42,18 +50,42 @@
                     [$required]="true"
                     ><input [id]="'edit-local-user-' + user.id" [formField]="$localUserForm.name"
                   /></app-form-field>
+                  <app-form-field
+                    class="w-full sm:w-48"
+                    [$id]="'edit-local-user-color-' + user.id"
+                    [$label]="'Badge color'"
+                  >
+                    <select
+                      [id]="'edit-local-user-color-' + user.id"
+                      [formField]="$localUserForm.color"
+                    >
+                      <option value="">Automatic</option>
+                      @for (color of $userColorOptions; track color) {
+                        <option [value]="color">{{ color }}</option>
+                      }
+                    </select>
+                  </app-form-field>
                   <button class="btn-primary" type="submit">Save</button
                   ><button class="btn-secondary" (click)="cancelLocalEditing()" type="button">
                     Cancel
                   </button>
                 </form>
               } @else {
-                <span class="font-medium">{{ user.name }}</span>
+                <div class="flex min-w-0 items-center gap-3">
+                  <span
+                    class="profile-monogram size-9 text-sm"
+                    [style.--user-color]="user.color | userColor"
+                    aria-hidden="true"
+                  >
+                    {{ user.name | userMonogram }}
+                  </span>
+                  <span class="truncate font-medium">{{ user.name }}</span>
+                </div>
                 <div class="flex gap-2">
                   <button
                     class="btn-icon border-finance-border text-finance-muted hover:bg-finance-raised rounded-control border"
                     [attr.aria-label]="'Edit ' + user.name"
-                    (click)="startEditingLocalUser(user.id, user.name)"
+                    (click)="startEditingLocalUser(user)"
                     type="button"
                   >
                     <svg class="size-4" lucidePencil aria-hidden="true"></svg>
@@ -142,11 +174,21 @@
                   </div>
                 </form>
               } @else {
-                <div>
-                  <p class="font-medium">{{ account.name || account.username }}</p>
-                  <p class="text-finance-muted text-xs">
-                    {{ account.username }} · {{ account.role }}
-                  </p>
+                <div class="flex min-w-0 items-center gap-3">
+                  <span
+                    class="profile-monogram size-9 text-sm"
+                    [class.profile-monogram-admin]="account.role === UserRole.Admin"
+                    [style.--user-color]="account.color | userColor"
+                    aria-hidden="true"
+                  >
+                    {{ account.name || account.username | userMonogram }}
+                  </span>
+                  <div class="min-w-0">
+                    <p class="truncate font-medium">{{ account.name || account.username }}</p>
+                    <p class="text-finance-muted truncate text-xs">
+                      {{ account.username }} · {{ account.role }}
+                    </p>
+                  </div>
                 </div>
                 @if (account.role !== UserRole.Admin) {
                   <div class="flex gap-2">

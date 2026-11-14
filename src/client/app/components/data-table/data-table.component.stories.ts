@@ -151,7 +151,7 @@ export const CustomCellRenderer: StoryObj<ComponentWithCustomControls> = {
     props: args,
     template: `
       <ng-template #statusRenderer let-value="value">
-        <span class="rounded-control border-finance-border inline-flex border px-2 py-1 text-xs text-sky-200">
+        <span class="rounded-control border-finance-border inline-flex border px-2 py-1 text-xs text-finance-accent-hover">
           {{ value }}
         </span>
       </ng-template>

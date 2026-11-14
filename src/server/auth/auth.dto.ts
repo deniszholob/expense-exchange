@@ -1,6 +1,7 @@
 // #region Imports
 import { ApiProperty } from '@nestjs/swagger';
 import { UserRole } from './user-role.enum.js';
+import { UserColor } from './user-color.enum.js';
 import type {
   AdminSetup,
   AuthResponse,
@@ -21,10 +22,14 @@ export class AuthUserDto implements AuthUser {
   @ApiProperty() public name!: string;
   @ApiProperty() public username!: string;
   @ApiProperty({ enum: UserRole, enumName: 'UserRole' }) public role!: UserRole;
+  @ApiProperty({ enum: UserColor, enumName: 'UserColor' })
+  public color!: UserColor;
 }
 export class LoginAccountDto implements LoginAccount {
   @ApiProperty() public username!: string;
   @ApiProperty({ enum: UserRole, enumName: 'UserRole' }) public role!: UserRole;
+  @ApiProperty({ enum: UserColor, enumName: 'UserColor' })
+  public color!: UserColor;
 }
 export class AuthStatusDto implements AuthStatus {
   @ApiProperty() public setupRequired!: boolean;
@@ -43,6 +48,8 @@ export class ProfileUpdateDto implements ProfileUpdate {
   @ApiProperty({ required: false }) public name?: string;
   @ApiProperty() public username!: string;
   @ApiProperty({ required: false }) public password?: string;
+  @ApiProperty({ enum: UserColor, enumName: 'UserColor', required: false })
+  public color?: UserColor;
 }
 export class CreateAuthAccountDto
   extends CredentialsDto

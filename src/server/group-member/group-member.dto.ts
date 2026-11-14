@@ -1,5 +1,6 @@
 // #region Imports
 import { ApiProperty } from '@nestjs/swagger';
+import { UserColor } from '../auth/user-color.enum.js';
 import type {
   AddGroupMember,
   GroupMemberDtoModel,
@@ -17,6 +18,9 @@ export class GroupMemberDto implements GroupMemberDtoModel {
 
   @ApiProperty({ required: false })
   public username?: string;
+
+  @ApiProperty({ enum: UserColor, enumName: 'UserColor', required: false })
+  public color?: UserColor;
 }
 
 export class GroupMemberProfileDto implements GroupMemberProfile {

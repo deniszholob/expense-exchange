@@ -44,6 +44,7 @@ import {
   getSessionFormDraftKey,
   removeSessionFormDraft,
 } from 'src/client/app/shared/session-form-draft';
+import { getParticipantColor } from 'src/client/app/shared/user-color-info';
 // #endregion
 
 // #region Component
@@ -144,11 +145,13 @@ export class TransactionsPageComponent extends DetailsPageDirective {
         party: {
           id: transaction.targetParticipantId,
           name: targetParticipant?.name ?? transaction.targetParticipantId,
+          color: getParticipantColor(targetParticipant),
         },
         beneficiaries: transaction.beneficiaryParticipantIds.map(
           (participantId) => ({
             id: participantId,
             name: participants.get(participantId)?.name ?? participantId,
+            color: getParticipantColor(participants.get(participantId)),
           }),
         ),
         date: transaction.postDate,
