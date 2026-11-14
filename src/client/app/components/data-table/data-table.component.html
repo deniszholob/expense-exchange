@@ -141,7 +141,7 @@
               [cdkDragData]="row.data"
               [cdkDragDisabled]="!$enableRowReordering()"
               [cdkDragPreviewContainer]="'parent'"
-              [class.bg-finance-raised/30]="$striped() && rowIndex % 2 === 1"
+              [class.table-row-striped]="$striped() && rowIndex % 2 === 1"
               cdkDrag
             >
               @if ($enableRowReordering()) {
