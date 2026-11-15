@@ -14,7 +14,10 @@ import type {
   RecurringOccurrenceDto,
 } from 'src/client/api/generated/expense-exchange-api.schemas';
 import { DateInputComponent } from 'src/client/app/components/forms/date-input/date-input.component';
-import { FormFieldComponent } from 'src/client/app/components/forms/form-field/form-field.component';
+import {
+  FormFieldComponent,
+  FormFieldIcon,
+} from 'src/client/app/components/forms/form-field/form-field.component';
 // #endregion
 
 // #region Component
@@ -26,6 +29,7 @@ import { FormFieldComponent } from 'src/client/app/components/forms/form-field/f
   imports: [FormField, FormFieldComponent, DateInputComponent, LucideCheck],
 })
 export class RecurringOccurrencePaymentComponent {
+  protected readonly FormFieldIcon = FormFieldIcon;
   public readonly $occurrence = input.required<RecurringOccurrenceDto>();
   public readonly $isSubmitting = input(false);
   public readonly $isEditing = input(false);

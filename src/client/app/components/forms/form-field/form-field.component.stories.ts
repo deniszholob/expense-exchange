@@ -5,7 +5,7 @@ import {
   TransactionScope,
   TRANSACTION_SCOPE_INFO_OPTIONS,
 } from 'src/client/app/shared/transaction-scope.enum';
-import { FormFieldComponent } from './form-field.component';
+import { FormFieldComponent, FormFieldIcon } from './form-field.component';
 import { MultiSelectComponent } from '../multi-select/multi-select.component';
 import { SegmentedControlComponent } from '../segmented-control/segmented-control.component';
 import { DateInputComponent } from '../date-input/date-input.component';
@@ -48,25 +48,26 @@ export const FormField: StoryObj<FormFieldComponent> = {
         label: display,
       })),
       selectedScope: TransactionScope.Group,
+      FormFieldIcon,
     },
     template: `
       <div class="mx-auto flex w-full max-w-xl flex-col gap-5 p-5">
-        <app-form-field [$id]="'expense-name'" [$label]="'Expense name'" [$required]="true" [$value]="'Groceries'">
+        <app-form-field [$id]="'expense-name'" [$label]="'Expense name'" [$required]="true" [$value]="'Groceries'" [$icon]="FormFieldIcon.Tag">
           <input id="expense-name" type="text" value="Groceries" />
         </app-form-field>
-        <app-form-field [$id]="'server-url'" [$label]="'Remote API server URL'" [$value]="'http://localhost:3000'">
+        <app-form-field [$id]="'server-url'" [$label]="'Remote API server URL'" [$value]="'http://localhost:3000'" [$icon]="FormFieldIcon.Link2">
           <input id="server-url" type="url" value="http://localhost:3000" />
         </app-form-field>
         <app-form-field [$id]="'password'" [$label]="'Password'" [$required]="true" [$value]="'sample-password'">
           <input id="password" type="password" value="sample-password" />
         </app-form-field>
-        <app-form-field [$id]="'amount'" [$label]="'Amount (USD)'" [$required]="true" [$value]="64.25">
+        <app-form-field [$id]="'amount'" [$label]="'Amount'" [$required]="true" [$value]="64.25" [$icon]="FormFieldIcon.DollarSign">
           <input id="amount" type="number" value="64.25" />
         </app-form-field>
-        <app-form-field [$id]="'date-paid'" [$label]="'Date paid'" [$required]="true" [$value]="'2026-11-12'">
+        <app-form-field [$id]="'date-paid'" [$label]="'Date paid'" [$required]="true" [$value]="'2026-11-12'" [$icon]="FormFieldIcon.CalendarDays">
           <app-date-input [$id]="'date-paid'" [value]="'2026-11-12'" />
         </app-form-field>
-        <app-form-field [$id]="'paid-by'" [$label]="'Paid by'" [$required]="true" [$value]="'alice'">
+        <app-form-field [$id]="'paid-by'" [$label]="'Paid by'" [$required]="true" [$value]="'alice'" [$icon]="FormFieldIcon.UserRound">
           <select id="paid-by">
             <option value="alice" selected>Alice</option>
             <option value="bob">Bob</option>
@@ -97,7 +98,7 @@ export const FormField: StoryObj<FormFieldComponent> = {
             </label>
           </fieldset>
         </app-form-field>
-        <app-form-field [$id]="'note'" [$label]="'Note'" [$value]="'Weekly groceries'">
+        <app-form-field [$id]="'note'" [$label]="'Note'" [$value]="'Weekly groceries'" [$icon]="FormFieldIcon.Pencil">
           <textarea id="note" rows="3">Weekly groceries</textarea>
         </app-form-field>
         <app-form-field [$id]="'locked-amount'" [$label]="'Fixed amount'" [$value]="64.25">

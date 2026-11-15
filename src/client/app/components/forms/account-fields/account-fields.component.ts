@@ -1,7 +1,10 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { FormField, type Field } from '@angular/forms/signals';
-import { FormFieldComponent } from '../form-field/form-field.component';
+import {
+  FormFieldComponent,
+  FormFieldIcon,
+} from '../form-field/form-field.component';
 // #endregion
 
 // #region Component
@@ -13,6 +16,7 @@ import { FormFieldComponent } from '../form-field/form-field.component';
   imports: [FormField, FormFieldComponent],
 })
 export class AccountFieldsComponent {
+  protected readonly FormFieldIcon = FormFieldIcon;
   public readonly $idPrefix = input.required<string>();
   public readonly $nameField = input.required<Field<string>>();
   public readonly $usernameField = input.required<Field<string>>();

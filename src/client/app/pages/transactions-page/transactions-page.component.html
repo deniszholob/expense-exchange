@@ -69,7 +69,7 @@
       />
     }
     @case (DetailsPageState.ERROR) {
-      <div class="section-container surface-card p-5 text-rose-200" role="alert">
+      <div class="section-container surface-card text-finance-negative p-5" role="alert">
         <ul class="list-inside list-disc">
           @for (error of $errors(); track $index) {
             <li>{{ error }}</li>

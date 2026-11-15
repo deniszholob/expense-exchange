@@ -51,13 +51,13 @@
     <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
     <link rel="apple-touch-startup-image" href="assets/expense-exchange-splash.png" />
-    <link rel="mask-icon" href="safari-pinned-tab.svg" color="#111315" />
-    <meta name="msapplication-TileColor" content="#111315" />
+    <link rel="mask-icon" href="safari-pinned-tab.svg" color="#15191B" />
+    <meta name="msapplication-TileColor" content="#15191B" />
     <base href="/" />
 
     <!-- PWA -->
     <link rel="manifest" href="manifest.webmanifest" />
-    <meta name="theme-color" content="#111315" />
+    <meta name="theme-color" content="#15191B" />
 
     <!-- Meta Tags Generated via http://heymeta.com -->
 
@@ -75,20 +75,128 @@
     <!-- <link rel="stylesheet" href="https://fonts.googleapis.com/css?"> -->
     <!-- Stylesheets -->
     <style>
+      .app-loading-screen {
+        box-sizing: border-box;
+        display: grid;
+        min-height: 100vh;
+        min-height: 100svh;
+        place-items: center;
+        padding: 24px;
+        color: var(--color-finance-text, #f1f3f2);
+        background:
+          radial-gradient(
+            ellipse at 50% 0%,
+            color-mix(in srgb, var(--color-finance-accent, #83b487) 10%, transparent),
+            transparent 58%
+          ),
+          var(--color-finance-canvas, #15191b);
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+      }
+      .app-loading-panel {
+        box-sizing: border-box;
+        width: min(100%, 440px);
+        padding: 32px;
+        border: 1px solid color-mix(in srgb, var(--color-finance-border, #3c4547) 75%, transparent);
+        border-radius: 14px;
+        background: linear-gradient(
+          150deg,
+          var(--color-finance-surface-highlight, #242a2c),
+          var(--color-finance-surface, #1d2224) 55%,
+          var(--color-finance-surface-lowlight, #1a1f21)
+        );
+        box-shadow: 0 24px 64px rgb(0 0 0 / 24%);
+        text-align: center;
+      }
+      .app-loading-mark {
+        display: grid;
+        width: 52px;
+        height: 52px;
+        margin: 0 auto 18px;
+        place-items: center;
+        border: 1px solid color-mix(in srgb, var(--color-finance-accent, #83b487) 30%, transparent);
+        border-radius: 14px;
+        background: color-mix(
+          in srgb,
+          var(--color-finance-accent, #83b487) 12%,
+          var(--color-finance-raised, #242a2c)
+        );
+      }
+      .app-loading-mark img {
+        width: 32px;
+        height: 32px;
+        object-fit: contain;
+      }
+      .app-loading-title {
+        margin: 0;
+        font-size: 1.35rem;
+        font-weight: 600;
+        letter-spacing: -0.025em;
+      }
+      .app-loading-status {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin: 18px 0 0;
+        color: var(--color-finance-accent-text, #acdbaf);
+        font-size: 0.95rem;
+        font-weight: 500;
+      }
       .app-loading-spinner {
         display: inline-block;
-        width: 18px;
-        height: 18px;
-        margin-right: 6px;
-        border: 2px solid rgba(255, 255, 255, 0.25);
-        border-top-color: rgba(255, 255, 255, 0.9);
+        width: 16px;
+        height: 16px;
+        border: 2px solid color-mix(in srgb, var(--color-finance-accent, #83b487) 22%, transparent);
+        border-top-color: var(--color-finance-accent-hover, #9bcb9e);
         border-radius: 9999px;
         animation: app-spin 0.9s linear infinite;
-        vertical-align: text-bottom;
+        flex: 0 0 auto;
       }
       @keyframes app-spin {
         to {
           transform: rotate(360deg);
+        }
+      }
+      .app-loading-help {
+        margin-top: 24px;
+        padding-top: 18px;
+        border-top: 1px solid
+          color-mix(in srgb, var(--color-finance-border, #3c4547) 58%, transparent);
+        color: var(--color-finance-secondary, #b0b9b7);
+        font-size: 0.82rem;
+        line-height: 1.6;
+      }
+      .app-loading-help p {
+        margin: 0;
+      }
+      .app-loading-help a {
+        color: var(--color-finance-accent-text, #acdbaf);
+        text-decoration: underline;
+        text-decoration-color: color-mix(
+          in srgb,
+          var(--color-finance-accent, #83b487) 55%,
+          transparent
+        );
+        text-underline-offset: 3px;
+      }
+      .app-loading-build {
+        display: inline-flex;
+        gap: 6px;
+        margin: 20px 0 0;
+        padding: 5px 9px;
+        border: 1px solid color-mix(in srgb, var(--color-finance-border, #3c4547) 55%, transparent);
+        border-radius: 9999px;
+        color: var(--color-finance-muted, #8d9996);
+        font-size: 0.7rem;
+        font-variant-numeric: tabular-nums;
+      }
+      .app-loading-build strong {
+        color: var(--color-finance-secondary, #b0b9b7);
+        font-weight: 500;
+      }
+      @media (max-width: 480px) {
+        .app-loading-panel {
+          padding: 28px 22px;
         }
       }
     </style>
@@ -96,30 +204,33 @@
 
   <body>
     <app-root>
-      <div style="text-align: center; padding-top: 20px">
-        <span class="app-loading-spinner" aria-hidden="true"></span>
-        Loading...
-
-        <p>
-          If this is loading forever, there may be a bug.
-          <br />
-          Hit <strong>F12</strong> to bring up the Debug console, and
-          <a
-            href="https://github.com/deniszholob/expense-exchange/issues"
-            target="_blank"
-            rel="noopener"
-          >
-            report
-          </a>
-          any errors.
-        </p>
-        <br />
-        <p class="text-muted">
-          <span>
-            <strong>Build: </strong>
-            {{BUILD_VERSION}} - {{BUILD_DATE}}
-          </span>
-        </p>
+      <div class="app-loading-screen" aria-busy="true">
+        <section class="app-loading-panel" aria-labelledby="app-loading-title">
+          <div class="app-loading-mark" aria-hidden="true">
+            <img src="assets/expense-exchange-icon.png" alt="" width="32" height="32" />
+          </div>
+          <h1 class="app-loading-title" id="app-loading-title">Expense Exchange</h1>
+          <p class="app-loading-status" role="status">
+            <span class="app-loading-spinner" aria-hidden="true"></span>
+            Loading your workspace…
+          </p>
+          <div class="app-loading-help">
+            <p>If this takes longer than expected, there may be a problem.</p>
+            <p>
+              Open the Debug console with <strong>F12</strong> and
+              <a
+                href="https://github.com/deniszholob/expense-exchange/issues"
+                target="_blank"
+                rel="noopener"
+                >report any errors</a
+              >.
+            </p>
+          </div>
+          <p class="app-loading-build">
+            <strong>Build</strong>
+            <span>{{BUILD_VERSION}} · {{BUILD_DATE}}</span>
+          </p>
+        </section>
       </div>
     </app-root>
 

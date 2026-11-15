@@ -9,13 +9,25 @@
 >
   @for (option of $options(); track option.value) {
     <button
-      class="rounded-control focus-visible:ring-finance-accent min-h-8 px-3 py-1.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none"
+      class="segmented-control-option focus-visible:ring-finance-accent min-h-8 px-3 py-1.5 text-sm focus-visible:ring-2 focus-visible:outline-none"
       [class.flex-1]="$stretch()"
       [class.text-center]="$stretch()"
-      [class.bg-finance-accent/15]="value() === option.value"
-      [class.text-finance-accent-hover]="value() === option.value"
+      [class.segmented-control-option--active]="value() === option.value"
+      [class.segmented-control-option--accent]="
+        value() === option.value &&
+        (option.tone === undefined || option.tone === SegmentedControlTone.Accent)
+      "
       [class.text-finance-muted]="value() !== option.value"
       [class.hover:bg-finance-hover]="value() !== option.value"
+      [class.segmented-control-option--negative]="
+        value() === option.value && option.tone === SegmentedControlTone.Negative
+      "
+      [class.segmented-control-option--positive]="
+        value() === option.value && option.tone === SegmentedControlTone.Positive
+      "
+      [class.segmented-control-option--warning]="
+        value() === option.value && option.tone === SegmentedControlTone.Warning
+      "
       [disabled]="option.disabled ?? false"
       [attr.aria-pressed]="value() === option.value"
       (click)="value.set(option.value)"

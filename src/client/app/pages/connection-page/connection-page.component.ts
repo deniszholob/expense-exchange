@@ -27,7 +27,10 @@ import {
   saveConfiguredRemoteApiUrl,
 } from 'src/client/app/shared/remote-api-config';
 import { RemoteApiHealthProbeService } from 'src/client/app/shared/remote-api-health-probe.service';
-import { FormFieldComponent } from '../../components/forms/form-field/form-field.component';
+import {
+  FormFieldComponent,
+  FormFieldIcon,
+} from '../../components/forms/form-field/form-field.component';
 import { PageRoute } from '../../app.info';
 // #endregion
 
@@ -40,6 +43,7 @@ import { PageRoute } from '../../app.info';
   imports: [CommonModule, PageLayoutComponent, FormField, FormFieldComponent],
 })
 export class ConnectionPageComponent {
+  protected readonly FormFieldIcon = FormFieldIcon;
   protected readonly appService = inject(AppService);
   protected readonly DataSource = DataSource;
   protected readonly DATA_SOURCE_INFO_OPTIONS = DATA_SOURCE_INFO_OPTIONS;

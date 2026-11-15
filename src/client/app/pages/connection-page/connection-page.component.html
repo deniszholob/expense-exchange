@@ -10,9 +10,8 @@
       <legend class="sr-only">Choose data source</legend>
       @for (source of DATA_SOURCE_INFO_OPTIONS; track source.id) {
         <label
-          class="rounded-control border-finance-border bg-finance-canvas/40 hover:border-finance-border-strong hover:bg-finance-raised flex cursor-pointer items-start gap-3 border p-4"
-          [class.border-finance-accent]="$draftDataSource() === source.id"
-          [class.bg-finance-accent-soft]="$draftDataSource() === source.id"
+          class="choice-card flex cursor-pointer items-start gap-3 p-4"
+          [class.data-source-option-selected]="$draftDataSource() === source.id"
         >
           <input
             class="mt-0.5"
@@ -35,12 +34,13 @@
     </fieldset>
 
     @if ($draftDataSource() === DataSource.RemoteApi) {
-      <div class="border-finance-border grid grid-cols-1 gap-4 border-t pt-5 md:grid-cols-2">
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div class="min-w-0">
           <app-form-field
             [$id]="'remoteApi'"
             [$label]="'Remote API server URL'"
             [$value]="$remoteApiUrl()"
+            [$icon]="FormFieldIcon.Link2"
             (clearRequested)="clearApiUrl()"
           >
             <input
@@ -57,39 +57,39 @@
           @if ($selectionDirty()) {
             @if ($draftApiHealth() === 'checking') {
               <p class="text-finance-muted mt-2 flex items-center gap-2 text-sm" role="status">
-                <span class="size-2 animate-pulse rounded-full bg-amber-400"></span>
+                <span class="status-indicator status-indicator-checking"></span>
                 Checking API health…
               </p>
             } @else if ($draftApiHealth() === 'healthy') {
               <p class="text-finance-positive mt-2 flex items-center gap-2 text-sm" role="status">
-                <span class="size-2 rounded-full bg-emerald-400"></span> API is reachable.
+                <span class="status-indicator status-indicator-healthy"></span> API is reachable.
               </p>
             } @else if ($draftApiHealth() === 'unavailable') {
               <p class="text-finance-negative mt-2 flex items-center gap-2 text-sm" role="alert">
-                <span class="size-2 rounded-full bg-rose-400"></span>
+                <span class="status-indicator status-indicator-error"></span>
                 {{ $draftApiHealthError() ?? 'Unable to reach the selected API.' }}
               </p>
             }
           } @else if (appService.$dataSource() === DataSource.RemoteApi) {
             @if (!$authStatusReady()) {
               <p class="text-finance-muted mt-2 flex items-center gap-2 text-sm" role="status">
-                <span class="size-2 animate-pulse rounded-full bg-amber-400"></span>
+                <span class="status-indicator status-indicator-checking"></span>
                 Checking API health…
               </p>
             } @else if ($apiHealthy()) {
               <p class="text-finance-positive mt-2 flex items-center gap-2 text-sm" role="status">
-                <span class="size-2 rounded-full bg-emerald-400"></span> API is reachable.
+                <span class="status-indicator status-indicator-healthy"></span> API is reachable.
               </p>
             } @else {
               <p class="text-finance-negative mt-2 flex items-center gap-2 text-sm" role="alert">
-                <span class="size-2 rounded-full bg-rose-400"></span>
+                <span class="status-indicator status-indicator-error"></span>
                 {{ $authError() ?? 'Unable to reach the selected API.' }}
               </p>
             }
           }
         </div>
         <aside
-          class="rounded-control border-finance-border bg-finance-canvas/40 min-w-0 border p-4"
+          class="rounded-control border-finance-border/45 bg-finance-canvas/25 min-w-0 border p-4"
         >
           <h3 class="text-sm font-medium">Previous server URLs</h3>
           @if ($remoteApiUrlHistory().length === 0) {
@@ -99,7 +99,7 @@
               @for (url of $remoteApiUrlHistory(); track url) {
                 <li>
                   <button
-                    class="rounded-control border-finance-border bg-finance-surface hover:bg-finance-raised w-full truncate border px-3 py-2 text-left text-sm transition-colors"
+                    class="border-finance-border/45 bg-finance-raised/60 hover:bg-finance-hover w-full justify-start truncate border px-3 py-2 text-left text-sm"
                     [attr.title]="url"
                     [attr.aria-label]="'Use server URL ' + url"
                     (click)="selectRecentApiUrl(url)"
@@ -114,7 +114,9 @@
         </aside>
       </div>
     } @else {
-      <div class="border-finance-border flex flex-col gap-3 border-t pt-5 sm:flex-row sm:items-end">
+      <div
+        class="border-finance-border/40 flex flex-col gap-3 border-t pt-5 sm:flex-row sm:items-end"
+      >
         <div class="flex-1">
           <label class="text-finance-muted mb-2 block text-sm" for="local-file"
             >Load local data file</label
@@ -131,7 +133,7 @@
         </button>
       </div>
     }
-    <div class="border-finance-border flex justify-end border-t pt-4">
+    <div class="border-finance-border/40 flex justify-end border-t pt-4">
       <button class="btn-primary" (click)="saveSelection()" type="button">
         Save data selection
       </button>
@@ -171,10 +173,17 @@
           class="mx-auto grid w-full max-w-4xl grid-cols-1 gap-5 md:grid-cols-2"
           (submit)="submitAdminSetup($event)"
         >
-          <app-form-field [$id]="'admin-name'" [$label]="'Display name'"
+          <app-form-field
+            [$id]="'admin-name'"
+            [$label]="'Display name'"
+            [$icon]="FormFieldIcon.UserRound"
             ><input id="admin-name" [formField]="$authForm.name" autocomplete="name"
           /></app-form-field>
-          <app-form-field [$id]="'admin-username'" [$label]="'Username'" [$required]="true"
+          <app-form-field
+            [$id]="'admin-username'"
+            [$label]="'Username'"
+            [$required]="true"
+            [$icon]="FormFieldIcon.UserRound"
             ><input id="admin-username" [formField]="$authForm.username" autocomplete="username"
           /></app-form-field>
           <app-form-field [$id]="'admin-password'" [$label]="'Password'" [$required]="true"

@@ -21,6 +21,7 @@ import { form, maxLength, minLength, required } from '@angular/forms/signals';
 import { AccountFieldsComponent } from '../../components/forms/account-fields/account-fields.component';
 import { UserIdentityComponent } from '../../components/user-identity/user-identity.component';
 import { DataSource } from '../../shared/data-source.enum';
+import { UserMonogramPipe } from '../../shared/user-monogram.pipe';
 import {
   USER_COLOR_INFO,
   USER_COLOR_OPTIONS,
@@ -39,6 +40,7 @@ import { UserColorPipe } from '../../shared/user-color.pipe';
     PageLayoutComponent,
     LucideLogOut,
     UserColorPipe,
+    UserMonogramPipe,
     AccountFieldsComponent,
     UserIdentityComponent,
   ],

@@ -13,12 +13,12 @@ export interface UserColorInfo {
 }
 
 export const USER_COLOR_INFO: Record<UserColor, UserColorInfo> = {
-  [UserColor.Blue]: { label: 'Blue', value: 'var(--color-blue-300)' },
-  [UserColor.Cyan]: { label: 'Cyan', value: 'var(--color-cyan-300)' },
-  [UserColor.Emerald]: { label: 'Teal', value: 'var(--color-teal-300)' },
-  [UserColor.Amber]: { label: 'Indigo', value: 'var(--color-indigo-300)' },
-  [UserColor.Rose]: { label: 'Violet', value: 'var(--color-violet-300)' },
-  [UserColor.Violet]: { label: 'Fuchsia', value: 'var(--color-fuchsia-300)' },
+  [UserColor.Blue]: { label: 'Blue', value: '#7089aa' },
+  [UserColor.Cyan]: { label: 'Cyan', value: '#6a9aa8' },
+  [UserColor.Emerald]: { label: 'Teal', value: '#75947e' },
+  [UserColor.Amber]: { label: 'Amber', value: '#a79265' },
+  [UserColor.Rose]: { label: 'Rose', value: '#a7787b' },
+  [UserColor.Violet]: { label: 'Violet', value: '#857da3' },
   [UserColor.Gray]: { label: 'Gray', value: 'var(--color-zinc-400)' },
 };
 

@@ -29,7 +29,10 @@ import { AuthService } from 'src/client/api/generated/auth/auth.service';
 import { AppService } from 'src/client/app/app.service';
 import { DataSource } from 'src/client/app/shared/data-source.enum';
 import { PageLayoutComponent } from 'src/client/app/layout';
-import { FormFieldComponent } from '../../components/forms/form-field/form-field.component';
+import {
+  FormFieldComponent,
+  FormFieldIcon,
+} from '../../components/forms/form-field/form-field.component';
 import { AccountFieldsComponent } from '../../components/forms/account-fields/account-fields.component';
 import { getHttpErrorMessage } from '../../shared/http-error-message';
 import { UserColorPipe } from '../../shared/user-color.pipe';
@@ -57,6 +60,7 @@ import { USER_COLOR_OPTIONS } from '../../shared/user-color-info';
   ],
 })
 export class UserManagementPageComponent {
+  protected readonly FormFieldIcon = FormFieldIcon;
   private readonly authApi = inject(AuthService);
   protected readonly appService = inject(AppService);
   protected readonly DataSource = DataSource;

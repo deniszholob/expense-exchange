@@ -25,7 +25,10 @@ import {
   type CreateRecurringRuleDto,
   type RecurringRuleDto,
 } from 'src/client/api/generated/expense-exchange-api.schemas';
-import { FormFieldComponent } from 'src/client/app/components/forms/form-field/form-field.component';
+import {
+  FormFieldComponent,
+  FormFieldIcon,
+} from 'src/client/app/components/forms/form-field/form-field.component';
 import { DateInputComponent } from 'src/client/app/components/forms/date-input/date-input.component';
 import { MultiSelectComponent } from 'src/client/app/components/forms/multi-select/multi-select.component';
 import { SegmentedControlComponent } from 'src/client/app/components/forms/segmented-control/segmented-control.component';
@@ -105,6 +108,7 @@ const AUTOPAY_OPTIONS = [
   ],
 })
 export class RecurringRuleDetailsComponent {
+  protected readonly FormFieldIcon = FormFieldIcon;
   protected readonly appService = inject(AppService);
   protected readonly recurringState = inject(RecurringStateService);
   private readonly route = inject(ActivatedRoute);

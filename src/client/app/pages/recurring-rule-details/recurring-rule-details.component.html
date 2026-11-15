@@ -41,10 +41,7 @@
       }
 
       @if ($isEditing() && $existingOccurrenceCount() > 0) {
-        <aside
-          class="rounded-control border border-amber-300/30 bg-amber-300/10 p-3 text-sm text-amber-100"
-          role="note"
-        >
+        <aside class="callout-warning rounded-control border p-3 text-sm" role="note">
           <strong>Changes affect existing occurrences.</strong>
           <span class="ml-1">
             Price, frequency, date, and autopay edits can add or remove past entries, replace
@@ -73,7 +70,12 @@
               [$stretch]="true"
             />
           </app-form-field>
-          <app-form-field [$id]="'recurring-name'" [$label]="'Name'" [$required]="true">
+          <app-form-field
+            [$id]="'recurring-name'"
+            [$label]="'Name'"
+            [$required]="true"
+            [$icon]="FormFieldIcon.Tag"
+          >
             <input
               id="recurring-name"
               [formField]="$ruleForm.name"
@@ -85,6 +87,7 @@
             [$id]="'recurring-cadence'"
             [$label]="$existingOccurrenceCount() > 0 ? 'Frequency · affects history' : 'Frequency'"
             [$required]="true"
+            [$icon]="FormFieldIcon.CalendarDays"
           >
             <select id="recurring-cadence" [formField]="$ruleForm.cadence">
               @for (option of $cadenceOptions; track option.value) {
@@ -121,14 +124,14 @@
                   <div
                     class="rounded-control border-finance-border grid items-end gap-3 border p-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_auto]"
                   >
-                    <app-form-field [$id]="'recurring-price-amount-' + index" [$label]="'Amount'">
+                    <app-form-field
+                      [$id]="'recurring-price-amount-' + index"
+                      [$label]="'Amount'"
+                      [$icon]="FormFieldIcon.DollarSign"
+                    >
                       <div class="relative">
-                        <span
-                          class="text-finance-muted pointer-events-none absolute top-1/2 left-3 -translate-y-1/2"
-                          >$</span
-                        >
                         <input
-                          class="pl-7 text-left tabular-nums"
+                          class="text-left tabular-nums"
                           [id]="'recurring-price-amount-' + index"
                           [formField]="$ruleForm.prices[index]!.amount"
                           step="0.01"
@@ -140,6 +143,7 @@
                       [$id]="'recurring-price-date-' + index"
                       [$label]="'Effective date'"
                       [$required]="true"
+                      [$icon]="FormFieldIcon.CalendarDays"
                     >
                       <app-date-input
                         [$id]="'recurring-price-date-' + index"
@@ -149,6 +153,7 @@
                     <app-form-field
                       [$id]="'recurring-price-pay-date-' + index"
                       [$label]="'Pay date (defaults to effective date)'"
+                      [$icon]="FormFieldIcon.CalendarDays"
                     >
                       <app-date-input
                         [$id]="'recurring-price-pay-date-' + index"
@@ -158,7 +163,7 @@
                     </app-form-field>
                     @if ($ruleValue().prices.length > 1) {
                       <button
-                        class="btn-icon btn-icon-delete rounded-control"
+                        class="btn-icon btn-icon-delete"
                         [attr.aria-label]="'Remove price effective ' + price.effectiveDate"
                         (click)="removePrice(index)"
                         type="button"
@@ -184,6 +189,7 @@
               $ruleValue().type === RecurringTransactionType.Expense ? 'Paid by' : 'Received by'
             "
             [$required]="true"
+            [$icon]="FormFieldIcon.UserRound"
           >
             <select id="recurring-target-participant" [formField]="$ruleForm.targetParticipantId">
               <option value="">Select a participant</option>
@@ -200,6 +206,7 @@
             [$label]="
               $existingOccurrenceCount() > 0 ? 'End date · affects history' : 'End date (optional)'
             "
+            [$icon]="FormFieldIcon.CalendarDays"
           >
             <app-date-input [$id]="'recurring-end-date'" [formField]="$ruleForm.endDate" />
           </app-form-field>
@@ -214,7 +221,7 @@
               [$options]="$memberOptions()"
             />
           </app-form-field>
-          <app-form-field [$id]="'recurring-note'" [$label]="'Note'">
+          <app-form-field [$id]="'recurring-note'" [$label]="'Note'" [$icon]="FormFieldIcon.Pencil">
             <textarea
               id="recurring-note"
               [formField]="$ruleForm.note"
@@ -223,9 +230,7 @@
             ></textarea>
           </app-form-field>
         </div>
-        <div
-          class="border-finance-border flex flex-col-reverse gap-2 border-t pt-4 sm:flex-row sm:justify-end"
-        >
+        <div class="form-action-row gap-2 pt-4">
           <button class="btn-secondary" (click)="cancel()" type="button">Cancel</button>
           <button class="btn-primary" type="submit">
             @if ($isEditing()) {

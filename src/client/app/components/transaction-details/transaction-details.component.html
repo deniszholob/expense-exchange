@@ -1,20 +1,41 @@
-<div class="mx-auto w-full max-w-3xl">
+<div class="mx-auto w-full max-w-5xl">
   <form class="surface-card flex flex-col gap-6 p-5 sm:p-7" (submit)="onSaveTransaction($event)">
-    <div class="border-finance-border border-b pb-5">
-      <h2 class="text-xl font-semibold">
-        @if ($isEditing()) {
-          Update {{ $isExpense() ? 'expense' : $isRefund() ? 'refund' : 'income' }}
-        } @else {
-          Add {{ $isExpense() ? 'expense' : $isRefund() ? 'refund' : 'income' }}
+    <div class="border-finance-border flex items-center gap-4 border-b pb-5">
+      <span
+        class="transaction-type-icon"
+        [class.transaction-type-icon--expense]="$isExpense()"
+        [class.transaction-type-icon--income]="!$isExpense() && !$isRefund()"
+        [class.transaction-type-icon--refund]="$isRefund()"
+        aria-hidden="true"
+      >
+        @switch ($transactionData().type) {
+          @case (TransactionType.Expense) {
+            <svg class="size-6" lucideShoppingCart></svg>
+          }
+          @case (TransactionType.Income) {
+            <svg class="size-6" lucideWallet></svg>
+          }
+          @case (TransactionType.Refund) {
+            <svg class="size-6" lucideRotateCcw></svg>
+          }
         }
-      </h2>
-      <p class="text-finance-muted mt-1 text-sm">
-        @if ($isExpense()) {
-          Record the payment and choose who should share it.
-        } @else {
-          Record when the funds were posted and received, and who they benefit.
-        }
-      </p>
+      </span>
+      <div>
+        <h2 class="text-xl font-semibold">
+          @if ($isEditing()) {
+            Update {{ $isExpense() ? 'expense' : $isRefund() ? 'refund' : 'income' }}
+          } @else {
+            Add {{ $isExpense() ? 'expense' : $isRefund() ? 'refund' : 'income' }}
+          }
+        </h2>
+        <p class="text-finance-muted mt-1 text-sm">
+          @if ($isExpense()) {
+            Record the payment and choose who should share it.
+          } @else {
+            Record when the funds were posted and received, and who they benefit.
+          }
+        </p>
+      </div>
     </div>
 
     @if ($actionError(); as error) {
@@ -30,31 +51,60 @@
         be allocated to; it does not automatically include the target.
       </p>
       <div class="mt-4 grid gap-3 sm:grid-cols-2">
-        <article class="bg-finance-surface rounded-control border-finance-border border p-3">
-          <h3 class="font-medium">Shared expense</h3>
-          <p class="text-finance-muted mt-1 text-sm">
-            Expense · $100 groceries · Paid by Bob · Benefits: Bob and Alice
-          </p>
+        <article class="transaction-example-card">
+          <div class="flex items-start gap-3">
+            <span class="transaction-type-icon transaction-type-icon--expense">
+              <svg class="size-5" lucideShoppingCart aria-hidden="true"></svg>
+            </span>
+            <div>
+              <h3 class="font-medium">Shared expense</h3>
+              <p class="text-finance-muted mt-1 text-sm">Expense · $100 groceries</p>
+              <p class="mt-1 text-sm">Paid by Bob · Benefits: Bob and Alice</p>
+            </div>
+          </div>
         </article>
-        <article class="bg-finance-surface rounded-control border-finance-border border p-3">
-          <h3 class="font-medium">Personal income</h3>
-          <p class="text-finance-muted mt-1 text-sm">
-            Income · $2,000 paycheck · Received by Bob · Benefits: Bob
-          </p>
+        <article class="transaction-example-card">
+          <div class="flex items-start gap-3">
+            <span class="transaction-type-icon transaction-type-icon--income">
+              <svg class="size-5" lucideWallet aria-hidden="true"></svg>
+            </span>
+            <div>
+              <h3 class="font-medium">Personal income</h3>
+              <p class="text-finance-muted mt-1 text-sm">Income · $2,000 paycheck</p>
+              <p class="mt-1 text-sm">Received by Bob · Benefits: Bob</p>
+            </div>
+          </div>
         </article>
-        <article class="bg-finance-surface rounded-control border-finance-border border p-3">
-          <h3 class="font-medium">Shared expense refund</h3>
-          <p class="text-finance-muted mt-1 text-sm">
-            Refund · $20 returned item · Received by Bob · Benefits: Bob and Alice · Link the
-            original expense. It reduces expenses rather than counting as income.
-          </p>
+        <article class="transaction-example-card">
+          <div class="flex items-start gap-3">
+            <span class="transaction-type-icon transaction-type-icon--refund">
+              <svg class="size-5" lucideRotateCcw aria-hidden="true"></svg>
+            </span>
+            <div>
+              <h3 class="font-medium">Shared expense refund</h3>
+              <p class="text-finance-muted mt-1 text-sm">Refund · $20 returned item</p>
+              <p class="mt-1 text-sm">Received by Bob · Benefits: Bob and Alice</p>
+              <p class="text-finance-muted mt-1 text-sm">
+                Link this to the original expense for context. Refunds are tracked separately from
+                income and spending.
+              </p>
+            </div>
+          </div>
         </article>
-        <article class="bg-finance-surface rounded-control border-finance-border border p-3">
-          <h3 class="font-medium">Gift card redeemed for someone else</h3>
-          <p class="text-finance-muted mt-1 text-sm">
-            Income · $50 gift card · Received/redeemed by Bob · Benefits: Alice. This allocates the
-            value to Alice, so the group balance can show Bob owes Alice.
-          </p>
+        <article class="transaction-example-card">
+          <div class="flex items-start gap-3">
+            <span class="transaction-type-icon transaction-type-icon--gift">
+              <svg class="size-5" lucideGift aria-hidden="true"></svg>
+            </span>
+            <div>
+              <h3 class="font-medium">Gift card redeemed for someone else</h3>
+              <p class="text-finance-muted mt-1 text-sm">Income · $50 gift card</p>
+              <p class="mt-1 text-sm">Received/redeemed by Bob · Benefits: Alice</p>
+              <p class="text-finance-muted mt-1 text-sm">
+                Allocates the value to Alice, so the group balance can show Bob owes Alice.
+              </p>
+            </div>
+          </div>
         </article>
       </div>
     </details>
@@ -76,6 +126,7 @@
           $isExpense() ? 'Expense name' : $isRefund() ? 'Refund description' : 'Income source'
         "
         [$required]="true"
+        [$icon]="FormFieldIcon.Tag"
       >
         <input
           id="name"
@@ -88,14 +139,15 @@
         />
       </app-form-field>
 
-      <app-form-field [$id]="'amount'" [$label]="'Amount (USD)'" [$required]="true">
+      <app-form-field
+        [$id]="'amount'"
+        [$label]="'Amount'"
+        [$required]="true"
+        [$icon]="FormFieldIcon.DollarSign"
+      >
         <div class="relative">
-          <span
-            class="text-finance-muted pointer-events-none absolute top-1/2 left-3 z-10 -translate-y-1/2 text-sm"
-            >$</span
-          >
           <input
-            class="pl-7 text-left font-medium tabular-nums"
+            class="text-left font-medium tabular-nums"
             id="amount"
             [formField]="$form.amount"
             type="number"
@@ -108,6 +160,7 @@
         [$id]="'postDate'"
         [$label]="$isExpense() ? 'Expense date' : $isRefund() ? 'Date initiated' : 'Statement date'"
         [$required]="true"
+        [$icon]="FormFieldIcon.CalendarDays"
       >
         <app-date-input id="postDate" [$id]="'postDate'" [formField]="$form.postDate" />
       </app-form-field>
@@ -116,6 +169,7 @@
         [$id]="'targetParticipantId'"
         [$label]="$isExpense() ? 'Paid by' : 'Received by'"
         [$required]="true"
+        [$icon]="FormFieldIcon.UserRound"
       >
         <select id="targetParticipantId" [formField]="$form.targetParticipantId">
           @for (participant of participants(); track participant.id) {
@@ -128,6 +182,7 @@
         [$id]="'completeDate'"
         [$label]="$isExpense() ? 'Date paid' : $isRefund() ? 'Date refunded' : 'Date received'"
         [$required]="true"
+        [$icon]="FormFieldIcon.CalendarDays"
       >
         <app-date-input id="completeDate" [$id]="'completeDate'" [formField]="$form.completeDate" />
       </app-form-field>
@@ -149,7 +204,11 @@
             </span>
           </app-form-field>
           @if ($isRefund()) {
-            <app-form-field [$id]="'linkedTransactionId'" [$label]="'Related expense'">
+            <app-form-field
+              [$id]="'linkedTransactionId'"
+              [$label]="'Related expense'"
+              [$icon]="FormFieldIcon.Link2"
+            >
               <select id="linkedTransactionId" [formField]="$form.linkedTransactionId">
                 <option value="">No linked expense</option>
                 @for (expense of expenses(); track expense.id) {
@@ -159,7 +218,7 @@
             </app-form-field>
           }
         </div>
-        <app-form-field [$id]="'note'" [$label]="'Note'">
+        <app-form-field [$id]="'note'" [$label]="'Note'" [$icon]="FormFieldIcon.Pencil">
           <textarea
             id="note"
             [formField]="$form.note"
@@ -170,16 +229,8 @@
       </div>
     </div>
 
-    <div
-      class="border-finance-border flex flex-col-reverse gap-3 border-t pt-5 sm:flex-row sm:justify-end"
-    >
-      <button
-        class="rounded-control border-finance-border text-finance-muted hover:bg-finance-raised hover:text-finance-text border px-5"
-        (click)="onCancel()"
-        type="button"
-      >
-        Cancel
-      </button>
+    <div class="form-action-row gap-3 pt-5">
+      <button class="btn-secondary sm:min-w-44" (click)="onCancel()" type="button">Cancel</button>
       <button class="btn-primary sm:min-w-44" type="submit">
         <svg class="size-4" lucideCheck aria-hidden="true"></svg>
         @if ($isEditing()) {

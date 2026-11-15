@@ -1,5 +1,5 @@
 // #region Imports
-import { NgComponentOutlet, NgOptimizedImage } from '@angular/common';
+import { NgComponentOutlet } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -16,8 +16,8 @@ import { RecurringStateService } from 'src/client/app/shared/recurring-state.ser
 import { getEarliestDate } from 'src/client/app/shared/date-range/date-range.util';
 import { UserRole } from 'src/client/api/generated/expense-exchange-api.schemas';
 import { DataSource } from '../../shared/data-source.enum';
-import { UserMonogramPipe } from '../../shared/user-monogram.pipe';
 import { UserColorPipe } from '../../shared/user-color.pipe';
+import { UserMonogramPipe } from '../../shared/user-monogram.pipe';
 // #endregion
 
 // #region Implementation
@@ -29,10 +29,9 @@ import { UserColorPipe } from '../../shared/user-color.pipe';
   host: { class: 'contents' },
   imports: [
     NgComponentOutlet,
-    NgOptimizedImage,
     DataRangeControlComponent,
-    UserMonogramPipe,
     UserColorPipe,
+    UserMonogramPipe,
     RouterModule,
   ],
 })
@@ -95,6 +94,16 @@ export class HeaderComponent {
       (left, right) => (left.utilityOrder ?? 0) - (right.utilityOrder ?? 0),
     );
   });
+  protected readonly $primaryLinks = computed(() =>
+    this.$links().filter(
+      (link) => link.id !== PageRoute.Data && link.id !== PageRoute.Dev,
+    ),
+  );
+  protected readonly $utilityLinks = computed(() =>
+    this.$links().filter(
+      (link) => link.id === PageRoute.Data || link.id === PageRoute.Dev,
+    ),
+  );
 
   public constructor(
     protected readonly appService: AppService,

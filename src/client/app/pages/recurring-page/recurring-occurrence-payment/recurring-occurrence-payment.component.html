@@ -6,13 +6,11 @@
     [$id]="'occurrence-amount-' + $occurrence().id"
     [$label]="'Amount paid'"
     [$required]="true"
+    [$icon]="FormFieldIcon.DollarSign"
   >
     <div class="relative">
-      <span class="text-finance-muted pointer-events-none absolute top-1/2 left-3 -translate-y-1/2"
-        >$</span
-      >
       <input
-        class="pl-7 text-left tabular-nums"
+        class="text-left tabular-nums"
         [id]="'occurrence-amount-' + $occurrence().id"
         [formField]="$paymentForm.amount"
         [readOnly]="!$isAmountEditable()"
@@ -25,6 +23,7 @@
     [$id]="'occurrence-pay-date-' + $occurrence().id"
     [$label]="$occurrence().isAutopay ? 'Scheduled pay date' : 'Pay date'"
     [$required]="true"
+    [$icon]="FormFieldIcon.CalendarDays"
   >
     @if ($isPayDateEditable()) {
       <app-date-input

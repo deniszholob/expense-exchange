@@ -1,9 +1,9 @@
 <ng-template #typeCell let-row="row">
   <span
-    class="transaction-type-badge"
-    [class.transaction-type-badge-expense]="row.kind === TransactionType.Expense"
-    [class.transaction-type-badge-income]="row.kind === TransactionType.Income"
-    [class.transaction-type-badge-refund]="row.kind === TransactionType.Refund"
+    class="status-badge"
+    [class.status-badge-expense]="row.kind === TransactionType.Expense"
+    [class.status-badge-income]="row.kind === TransactionType.Income"
+    [class.status-badge-refund]="row.kind === TransactionType.Refund"
   >
     {{ row.kind }}
   </span>
@@ -14,7 +14,7 @@
     class="font-semibold tabular-nums"
     [class.text-finance-negative]="row.kind === TransactionType.Expense"
     [class.text-finance-positive]="row.kind === TransactionType.Income"
-    [class.text-amber-300]="row.kind === TransactionType.Refund"
+    [class.text-finance-warning]="row.kind === TransactionType.Refund"
   >
     {{ row.kind === TransactionType.Expense ? '−' : '+' }}{{ row.amount | currency }}
   </span>

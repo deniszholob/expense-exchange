@@ -3,7 +3,7 @@
     <legend class="text-finance-muted mb-1 text-sm">Choose an account</legend>
     @for (account of $accounts(); track account.username) {
       <button
-        class="rounded-control border-finance-border bg-finance-canvas/40 hover:border-finance-border-strong hover:bg-finance-raised flex w-full items-center gap-3 border p-3 text-left transition-colors"
+        class="choice-card flex w-full items-center gap-3 p-3 text-left"
         [class.border-finance-accent]="
           $selectedUsername() === account.username && account.role !== UserRole.Admin
         "

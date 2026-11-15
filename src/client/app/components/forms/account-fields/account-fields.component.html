@@ -1,8 +1,17 @@
 <div class="flex w-full flex-col gap-4">
-  <app-form-field [$id]="$idPrefix() + '-name'" [$label]="'Display name'">
+  <app-form-field
+    [$id]="$idPrefix() + '-name'"
+    [$label]="'Display name'"
+    [$icon]="FormFieldIcon.UserRound"
+  >
     <input [id]="$idPrefix() + '-name'" [formField]="$nameField()" autocomplete="name" />
   </app-form-field>
-  <app-form-field [$id]="$idPrefix() + '-username'" [$label]="'Username'" [$required]="true">
+  <app-form-field
+    [$id]="$idPrefix() + '-username'"
+    [$label]="'Username'"
+    [$required]="true"
+    [$icon]="FormFieldIcon.UserRound"
+  >
     <input
       [id]="$idPrefix() + '-username'"
       [formField]="$usernameField()"

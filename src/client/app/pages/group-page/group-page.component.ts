@@ -12,6 +12,7 @@ import {
   LucideCheck,
   LucidePencil,
   LucideTrash2,
+  LucideUserRoundPlus,
   LucideUsersRound,
   LucideX,
 } from '@lucide/angular';
@@ -25,7 +26,10 @@ import { GroupMembersService } from 'src/client/api/generated/group-members/grou
 import { AppService } from 'src/client/app/app.service';
 import { DataSource } from 'src/client/app/shared/data-source.enum';
 import { PageLayoutComponent } from 'src/client/app/layout';
-import { FormFieldComponent } from '../../components/forms/form-field/form-field.component';
+import {
+  FormFieldComponent,
+  FormFieldIcon,
+} from '../../components/forms/form-field/form-field.component';
 import { UserIdentityComponent } from '../../components/user-identity/user-identity.component';
 import { UserMonogramPipe } from '../../shared/user-monogram.pipe';
 // #endregion
@@ -55,6 +59,7 @@ interface ExternalParticipantFormValue {
     FormField,
     FormFieldComponent,
     LucideTrash2,
+    LucideUserRoundPlus,
     LucidePencil,
     LucideCheck,
     LucideX,
@@ -64,6 +69,7 @@ interface ExternalParticipantFormValue {
   ],
 })
 export class GroupPageComponent {
+  protected readonly FormFieldIcon = FormFieldIcon;
   protected readonly appService = inject(AppService);
   private readonly authApi = inject(AuthService);
   private readonly groupMembersApi = inject(GroupMembersService);

@@ -5,10 +5,7 @@
   >
     <div class="flex items-center justify-between gap-3">
       <h2 class="text-lg font-semibold" id="group-heading">Group members</h2>
-      <span
-        class="border-finance-border bg-finance-raised text-finance-muted rounded-full border px-3 py-1 text-xs font-medium"
-        >{{ $groupMembers().length }}</span
-      >
+      <span class="count-badge">{{ $groupMembers().length }}</span>
     </div>
 
     <div class="border-finance-border border-b pb-5">
@@ -18,6 +15,7 @@
             [$id]="'group-member-account'"
             [$label]="'Add a group member'"
             [$required]="true"
+            [$icon]="FormFieldIcon.UsersRound"
           >
             <select id="group-member-account" [formField]="$form.accountId">
               @if (appService.$dataSource() === DataSource.Local) {
@@ -43,6 +41,7 @@
           "
           type="submit"
         >
+          <svg class="size-4" lucideUserRoundPlus aria-hidden="true"></svg>
           Add to group
         </button>
       </form>
@@ -67,7 +66,7 @@
               [$color]="member.color"
             />
             <button
-              class="btn-icon btn-danger shrink-0"
+              class="btn-icon btn-icon-delete shrink-0"
               [attr.aria-label]="'Remove ' + member.displayName + ' from group'"
               (click)="removeMember(member.id)"
               type="button"
@@ -93,9 +92,7 @@
           Save people who share costs but do not have an account.
         </p>
       </div>
-      <span
-        class="border-finance-border bg-finance-raised text-finance-muted rounded-full border px-3 py-1 text-xs font-medium"
-      >
+      <span class="count-badge">
         {{ $externalParticipants().length }}
       </span>
     </div>
@@ -111,6 +108,7 @@
             $editingExternalParticipantId() ? 'Participant name' : 'Add external participant'
           "
           [$required]="true"
+          [$icon]="FormFieldIcon.UserRoundPlus"
         >
           <input
             id="external-participant-name"
@@ -122,8 +120,16 @@
         </app-form-field>
       </div>
       <div class="flex w-full gap-2 sm:w-auto">
-        <button class="btn-primary flex-1 sm:flex-none" type="submit">
-          <svg class="size-4" lucideCheck aria-hidden="true"></svg>
+        <button
+          class="btn-primary flex-1 sm:flex-none"
+          [disabled]="$externalParticipantForm().invalid()"
+          type="submit"
+        >
+          @if ($editingExternalParticipantId()) {
+            <svg class="size-4" lucideCheck aria-hidden="true"></svg>
+          } @else {
+            <svg class="size-4" lucideUserRoundPlus aria-hidden="true"></svg>
+          }
           {{ $editingExternalParticipantId() ? 'Save name' : 'Add person' }}
         </button>
         @if ($editingExternalParticipantId()) {
@@ -165,7 +171,7 @@
             </div>
             <div class="flex shrink-0 items-center gap-2">
               <button
-                class="btn-icon"
+                class="btn-icon btn-icon-edit"
                 [attr.aria-label]="'Rename ' + participant.name"
                 (click)="editExternalParticipant(participant.id, participant.name)"
                 type="button"
@@ -173,7 +179,7 @@
                 <svg class="size-4" lucidePencil aria-hidden="true"></svg>
               </button>
               <button
-                class="btn-icon btn-danger"
+                class="btn-icon btn-icon-delete"
                 [attr.aria-label]="'Delete ' + participant.name"
                 (click)="deleteExternalParticipant(participant.id)"
                 type="button"

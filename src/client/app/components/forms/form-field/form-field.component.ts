@@ -1,3 +1,4 @@
+import { NgComponentOutlet } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -9,7 +10,21 @@ import {
   signal,
 } from '@angular/core';
 import { FormField } from '@angular/forms/signals';
-import { LucideEye, LucideEyeOff, LucideX } from '@lucide/angular';
+import {
+  LucideCalendarDays,
+  LucideDollarSign,
+  LucideEye,
+  LucideEyeOff,
+  LucideLink2,
+  LucidePencil,
+  LucidePalette,
+  LucideTag,
+  LucideUserRound,
+  LucideUserRoundPlus,
+  LucideUsersRound,
+  type LucideIcon,
+  LucideX,
+} from '@lucide/angular';
 
 // #region Constants
 const SELECTABLE_INPUT_TYPES: ReadonlySet<string> = new Set([
@@ -21,6 +36,30 @@ const SELECTABLE_INPUT_TYPES: ReadonlySet<string> = new Set([
   'text',
   'url',
 ]);
+
+export enum FormFieldIcon {
+  CalendarDays = 'CalendarDays',
+  DollarSign = 'DollarSign',
+  Link2 = 'Link2',
+  Pencil = 'Pencil',
+  Palette = 'Palette',
+  Tag = 'Tag',
+  UserRound = 'UserRound',
+  UserRoundPlus = 'UserRoundPlus',
+  UsersRound = 'UsersRound',
+}
+
+const FORM_FIELD_ICONS: Record<FormFieldIcon, LucideIcon> = {
+  [FormFieldIcon.CalendarDays]: LucideCalendarDays,
+  [FormFieldIcon.DollarSign]: LucideDollarSign,
+  [FormFieldIcon.Link2]: LucideLink2,
+  [FormFieldIcon.Pencil]: LucidePencil,
+  [FormFieldIcon.Palette]: LucidePalette,
+  [FormFieldIcon.Tag]: LucideTag,
+  [FormFieldIcon.UserRound]: LucideUserRound,
+  [FormFieldIcon.UserRoundPlus]: LucideUserRoundPlus,
+  [FormFieldIcon.UsersRound]: LucideUsersRound,
+};
 // #endregion
 
 // #region Component
@@ -28,7 +67,7 @@ const SELECTABLE_INPUT_TYPES: ReadonlySet<string> = new Set([
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-form-field',
   templateUrl: './form-field.component.html',
-  imports: [LucideEye, LucideEyeOff, LucideX],
+  imports: [NgComponentOutlet, LucideEye, LucideEyeOff, LucideX],
   host: {
     class: 'contents',
     '(click)': 'onControlClick($event)',
@@ -39,6 +78,7 @@ export class FormFieldComponent {
   public readonly $label = input.required<string>();
   public readonly $required = input(false);
   public readonly $clearable = input(true);
+  public readonly $icon = input<FormFieldIcon>();
   public readonly $value = input<unknown>();
   public readonly clearRequested = output<void>();
 
@@ -46,6 +86,10 @@ export class FormFieldComponent {
   private readonly $projectedElement =
     contentChild<ElementRef<HTMLElement>>(ElementRef);
   protected readonly $passwordVisible = signal(false);
+  protected readonly $iconComponent = computed(() => {
+    const icon = this.$icon();
+    return icon === undefined ? undefined : FORM_FIELD_ICONS[icon];
+  });
   protected readonly $passwordInput = computed(() => {
     const formElement = this.$formField()?.element;
     const projectedElement = this.$projectedElement()?.nativeElement;

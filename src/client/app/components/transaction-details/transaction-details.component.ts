@@ -17,16 +17,28 @@ import {
   minLength,
   required,
 } from '@angular/forms/signals';
-import { LucideCheck } from '@lucide/angular';
+import {
+  LucideCheck,
+  LucideGift,
+  LucideRotateCcw,
+  LucideShoppingCart,
+  LucideWallet,
+} from '@lucide/angular';
 import { TransactionType } from 'src/client/api/generated/expense-exchange-api.schemas';
 import type {
   GroupMemberDto,
   CreateTransactionDto,
   TransactionDto,
 } from 'src/client/api/generated/expense-exchange-api.schemas';
-import { FormFieldComponent } from '../forms/form-field/form-field.component';
+import {
+  FormFieldComponent,
+  FormFieldIcon,
+} from '../forms/form-field/form-field.component';
 import { MultiSelectComponent } from '../forms/multi-select/multi-select.component';
-import { SegmentedControlComponent } from '../forms/segmented-control/segmented-control.component';
+import {
+  SegmentedControlComponent,
+  SegmentedControlTone,
+} from '../forms/segmented-control/segmented-control.component';
 import { DateInputComponent } from '../forms/date-input/date-input.component';
 import { TRANSACTION_TYPE_INFO_OPTIONS } from 'src/client/app/shared/transaction-type.info';
 import { DataSource } from 'src/client/app/shared/data-source.enum';
@@ -46,6 +58,15 @@ type TransactionFormValue = Omit<
   note: string;
   linkedTransactionId: string;
 };
+
+const TRANSACTION_TYPE_SEGMENT_TONE: Record<
+  TransactionType,
+  SegmentedControlTone
+> = {
+  [TransactionType.Expense]: SegmentedControlTone.Negative,
+  [TransactionType.Income]: SegmentedControlTone.Positive,
+  [TransactionType.Refund]: SegmentedControlTone.Warning,
+};
 // #endregion
 
 // #region Component
@@ -59,12 +80,17 @@ type TransactionFormValue = Omit<
     FormField,
     FormFieldComponent,
     LucideCheck,
+    LucideGift,
+    LucideRotateCcw,
+    LucideShoppingCart,
+    LucideWallet,
     MultiSelectComponent,
     SegmentedControlComponent,
     DateInputComponent,
   ],
 })
 export class TransactionDetailsComponent {
+  protected readonly FormFieldIcon = FormFieldIcon;
   public readonly currentUser = input<GroupMemberDto>();
   public readonly participants =
     input.required<readonly { id: string; name: string }[]>();
@@ -83,6 +109,7 @@ export class TransactionDetailsComponent {
     TRANSACTION_TYPE_INFO_OPTIONS.map(({ id, display }) => ({
       value: id,
       label: display,
+      tone: TRANSACTION_TYPE_SEGMENT_TONE[id],
       disabled: this.$isEditing(),
     })),
   );

@@ -1,51 +1,41 @@
-<header
-  class="border-finance-border bg-finance-chrome/95 relative z-30 shrink-0 border-b shadow-lg shadow-black/10 backdrop-blur-xl"
->
-  <div class="container-fixed gap-0 py-2 sm:py-3">
-    <div class="flex min-h-10 items-center gap-2">
-      <a
-        class="text-finance-text flex shrink-0 items-center no-underline"
-        [routerLink]="['/', PageRoute.Data]"
-        aria-label="Expense Exchange home"
-      >
-        <img
-          class="rounded-control size-9 object-cover"
-          ngSrc="/assets/expense-exchange-icon.png"
-          width="36"
-          height="36"
-          alt=""
-        />
-      </a>
-
-      <nav class="flex min-w-0 flex-1 flex-wrap items-center gap-1" aria-label="Main navigation">
-        @for (link of $links(); track link.id) {
-          @if (link.id === PageRoute.Data) {
-            <div class="ml-auto flex items-center gap-1">
-              <app-data-range-control
-                [($dataRange)]="dataRangeService.$dataRange"
-                [$earliestDate]="$earliestTransactionDate()"
-                [$idPrefix]="'global-data-range'"
+<header class="app-header-shell relative z-30 shrink-0 border-b">
+  <div class="container-fluid gap-0 py-2 sm:py-3">
+    <div class="app-header-inner section-container">
+      <nav class="app-header-main-nav" aria-label="Main navigation">
+        @for (link of $primaryLinks(); track link.id) {
+          <a class="nav-tab" [routerLink]="['/', link.id]" routerLinkActive="nav-tab-active">
+            <span class="inline-flex size-4 items-center justify-center" aria-hidden="true">
+              <ng-container
+                [ngComponentOutlet]="link.icon"
+                [ngComponentOutletInputs]="{ size: 16 }"
               />
-              <a
-                class="rounded-control text-finance-muted hover:bg-finance-raised hover:text-finance-text inline-flex items-center gap-2 px-3 py-2 text-sm font-medium no-underline transition-colors"
-                [routerLink]="['/', link.id]"
-                routerLinkActive="bg-finance-accent-strong/20 text-finance-accent-hover ring-1 ring-inset ring-finance-accent/30"
+            </span>
+            {{ link.display }}
+            @if (link.id === PageRoute.Recurring && $recurringAttentionCount() > 0) {
+              <span
+                class="count-badge count-badge-warning min-w-0 px-1.5 py-0.5 text-[0.65rem] leading-none font-semibold"
+                [attr.aria-label]="$recurringAttentionCount() + ' occurrences need attention'"
+                [title]="$recurringAttentionCount() + ' occurrences need attention'"
               >
-                <span class="inline-flex size-4 items-center justify-center" aria-hidden="true">
-                  <ng-container
-                    [ngComponentOutlet]="link.icon"
-                    [ngComponentOutletInputs]="{ size: 16 }"
-                  />
-                </span>
-                {{ link.display }}
-              </a>
-            </div>
-          } @else {
-            <a
-              class="rounded-control text-finance-muted hover:bg-finance-raised hover:text-finance-text inline-flex items-center gap-2 px-3 py-2 text-sm font-medium no-underline transition-colors"
-              [routerLink]="['/', link.id]"
-              routerLinkActive="bg-finance-accent-strong/20 text-finance-accent-hover ring-1 ring-inset ring-finance-accent/30"
-            >
+                {{ $recurringAttentionCount() }}
+              </span>
+            }
+          </a>
+        }
+      </nav>
+
+      <div class="app-header-center">
+        <app-data-range-control
+          [($dataRange)]="dataRangeService.$dataRange"
+          [$earliestDate]="$earliestTransactionDate()"
+          [$idPrefix]="'global-data-range'"
+        />
+      </div>
+
+      <div class="app-header-utilities">
+        <nav class="flex items-center gap-1" aria-label="Utility navigation">
+          @for (link of $utilityLinks(); track link.id) {
+            <a class="nav-tab" [routerLink]="['/', link.id]" routerLinkActive="nav-tab-active">
               <span class="inline-flex size-4 items-center justify-center" aria-hidden="true">
                 <ng-container
                   [ngComponentOutlet]="link.icon"
@@ -53,47 +43,36 @@
                 />
               </span>
               {{ link.display }}
-              @if (link.id === PageRoute.Recurring && $recurringAttentionCount() > 0) {
-                <span
-                  class="rounded-full border border-amber-400/30 bg-amber-400/10 px-1.5 py-0.5 text-[0.65rem] leading-none font-semibold text-amber-300 tabular-nums"
-                  [attr.aria-label]="$recurringAttentionCount() + ' occurrences need attention'"
-                  [title]="$recurringAttentionCount() + ' occurrences need attention'"
-                >
-                  {{ $recurringAttentionCount() }}
-                </span>
-              }
             </a>
           }
-        }
-      </nav>
+        </nav>
 
-      @if (appService.$currentUser(); as currentUser) {
-        <a
-          class="rounded-control border-finance-border bg-finance-surface text-finance-text hover:border-finance-border-strong hover:bg-finance-raised inline-flex shrink-0 items-center gap-2 border px-2 py-1.5 text-sm font-medium no-underline transition-colors"
-          [routerLink]="['/', PageRoute.Profile]"
-          [attr.aria-label]="'Profile: ' + currentUser.name"
-        >
-          <span
-            class="profile-monogram"
-            [class.profile-monogram-admin]="currentUser.role === UserRole.Admin"
-            [style.--user-color]="currentUser.color | userColor"
-            >{{ currentUser.name | userMonogram }}</span
+        @if (appService.$currentUser(); as currentUser) {
+          <a
+            class="profile-chip rounded-control inline-flex shrink-0 items-center gap-2 px-2 py-1.5 text-sm font-medium no-underline transition-colors"
+            [routerLink]="['/', PageRoute.Profile]"
+            [attr.aria-label]="'Profile: ' + currentUser.name"
+            routerLinkActive="nav-tab-active"
           >
-          <span class="hidden sm:inline">{{ currentUser.name }}</span>
-        </a>
-      } @else if (
-        appService.$dataSource() === DataSource.RemoteApi &&
-        appService.$authStatusReady() &&
-        appService.$apiHealthy() &&
-        !appService.$authSetupRequired()
-      ) {
-        <a
-          class="rounded-control bg-finance-accent-strong hover:bg-finance-accent-strong-hover inline-flex min-h-10 shrink-0 items-center justify-center px-4 py-2 text-sm font-semibold text-white no-underline transition-colors"
-          [routerLink]="['/', PageRoute.Login]"
-        >
-          Sign in
-        </a>
-      }
+            <span
+              class="profile-monogram"
+              [style.--user-color]="currentUser.color | userColor"
+              aria-hidden="true"
+              >{{ currentUser.name | userMonogram }}</span
+            >
+            <span class="hidden sm:inline">{{ currentUser.name }}</span>
+          </a>
+        } @else if (
+          appService.$dataSource() === DataSource.RemoteApi &&
+          appService.$authStatusReady() &&
+          appService.$apiHealthy() &&
+          !appService.$authSetupRequired()
+        ) {
+          <a class="btn btn-primary shrink-0 no-underline" [routerLink]="['/', PageRoute.Login]">
+            Sign in
+          </a>
+        }
+      </div>
     </div>
   </div>
 </header>

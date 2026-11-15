@@ -78,7 +78,7 @@
             </span>
             <span class="min-w-0 truncate">{{ row.name }}</span>
             <span
-              class="border-finance-border bg-finance-raised text-finance-muted inline-flex min-w-6 shrink-0 items-center justify-center rounded-full border px-1.5 py-0.5 text-xs tabular-nums"
+              class="count-badge shrink-0"
               [attr.aria-label]="row.occurrenceCount + ' occurrences'"
               title="Occurrences"
             >
@@ -86,7 +86,7 @@
             </span>
             @if (row.attentionCount > 0) {
               <span
-                class="inline-flex min-w-6 shrink-0 items-center justify-center rounded-full border border-amber-300/30 bg-amber-300/10 px-1.5 py-0.5 text-xs font-semibold text-amber-200 tabular-nums"
+                class="count-badge count-badge-warning shrink-0 font-semibold"
                 [attr.aria-label]="row.attentionCount + ' occurrences need attention'"
                 title="Occurrences need attention"
               >
@@ -97,9 +97,9 @@
         </ng-template>
         <ng-template #typeCell let-row="row">
           <span
-            class="transaction-type-badge"
-            [class.transaction-type-badge-expense]="row.type === RecurringTransactionType.Expense"
-            [class.transaction-type-badge-income]="row.type === RecurringTransactionType.Income"
+            class="status-badge"
+            [class.status-badge-expense]="row.type === RecurringTransactionType.Expense"
+            [class.status-badge-income]="row.type === RecurringTransactionType.Income"
             >{{ row.type }}</span
           >
         </ng-template>
@@ -203,9 +203,7 @@
                 Back to recurring rules
               </button>
             }
-            <span
-              class="rounded-full border border-amber-300/20 bg-amber-300/10 px-3 py-1 text-xs font-medium text-amber-200"
-            >
+            <span class="status-badge status-badge-warning">
               {{ $visibleAttentionCount() }} need attention
             </span>
           </div>
@@ -244,11 +242,7 @@
                   >
                     <span>{{ group.name }}</span>
                     <span class="flex shrink-0 items-center gap-2">
-                      <span
-                        class="text-finance-muted border-finance-border rounded-full border px-2 py-0.5 text-xs"
-                      >
-                        {{ group.occurrences.length }} due
-                      </span>
+                      <span class="status-badge text-xs"> {{ group.occurrences.length }} due </span>
                       <svg
                         class="text-finance-muted size-4 transition-transform group-open:rotate-180"
                         lucideChevronDown
@@ -263,9 +257,7 @@
                         class="grid grid-cols-1 gap-3 py-3 first:pt-0 last:pb-3 lg:grid-cols-[minmax(12rem,1fr)_minmax(0,1.5fr)] lg:items-center"
                       >
                         <div class="flex min-w-0 items-center gap-3 lg:translate-y-4">
-                          <span
-                            class="rounded-control mt-0.5 grid size-8 shrink-0 place-items-center bg-amber-300/10 text-amber-200"
-                          >
+                          <span class="status-icon-warning mt-0.5 size-8">
                             <svg class="size-4" lucideCircleAlert aria-hidden="true"></svg>
                           </span>
                           <div class="min-w-0">
@@ -330,7 +322,7 @@
                     <strong class="tabular-nums">${{ occurrence.amount | number: '1.2-2' }}</strong>
                     @if ($editingOccurrenceId() !== occurrence.id && !item.isFullyAutomated) {
                       <button
-                        class="btn-icon btn-icon-edit rounded-control"
+                        class="btn-icon btn-icon-edit"
                         [attr.aria-label]="
                           'Edit payment for ' + occurrence.name + ' on ' + occurrence.statementDate
                         "

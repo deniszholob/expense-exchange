@@ -13,9 +13,15 @@
           [$id]="'local-user-name'"
           [$label]="'Name'"
           [$required]="true"
+          [$icon]="FormFieldIcon.UserRound"
           ><input id="local-user-name" [formField]="$localUserForm.name" autocomplete="off"
         /></app-form-field>
-        <app-form-field class="w-full sm:w-48" [$id]="'local-user-color'" [$label]="'Badge color'">
+        <app-form-field
+          class="w-full sm:w-48"
+          [$id]="'local-user-color'"
+          [$label]="'Badge color'"
+          [$icon]="FormFieldIcon.Palette"
+        >
           <select id="local-user-color" [formField]="$localUserForm.color">
             <option value="">Automatic</option>
             @for (color of $userColorOptions; track color) {
@@ -48,12 +54,14 @@
                     [$id]="'edit-local-user-' + user.id"
                     [$label]="'Name'"
                     [$required]="true"
+                    [$icon]="FormFieldIcon.UserRound"
                     ><input [id]="'edit-local-user-' + user.id" [formField]="$localUserForm.name"
                   /></app-form-field>
                   <app-form-field
                     class="w-full sm:w-48"
                     [$id]="'edit-local-user-color-' + user.id"
                     [$label]="'Badge color'"
+                    [$icon]="FormFieldIcon.Palette"
                   >
                     <select
                       [id]="'edit-local-user-color-' + user.id"
@@ -83,7 +91,7 @@
                 </div>
                 <div class="flex gap-2">
                   <button
-                    class="btn-icon border-finance-border text-finance-muted hover:bg-finance-raised rounded-control border"
+                    class="btn-icon btn-icon-edit"
                     [attr.aria-label]="'Edit ' + user.name"
                     (click)="startEditingLocalUser(user)"
                     type="button"
@@ -91,7 +99,7 @@
                     <svg class="size-4" lucidePencil aria-hidden="true"></svg>
                   </button>
                   <button
-                    class="btn-icon btn-danger"
+                    class="btn-icon btn-icon-delete"
                     [attr.aria-label]="'Delete ' + user.name"
                     (click)="deleteLocalUser(user.id)"
                     type="button"
@@ -193,7 +201,7 @@
                 @if (account.role !== UserRole.Admin) {
                   <div class="flex gap-2">
                     <button
-                      class="btn-icon border-finance-border text-finance-muted hover:bg-finance-raised rounded-control border"
+                      class="btn-icon btn-icon-edit"
                       [attr.aria-label]="'Edit account ' + account.username"
                       (click)="startEditing(account)"
                       type="button"
@@ -201,7 +209,7 @@
                       <svg class="size-4" lucidePencil aria-hidden="true"></svg>
                     </button>
                     <button
-                      class="btn-icon btn-danger"
+                      class="btn-icon btn-icon-delete"
                       [attr.aria-label]="'Delete account ' + account.username"
                       (click)="deleteAccount(account.id)"
                       type="button"

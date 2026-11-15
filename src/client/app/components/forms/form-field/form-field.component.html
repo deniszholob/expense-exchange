@@ -9,10 +9,20 @@
     }
   </label>
   <div class="form-field-control relative w-full">
+    @if ($iconComponent(); as iconComponent) {
+      <span class="form-field-leading-icon" aria-hidden="true">
+        <ng-container
+          [ngComponentOutlet]="iconComponent"
+          [ngComponentOutletInputs]="{ size: 16 }"
+        />
+      </span>
+    }
     <ng-content></ng-content>
     @if ($passwordInput()) {
       <button
-        class="form-field-password-toggle text-finance-muted rounded-control hover:bg-finance-hover hover:text-finance-text focus-visible:ring-finance-accent absolute top-2 left-2 grid size-6 min-h-0 place-items-center p-1 transition-colors focus-visible:ring-2"
+        class="form-field-password-toggle hover:bg-finance-hover focus-visible:ring-finance-accent absolute top-2 left-2 grid size-6 min-h-0 place-items-center p-1 focus-visible:ring-2"
+        [class.text-finance-accent-text]="$passwordVisible()"
+        [class.text-finance-muted]="!$passwordVisible()"
         [attr.aria-label]="$passwordVisible() ? 'Hide password' : 'Show password'"
         [attr.aria-pressed]="$passwordVisible()"
         (click)="togglePasswordVisibility()"

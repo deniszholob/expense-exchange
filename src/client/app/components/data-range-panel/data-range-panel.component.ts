@@ -6,7 +6,10 @@ import {
   input,
   model,
 } from '@angular/core';
-import { FormFieldComponent } from '../forms/form-field/form-field.component';
+import {
+  FormFieldComponent,
+  FormFieldIcon,
+} from '../forms/form-field/form-field.component';
 import { DateRangePreset } from 'src/client/app/shared/date-range/date-range-preset.enum';
 import type { DateRange } from 'src/client/app/shared/date-range/date-range.model';
 import {
@@ -44,6 +47,7 @@ const MONTH_OPTIONS = [
   imports: [FormFieldComponent, DateInputComponent],
 })
 export class DataRangePanelComponent {
+  protected readonly FormFieldIcon = FormFieldIcon;
   public readonly $range = model.required<DateRange>();
   public readonly $earliestDate = input<string>();
   public readonly $idPrefix = input('data-range');

@@ -18,7 +18,10 @@ import { PageLayoutComponent } from 'src/client/app/layout';
 import { AppService } from 'src/client/app/app.service';
 import { PageRoute } from 'src/client/app/app.info';
 import { DataSource } from 'src/client/app/shared/data-source.enum';
-import { FormFieldComponent } from '../../components/forms/form-field/form-field.component';
+import {
+  FormFieldComponent,
+  FormFieldIcon,
+} from '../../components/forms/form-field/form-field.component';
 import { AuthAccountSelectorComponent } from '../../components/auth-account-selector/auth-account-selector.component';
 // #endregion
 
@@ -38,6 +41,7 @@ import { AuthAccountSelectorComponent } from '../../components/auth-account-sele
   ],
 })
 export class LoginPageComponent {
+  protected readonly FormFieldIcon = FormFieldIcon;
   private readonly appService = inject(AppService);
   private readonly router = inject(Router);
   protected readonly $setupRequired = this.appService.$authSetupRequired;

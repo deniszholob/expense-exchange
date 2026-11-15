@@ -18,9 +18,7 @@
         <p class="text-finance-muted mt-2 text-sm">
           Finish connecting the server and create its first administrator in Data settings.
         </p>
-        <a class="btn-primary mt-4 inline-flex no-underline" routerLink="/data">
-          Open Data settings
-        </a>
+        <a class="btn btn-primary mt-4 no-underline" routerLink="/data"> Open Data settings </a>
       </section>
     } @else {
       <section class="surface-card mx-auto w-full max-w-md p-5 sm:p-7">
@@ -34,7 +32,11 @@
             [$selectedUsername]="$credentials().username"
             (selected)="selectLoginAccount($event)"
           />
-          <app-form-field [$id]="'username'" [$label]="'Username'" [$required]="true"
+          <app-form-field
+            [$id]="'username'"
+            [$label]="'Username'"
+            [$required]="true"
+            [$icon]="FormFieldIcon.UserRound"
             ><input id="username" [formField]="$form.username" autocomplete="username"
           /></app-form-field>
           <app-form-field [$id]="'password'" [$label]="'Password'" [$required]="true"

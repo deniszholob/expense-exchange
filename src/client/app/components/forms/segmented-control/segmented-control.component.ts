@@ -9,11 +9,19 @@ import type { FormValueControl } from '@angular/forms/signals';
 // #endregion
 
 // #region Types
+export enum SegmentedControlTone {
+  Accent = 'Accent',
+  Negative = 'Negative',
+  Positive = 'Positive',
+  Warning = 'Warning',
+}
+
 export interface SegmentedControlOption<
   TValue extends string | boolean = string,
 > {
   readonly value: TValue;
   readonly label: string;
+  readonly tone?: SegmentedControlTone;
   readonly disabled?: boolean;
 }
 // #endregion
@@ -28,6 +36,7 @@ export interface SegmentedControlOption<
 export class SegmentedControlComponent<
   TValue extends string | boolean = string,
 > implements FormValueControl<TValue> {
+  public readonly SegmentedControlTone = SegmentedControlTone;
   public readonly value = model.required<TValue>();
   public readonly $options =
     input.required<readonly SegmentedControlOption<TValue>[]>();
