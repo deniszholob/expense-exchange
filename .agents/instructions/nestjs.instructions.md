@@ -9,13 +9,23 @@ Apply to NestJS modules, controllers, providers, API schemas, persistence adapte
 
 ## Module and application structure
 
+- Follow idiomatic NestJS practices for the installed NestJS version. Before adding custom framework plumbing or bypassing Nest abstractions, check whether a built-in Nest feature fits the requirement; use the framework feature when it gives a clear boundary and preserves the app's behavior. Do not add middleware, pipes, interceptors, filters, or other abstractions solely to use them.
 - Organize by domain capability. Each module owns its controllers, application services, and providers; export only what other modules need.
+- Keep `AppModule` as the composition root: import feature and infrastructure modules there rather than registering every feature provider in one root module. Avoid circular module dependencies; if two features need each other, extract a narrow shared contract or application-level orchestration boundary.
 - Keep controllers thin: parse/validate transport input, call an application service, and map the result to a public response DTO.
 - Put use-case orchestration in application services. Keep reusable domain rules in domain functions/services and I/O in adapters.
 - Keep domain logic independent from Nest decorators, Express request/response objects, and filesystem/database APIs.
 - Use constructor injection for Nest providers. Avoid service locators and global mutable state.
 - Give providers one clear responsibility. Do not add layers that merely forward calls without enforcing a useful boundary.
 - Use explicit request/response DTOs at HTTP boundaries. Never serialize persistence entities directly when they contain internal fields.
+
+## Nest request lifecycle and framework features
+
+- Use the Nest request lifecycle intentionally: middleware for request handling that must run before route selection, guards for authentication and authorization, pipes for validating or transforming handler inputs, interceptors for cross-cutting behavior around handler execution, and exception filters when a defined error-response or logging policy requires custom handling.
+- Prefer Nest module registration and dependency injection for reusable middleware and application-wide pipes, interceptors, and filters. Register global enhancers through Nest's provider tokens when they need dependency injection.
+- Use built-in Nest features and maintained first-party integrations where they meet the requirement. Verify package names, APIs, and compatibility against the repository's installed NestJS version before adopting them. Preserve existing API, persistence, and security behavior when introducing a framework feature.
+- Use the Express adapter directly only when an Express-specific capability is required or gives a clear deployment benefit. Keep such configuration in the bootstrap boundary and document why it cannot live in a platform-independent Nest abstraction.
+- Do not create custom infrastructure when Nest's built-in exception handling, parsing, serialization, lifecycle hooks, or other existing behavior already meets the requirement.
 
 ## TypeScript and async behavior
 
