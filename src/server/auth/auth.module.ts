@@ -1,5 +1,6 @@
 // #region Imports
 import { Module } from '@nestjs/common';
+import { PasswordHasher } from '@nestjs/authentication';
 
 import { PersistenceModule } from '../persistence.module.js';
 import { AdminGuard } from '../guards/admin.guard.js';
@@ -13,7 +14,16 @@ import { AuthService } from './auth.service.js';
 @Module({
   imports: [PersistenceModule],
   controllers: [AuthController],
-  providers: [AuthService, AuthGuard, AdminGuard, GroupMemberGuard],
+  providers: [
+    {
+      provide: PasswordHasher,
+      useFactory: (): PasswordHasher => new PasswordHasher(),
+    },
+    AuthService,
+    AuthGuard,
+    AdminGuard,
+    GroupMemberGuard,
+  ],
   exports: [AuthService, AuthGuard, GroupMemberGuard],
 })
 export class AuthModule {}

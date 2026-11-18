@@ -94,6 +94,7 @@
     "@angular/platform-browser": "^22.1.6",
     "@angular/router": "^22.1.6",
     "@lucide/angular": "^1.46.0",
+    "@nestjs/authentication": "^0.1.6",
     "@nestjs/common": "^12.0.1",
     "@nestjs/core": "^12.0.1",
     "@nestjs/platform-express": "^12.0.1",

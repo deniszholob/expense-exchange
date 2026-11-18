@@ -3,16 +3,15 @@ import {
   createHmac,
   randomBytes,
   randomUUID,
-  scrypt as scryptCallback,
   timingSafeEqual,
 } from 'node:crypto';
-import { promisify } from 'node:util';
 import {
   BadRequestException,
   ConflictException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { PasswordHasher } from '@nestjs/authentication';
 import { GroupMemberRepository } from '../group-member/group-member.repository.js';
 import { AuthRepository } from './auth.repository.js';
 import type { AuthAccount } from './auth-account.schema.js';
@@ -28,8 +27,6 @@ import { UserColor } from './user-color.enum.js';
 // #endregion
 
 // #region Types and Constants
-const scrypt = promisify(scryptCallback);
-
 const TOKEN_LIFETIME_DAYS = 14;
 const TOKEN_LIFETIME_HOURS = 24 * TOKEN_LIFETIME_DAYS;
 const TOKEN_LIFETIME_MINUTES = 60 * TOKEN_LIFETIME_HOURS;
@@ -49,6 +46,7 @@ export class AuthService {
   public constructor(
     private readonly repository: AuthRepository,
     private readonly groupMembers: GroupMemberRepository,
+    private readonly passwordHasher: PasswordHasher,
   ) {}
 
   public async status(): Promise<AuthStatus> {
@@ -72,7 +70,7 @@ export class AuthService {
         username: normalizeUsername(username),
         role: UserRole.Admin,
         color: UserColor.Gray,
-        passwordHash: await hashPassword(password),
+        passwordHash: await this.passwordHasher.hash(password),
         sessionVersion: 0,
       };
       store.accounts.push(account);
@@ -119,7 +117,7 @@ export class AuthService {
         username: normalizedUsername,
         role: UserRole.User,
         color: getNextUserColor(store.accounts),
-        passwordHash: await hashPassword(password),
+        passwordHash: await this.passwordHasher.hash(password),
         sessionVersion: 0,
       };
       store.accounts.push(account);
@@ -146,7 +144,7 @@ export class AuthService {
       }
       if (input.name !== undefined) account.name = input.name.trim();
       if (input.password) {
-        account.passwordHash = await hashPassword(input.password);
+        account.passwordHash = await this.passwordHasher.hash(input.password);
         account.sessionVersion += 1;
       }
       return publicUser(account);
@@ -213,7 +211,7 @@ export class AuthService {
       )
         throw new UnauthorizedException('Invalid or expired recovery code.');
       await this.repository.deletePasswordResetChallenge(account.id);
-      account.passwordHash = await hashPassword(input.password);
+      account.passwordHash = await this.passwordHasher.hash(input.password);
       account.sessionVersion += 1;
     });
   }
@@ -225,7 +223,11 @@ export class AuthService {
     const account = (await this.readAccounts()).accounts.find(
       (entry) => entry.username === normalizeUsername(username),
     );
-    if (!account || !(await verifyPassword(password, account.passwordHash)))
+    const passwordIsValid = await this.passwordHasher.verify(
+      password,
+      account?.passwordHash,
+    );
+    if (!account || !passwordIsValid)
       throw new UnauthorizedException('Invalid username or password');
     return {
       user: publicUser(account),
@@ -286,7 +288,7 @@ export class AuthService {
       if (account.role === UserRole.User && color !== undefined)
         account.color = color;
       if (password.length > 0)
-        account.passwordHash = await hashPassword(password);
+        account.passwordHash = await this.passwordHasher.hash(password);
       return publicUser(account);
     });
   }
@@ -344,25 +346,6 @@ export class AuthService {
 // #endregion
 
 // #region Helpers
-async function hashPassword(password: string): Promise<string> {
-  const salt = randomBytes(16);
-  const derived = (await scrypt(password, salt, 64)) as Buffer;
-  return `${salt.toString('hex')}:${derived.toString('hex')}`;
-}
-async function verifyPassword(
-  password: string,
-  stored: string,
-): Promise<boolean> {
-  const [saltHex, hashHex] = stored.split(':');
-  if (!saltHex || !hashHex) return false;
-  const expected = Buffer.from(hashHex, 'hex');
-  const actual = (await scrypt(
-    password,
-    Buffer.from(saltHex, 'hex'),
-    expected.length,
-  )) as Buffer;
-  return expected.length === actual.length && timingSafeEqual(expected, actual);
-}
 function publicUser(account: AuthAccount): AuthUser {
   return {
     id: account.id,
