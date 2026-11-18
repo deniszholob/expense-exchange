@@ -24,13 +24,10 @@ import type {
 import { PASSWORD_RESET_LIFETIME_MINUTES } from './auth.schema.js';
 import { UserRole } from './user-role.enum.js';
 import { UserColor } from './user-color.enum.js';
+import { SESSION_LIFETIME_MS } from './auth-session.constants.js';
 // #endregion
 
 // #region Types and Constants
-const TOKEN_LIFETIME_DAYS = 14;
-const TOKEN_LIFETIME_HOURS = 24 * TOKEN_LIFETIME_DAYS;
-const TOKEN_LIFETIME_MINUTES = 60 * TOKEN_LIFETIME_HOURS;
-const TOKEN_LIFETIME_SECONDS = 60 * TOKEN_LIFETIME_MINUTES;
 const PASSWORD_RESET_RANDOM_BYTES = 16;
 const PASSWORD_RESET_LIFETIME_MS = PASSWORD_RESET_LIFETIME_MINUTES * 60 * 1000;
 
@@ -301,7 +298,7 @@ export class AuthService {
       JSON.stringify({
         id,
         sessionVersion,
-        expires: Date.now() + TOKEN_LIFETIME_SECONDS * 1000,
+        expires: Date.now() + SESSION_LIFETIME_MS,
       }),
     ).toString('base64url');
     return `${payload}.${await this.sign(payload)}`;

@@ -54,6 +54,10 @@ import { AuthGuard } from '../guards/auth.guard.js';
 import { AdminGuard } from '../guards/admin.guard.js';
 import type { AuthenticatedRequest } from '../guards/auth.guard.js';
 import { UserRole } from './user-role.enum.js';
+import {
+  SESSION_COOKIE_NAME,
+  SESSION_LIFETIME_MS,
+} from './auth-session.constants.js';
 // #endregion
 
 // #region Controller
@@ -236,7 +240,7 @@ export class AuthController {
     @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
   ): LogoutResponseDto {
-    response.clearCookie('expense_exchange_session', cookieOptions(request));
+    response.clearCookie(SESSION_COOKIE_NAME, cookieOptions(request));
     return { success: true };
   }
 
@@ -294,9 +298,9 @@ function setSessionCookie(
   token: string,
   request: Request,
 ): void {
-  response.cookie('expense_exchange_session', token, {
+  response.cookie(SESSION_COOKIE_NAME, token, {
     ...cookieOptions(request),
-    maxAge: 14 * 24 * 60 * 60 * 1000,
+    maxAge: SESSION_LIFETIME_MS,
   });
 }
 function cookieOptions(request: Request): {
