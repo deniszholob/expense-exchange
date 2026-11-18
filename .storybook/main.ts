@@ -11,7 +11,11 @@ const config: StorybookConfig = {
     stripPrefixes: ['src/client/app/'],
   }),
   addons: ['@storybook/addon-a11y', '@storybook/addon-docs'],
-  framework: { name: '@storybook/angular-vite', options: {} },
+  features: { experimentalDocgenServer: false },
+  framework: {
+    name: '@storybook/angular-vite',
+    options: { compodoc: false },
+  },
   core: { disableTelemetry: true },
   staticDirs: [{ from: '../src/assets', to: '/assets' }],
 };

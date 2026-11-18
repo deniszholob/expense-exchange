@@ -1,6 +1,8 @@
 // === Auto Generated during deployment build === //
 
-/** MS since UNIX epoch - can use with angular date pipe */
-export const APP_BUILD_DATE: number = 1794696242868;
-/** Version extracted from package.json */
-export const APP_BUILD_VERSION: string = '0.1.0';
+// #region Build Metadata
+/** Milliseconds since the Unix epoch; Can Use with Angular date pipe; production builds replace this module. */
+export const APP_BUILD_DATE: number = 0;
+/** Production builds replace this source default with package.json version metadata. */
+export const APP_BUILD_VERSION: string = '0.0.0';
+// #endregion

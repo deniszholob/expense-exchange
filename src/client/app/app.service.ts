@@ -34,6 +34,8 @@ import { LocalTransactionSchema } from 'src/client/app/shared/local-transaction.
 
 // #region Constants
 const DATA_SOURCE_STORAGE_KEY = 'expense-exchange.data-source';
+export const LOCAL_USER_ID = 'local-user';
+const LOCAL_USER_NAME = 'Local';
 // #endregion
 
 // #region Service
@@ -121,7 +123,9 @@ export class AppService {
 
   public constructor() {
     if (this.$dataSource() === DataSource.Local)
-      this.$currentUser.set(createLocalAuthUser());
+      this.$currentUser.set(
+        createLocalAuthUser(this.$localStore().availableUsers),
+      );
   }
 
   public signOut(): void {
@@ -301,6 +305,11 @@ export class AppService {
         member.id === user.id ? { ...member, ...updatedUser } : member,
       ),
     }));
+    if (user.id === LOCAL_USER_ID && this.$dataSource() === DataSource.Local) {
+      this.$currentUser.update((currentUser) =>
+        currentUser ? { ...currentUser, name: user.name, color } : currentUser,
+      );
+    }
   }
 
   public updateLocalUserColor(color: UserColor): void {
@@ -311,6 +320,7 @@ export class AppService {
   }
 
   public removeLocalAvailableUser(id: string): void {
+    if (id === LOCAL_USER_ID) return;
     this.updateLocalStore((store) => ({
       ...store,
       availableUsers: store.availableUsers.filter((item) => item.id !== id),
@@ -422,7 +432,9 @@ export class AppService {
     this.updateLocalStore(() => ({
       version: 3,
       users: parsed.data.users,
-      availableUsers: parsed.data.availableUsers ?? parsed.data.users,
+      availableUsers: ensureLocalUser(
+        parsed.data.availableUsers ?? parsed.data.users,
+      ),
       externalParticipants: parsed.data.externalParticipants ?? [],
       transactions: parsed.data.transactions,
     }));
@@ -435,7 +447,7 @@ export class AppService {
     this.updateLocalStore(() => ({
       version: 3,
       users: [],
-      availableUsers: [],
+      availableUsers: [createLocalUserRecord()],
       externalParticipants: [],
       transactions: [],
     }));
@@ -459,7 +471,9 @@ export class AppService {
     this.$externalParticipantsResource.set(undefined);
     this.$loginAccountsResource.set(undefined);
     if (source === DataSource.Local) {
-      this.$currentUser.set(createLocalAuthUser());
+      this.$currentUser.set(
+        createLocalAuthUser(this.$localStore().availableUsers),
+      );
       if (previousSource === DataSource.RemoteApi)
         void firstValueFrom(this.authApi.authControllerLogout()).catch(
           () => undefined,
@@ -589,13 +603,16 @@ function readLocalStore(): LocalStore {
       const parsed: unknown = JSON.parse(serialized);
       const result = LocalStoreSchema.safeParse(parsed);
       if (result.success) {
-        const availableUsers = (
-          result.data.availableUsers ?? result.data.users
-        ).map((user, index) => ({
-          ...user,
-          color:
-            user.color ?? LOCAL_USER_COLORS[index % LOCAL_USER_COLORS.length]!,
-        }));
+        const availableUsers = ensureLocalUser(
+          (result.data.availableUsers ?? result.data.users).map(
+            (user, index) => ({
+              ...user,
+              color:
+                user.color ??
+                LOCAL_USER_COLORS[index % LOCAL_USER_COLORS.length]!,
+            }),
+          ),
+        );
         const users = result.data.users.map((user) => ({
           ...user,
           color:
@@ -613,6 +630,9 @@ function readLocalStore(): LocalStore {
         };
         if (
           result.data.version !== 3 ||
+          !result.data.availableUsers?.some(
+            (user) => user.id === LOCAL_USER_ID,
+          ) ||
           result.data.users.some((user) => user.color === undefined) ||
           result.data.availableUsers?.some((user) => user.color === undefined)
         )
@@ -629,20 +649,33 @@ function readLocalStore(): LocalStore {
   return {
     version: 3,
     users: [],
-    availableUsers: [],
+    availableUsers: [createLocalUserRecord()],
     externalParticipants: [],
     transactions: [],
   };
 }
 
-function createLocalAuthUser(): AuthUserDto {
+function createLocalAuthUser(
+  availableUsers: readonly GroupMemberDto[],
+): AuthUserDto {
+  const localUser = availableUsers.find((user) => user.id === LOCAL_USER_ID);
   return {
-    id: 'local-user',
-    name: 'Local',
+    id: LOCAL_USER_ID,
+    name: localUser?.name ?? LOCAL_USER_NAME,
     username: 'local',
     role: UserRole.User,
-    color: readLocalUserColor(),
+    color: localUser?.color ?? readLocalUserColor(),
   };
+}
+
+function createLocalUserRecord(): GroupMemberDto {
+  return { id: LOCAL_USER_ID, name: LOCAL_USER_NAME, color: UserColor.Blue };
+}
+
+function ensureLocalUser(users: GroupMemberDto[]): GroupMemberDto[] {
+  return users.some((user) => user.id === LOCAL_USER_ID)
+    ? users
+    : [...users, createLocalUserRecord()];
 }
 
 function readLocalUserColor(): UserColor {

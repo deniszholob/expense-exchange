@@ -20,7 +20,7 @@ import {
   type GroupMemberDto,
 } from 'src/client/api/generated/expense-exchange-api.schemas';
 import { AuthService } from 'src/client/api/generated/auth/auth.service';
-import { AppService } from 'src/client/app/app.service';
+import { AppService, LOCAL_USER_ID } from 'src/client/app/app.service';
 import { DataSource } from 'src/client/app/shared/data-source.enum';
 import { PageLayoutComponent } from 'src/client/app/layout';
 import {
@@ -58,6 +58,7 @@ export class UserManagementPageComponent {
   private readonly authApi = inject(AuthService);
   protected readonly appService = inject(AppService);
   protected readonly DataSource = DataSource;
+  protected readonly LOCAL_USER_ID = LOCAL_USER_ID;
   protected readonly UserRole = UserRole;
   protected readonly $userColorOptions = USER_COLOR_OPTIONS;
   protected readonly $accounts = signal<AuthUserDto[]>([]);
@@ -167,6 +168,7 @@ export class UserManagementPageComponent {
   }
 
   protected deleteLocalUser(id: string): void {
+    if (id === LOCAL_USER_ID) return;
     const inGroup = this.appService
       .$groupMembers()
       .some((member) => member.id === id);

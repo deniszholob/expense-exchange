@@ -69,6 +69,7 @@ if (isDirectoryBuild) {
   for (const entry of entries) {
     if (
       entry.name === 'builder-debug.yml' ||
+      entry.name === 'builder-effective-config.yaml' ||
       entry.name.startsWith('__') ||
       entry.name.startsWith('latest-') ||
       (entry.isDirectory() &&
@@ -83,4 +84,7 @@ if (isDirectoryBuild) {
 }
 
 await rm(CFG.electronOutputDirectory, { recursive: true, force: true });
+await rm(join(CFG.releaseDirectory, 'builder-effective-config.yaml'), {
+  force: true,
+});
 // #endregion

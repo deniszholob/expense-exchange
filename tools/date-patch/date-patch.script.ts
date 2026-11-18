@@ -7,16 +7,18 @@ import { DATE_PATCH_SCRIPT_CONFIG as CFG } from './date-patch.script.config.ts';
 // #region Main
 const buildDate = Date.now();
 const buildVersion = process.env['npm_package_version'] ?? '0.0.0';
-const contents = `// === Auto Generated during deployment build === //
+const generatedApplicationBuild = `// === Auto Generated during deployment build === //
 
-/** MS since UNIX epoch - can use with angular date pipe */
+// #region Build Metadata
+/** Milliseconds since the Unix epoch; Can Use with Angular date pipe; production builds replace this module. */
 export const APP_BUILD_DATE: number = ${buildDate};
-/** Version extracted from package.json */
+/** Production builds replace this source default with package.json version metadata. */
 export const APP_BUILD_VERSION: string = '${buildVersion}';
+// #endregion
 `;
 
-await writeFile(CFG.applicationBuildFile, contents);
 await mkdir(dirname(CFG.buildMetadataFile), { recursive: true });
+await writeFile(CFG.generatedApplicationBuildFile, generatedApplicationBuild);
 await writeFile(
   CFG.buildMetadataFile,
   `${JSON.stringify({ date: buildDate, version: buildVersion }, null, 2)}\n`,

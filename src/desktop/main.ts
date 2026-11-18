@@ -8,6 +8,10 @@ function createWindow(): void {
   const window = new BrowserWindow({
     width: 1280,
     height: 800,
+    icon: join(
+      import.meta.dirname,
+      '../client/browser/assets/expense-exchange-icon.png',
+    ),
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,

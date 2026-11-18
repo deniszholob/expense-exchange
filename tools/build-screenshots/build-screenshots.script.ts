@@ -6,6 +6,7 @@ import { createServer } from 'node:http';
 import { extname, join, resolve } from 'node:path';
 import { chromium } from '@playwright/test';
 import { BUILD_SCREENSHOTS_SCRIPT_CONFIG as CFG } from './build-screenshots.script.config.ts';
+import { initializeScreenshotMockData } from './build-screenshots.mock-data.ts';
 // #endregion
 
 // #region Helpers
@@ -59,6 +60,7 @@ function contentTypeForFile(path: string): string {
       return 'application/octet-stream';
   }
 }
+
 // #endregion
 
 // #region Main
@@ -118,9 +120,12 @@ try {
       mkdir(CFG.browserAssetDirectory, { recursive: true }),
     ]);
     const page = await browser.newPage({ viewport: CFG.landscapeViewport });
+    await page.addInitScript(initializeScreenshotMockData);
     await page.goto(CFG.baseUrl, { waitUntil: 'networkidle' });
     await page.locator('app-page-layout').waitFor({ state: 'visible' });
-    await page.getByText('Data Source', { exact: true }).waitFor();
+    await page
+      .getByRole('heading', { name: 'Group balance', exact: true })
+      .waitFor();
     await page.evaluate(() => document.fonts.ready);
     await page.screenshot({
       path: resolve(CFG.releaseDirectory, CFG.landscapeScreenshot),

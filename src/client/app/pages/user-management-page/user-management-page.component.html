@@ -88,6 +88,9 @@
                     {{ user.name | userMonogram }}
                   </span>
                   <span class="truncate font-medium">{{ user.name }}</span>
+                  @if (user.id === LOCAL_USER_ID) {
+                    <span class="count-badge shrink-0">Signed in</span>
+                  }
                 </div>
                 <div class="flex gap-2">
                   <button
@@ -98,14 +101,16 @@
                   >
                     <svg class="size-4" lucidePencil aria-hidden="true"></svg>
                   </button>
-                  <button
-                    class="btn-icon btn-icon-delete"
-                    [attr.aria-label]="'Delete ' + user.name"
-                    (click)="deleteLocalUser(user.id)"
-                    type="button"
-                  >
-                    <svg class="size-4" lucideTrash2 aria-hidden="true"></svg>
-                  </button>
+                  @if (user.id !== LOCAL_USER_ID) {
+                    <button
+                      class="btn-icon btn-icon-delete"
+                      [attr.aria-label]="'Delete ' + user.name"
+                      (click)="deleteLocalUser(user.id)"
+                      type="button"
+                    >
+                      <svg class="size-4" lucideTrash2 aria-hidden="true"></svg>
+                    </button>
+                  }
                 </div>
               }
             </li>

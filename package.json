@@ -40,7 +40,7 @@
     "serve:server:prod": "node .dist/server-bundle/server.cjs",
     "serve:web": "http-server .dist/client/browser --port=5555 --cors --cache=-1",
     "serve:docker": "docker run --rm --name expense-exchange --publish ${HOST_PORT:-3001}:3000 --volume expense-exchange-data:/app/data expense-exchange:${npm_package_version}",
-    "docker:build": "docker build --build-arg APP_VERSION=${npm_package_version} --tag expense-exchange:${npm_package_version} --tag expense-exchange:local .",
+    "docker:build": "docker build --build-arg APP_VERSION=${npm_package_version} --build-arg APP_UID=${APP_UID:-99} --build-arg APP_GID=${APP_GID:-100} --tag expense-exchange:${npm_package_version} --tag expense-exchange:local .",
     "docker:package": "mkdir -p .builds/expense-exchange-v${npm_package_version} && docker save --output .builds/expense-exchange-v${npm_package_version}/expense-exchange-v${npm_package_version}-docker-image.tar expense-exchange:${npm_package_version}",
     "docker:run": "pnpm run serve:docker",
     "smoke:docker": "node --experimental-strip-types tools/docker-smoke/docker-smoke.script.ts",

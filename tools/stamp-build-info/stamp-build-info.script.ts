@@ -30,14 +30,14 @@ const buildLabel = `v${metadata.version} - ${new Date(metadata.date).toISOString
 const buildDate = new Date(metadata.date).toISOString();
 const sourceHtml = await readFile(indexFile, 'utf8');
 const metaTagPattern = new RegExp(
-  `<meta\\s+name="${CFG.metaName}"\\s+content="[^"]*"\\s*\\/?>`,
+  `<meta\\s+name="${CFG.metaName}"(?=\\s|>)[^>]*>`,
 );
 
 if (!metaTagPattern.test(sourceHtml)) {
   throw new Error(`Build metadata placeholder was not found in ${indexFile}.`);
 }
 
-const stampedMetaTag = `<meta name="${CFG.metaName}" content="${escapeHtmlAttribute(buildLabel)}" />`;
+const stampedMetaTag = `<meta name="${CFG.metaName}" content="${escapeHtmlAttribute(buildLabel)}" data-version="${escapeHtmlAttribute(metadata.version)}" data-date="${metadata.date}" />`;
 const htmlWithMeta = sourceHtml.replace(metaTagPattern, stampedMetaTag);
 if (
   !htmlWithMeta.includes('{{BUILD_VERSION}}') ||
