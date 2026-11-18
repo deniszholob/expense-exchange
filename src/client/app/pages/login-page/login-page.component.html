@@ -21,38 +21,226 @@
         <a class="btn btn-primary mt-4 no-underline" routerLink="/data"> Open Data settings </a>
       </section>
     } @else {
-      <section class="surface-card mx-auto w-full max-w-md p-5 sm:p-7">
-        <div class="mb-6">
-          <h2 class="text-xl font-semibold">Sign in to Expense Exchange</h2>
-          <p class="text-finance-muted mt-2 text-sm">Use your server account to continue.</p>
-        </div>
-        <form class="flex flex-col gap-4" (submit)="submit($event)">
-          <app-auth-account-selector
-            [$accounts]="$loginAccounts()"
-            [$selectedUsername]="$credentials().username"
-            (selected)="selectLoginAccount($event)"
-          />
-          <app-form-field
-            [$id]="'username'"
-            [$label]="'Username'"
-            [$required]="true"
-            [$icon]="FormFieldIcon.UserRound"
-            ><input id="username" [formField]="$form.username" autocomplete="username"
-          /></app-form-field>
-          <app-form-field [$id]="'password'" [$label]="'Password'" [$required]="true"
-            ><input
-              id="password"
-              [formField]="$form.password"
-              type="password"
-              autocomplete="current-password"
-          /></app-form-field>
-          @if ($error(); as error) {
-            <p class="text-finance-negative text-sm" role="alert">{{ error }}</p>
-          }
-          <button class="btn-primary mt-1 w-full" [disabled]="$loading()" type="submit">
-            {{ $loading() ? 'Please wait…' : 'Sign in' }}
+      <section
+        class="surface-card login-card mx-auto w-full p-5 sm:p-7"
+        [class.login-card-wide]="$recoveryOpen()"
+      >
+        @if (!$recoveryOpen()) {
+          <div class="mb-6">
+            <h2 class="text-xl font-semibold">Sign in to Expense Exchange</h2>
+            <p class="text-finance-muted mt-2 text-sm">Use your server account to continue.</p>
+          </div>
+          <form class="flex flex-col gap-4" (submit)="submit($event)">
+            <app-auth-account-selector
+              [$accounts]="$loginAccounts()"
+              [$selectedUsername]="$credentials().username"
+              (selected)="selectLoginAccount($event)"
+            />
+            <app-form-field
+              [$id]="'username'"
+              [$label]="'Username'"
+              [$required]="true"
+              [$icon]="FormFieldIcon.UserRound"
+              ><input id="username" [formField]="$form.username" autocomplete="username"
+            /></app-form-field>
+            <app-form-field [$id]="'password'" [$label]="'Password'" [$required]="true"
+              ><input
+                id="password"
+                [formField]="$form.password"
+                type="password"
+                autocomplete="current-password"
+            /></app-form-field>
+            @if ($error(); as error) {
+              <p class="text-finance-negative text-sm" role="alert">{{ error }}</p>
+            }
+            <button class="btn-primary mt-1 w-full" [disabled]="$loading()" type="submit">
+              {{ $loading() ? 'Please wait…' : 'Sign in' }}
+            </button>
+          </form>
+          <button
+            class="link-button mt-4 w-full text-center text-sm"
+            (click)="openRecovery()"
+            type="button"
+          >
+            Forgot your password?
           </button>
-        </form>
+        } @else {
+          <div class="mb-5 flex items-start justify-between gap-3">
+            <div>
+              <h2 class="text-xl font-semibold">Recover your account</h2>
+              @if (!$recoveryMethod()) {
+                <p class="text-finance-muted mt-2 text-sm">
+                  Choose a recovery method and check what it requires.
+                </p>
+              }
+            </div>
+            <button class="btn-secondary shrink-0" (click)="closeRecovery()" type="button">
+              Back to sign in
+            </button>
+          </div>
+
+          @if (!$recoveryMethod()) {
+            <div class="recovery-method-options">
+              <button
+                class="btn-secondary border-finance-border hover:border-finance-accent hover:bg-finance-hover focus-visible:ring-finance-accent w-full flex-col items-start gap-3 p-4 text-left transition duration-150 hover:-translate-y-0.5 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-offset-2"
+                (click)="selectRecoveryMethod(PasswordRecoveryMethod.AdminAssisted)"
+                type="button"
+              >
+                <span class="font-semibold">Admin-assisted recovery</span>
+                <span class="text-finance-muted block text-left text-sm font-normal">
+                  Requires an administrator who can still sign in and a way to contact them.
+                </span>
+                <span class="text-finance-accent text-sm font-semibold">Choose this option →</span>
+              </button>
+              <button
+                class="btn-secondary border-finance-border hover:border-finance-accent hover:bg-finance-hover focus-visible:ring-finance-accent w-full flex-col items-start gap-3 p-4 text-left transition duration-150 hover:-translate-y-0.5 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-offset-2"
+                (click)="selectRecoveryMethod(PasswordRecoveryMethod.ServerFilesystem)"
+                type="button"
+              >
+                <span class="font-semibold">Server filesystem recovery</span>
+                <span class="text-finance-muted block text-left text-sm font-normal">
+                  Requires access to the server’s persistent data folder, directly or through its
+                  owner.
+                </span>
+                <span class="text-finance-accent text-sm font-semibold">Choose this option →</span>
+              </button>
+            </div>
+          } @else {
+            <button class="link-button mb-4 text-sm" (click)="showRecoveryMethods()" type="button">
+              Choose another recovery method
+            </button>
+
+            @if ($recoveryMethod() === PasswordRecoveryMethod.AdminAssisted) {
+              <div class="recovery-detail-layout border-finance-border border-t pt-4">
+                <div>
+                  <h3 class="font-semibold">Admin-assisted recovery</h3>
+                  <p class="text-finance-muted mt-1 text-sm">
+                    This screen does not send a request. Contact the administrator directly.
+                  </p>
+                </div>
+                <div>
+                  <h4 class="text-sm font-semibold">Steps</h4>
+                  <ol class="text-finance-muted mt-1 list-inside list-decimal space-y-1 text-sm">
+                    <li>
+                      Ask the administrator to open Users and set a temporary password for your
+                      account.
+                    </li>
+                    <li>Have them verify it’s you and share the password privately.</li>
+                    <li>
+                      Sign in with it, then choose a personal password from your Profile page.
+                    </li>
+                  </ol>
+                </div>
+              </div>
+            } @else {
+              <div class="recovery-detail-layout border-finance-border border-t pt-4">
+                <div>
+                  <h3 class="font-semibold">Server filesystem recovery</h3>
+                  <p class="text-finance-muted mt-1 text-sm">
+                    The text file contains your username, a one-time code, and its expiry time. It
+                    expires after 30 minutes and never contains your password.
+                  </p>
+                </div>
+                <div>
+                  <h4 class="text-sm font-semibold">Required access</h4>
+                  <p class="text-finance-muted mt-1 text-sm">
+                    You or someone helping you must have access to the server’s persistent data
+                    directory. For Docker, the file is inside
+                    <code>/app/data/password-reset-requests</code>; access the host folder mounted
+                    there. Outside Docker, check the configured <code>DATA_DIR</code> or the default
+                    <code>.dist/data/password-reset-requests</code> folder.
+                  </p>
+                </div>
+                <div>
+                  <h4 class="text-sm font-semibold">Steps</h4>
+                  <ol class="text-finance-muted mt-1 list-inside list-decimal space-y-1 text-sm">
+                    <li>Enter your username below to request a recovery file.</li>
+                    <li>
+                      Ask the server owner to verify it’s you, find the file containing your
+                      username, and share the code privately.
+                    </li>
+                    <li>
+                      Enter the code and a new password. The server removes the file and signs out
+                      existing sessions.
+                    </li>
+                  </ol>
+                </div>
+
+                <div class="recovery-action">
+                  @if (!$recoveryRequested()) {
+                    <form class="flex flex-col gap-3" (submit)="requestFilesystemRecovery($event)">
+                      <app-form-field
+                        [$id]="'recovery-username'"
+                        [$label]="'Username'"
+                        [$required]="true"
+                        [$icon]="FormFieldIcon.UserRound"
+                        ><input
+                          id="recovery-username"
+                          [formField]="$recoveryRequestForm.username"
+                          autocomplete="username"
+                      /></app-form-field>
+                      <button
+                        class="btn-primary w-full"
+                        [disabled]="$recoveryLoading()"
+                        type="submit"
+                      >
+                        {{ $recoveryLoading() ? 'Please wait…' : 'Create recovery file' }}
+                      </button>
+                    </form>
+                  } @else if (!$recoveryCompleted()) {
+                    <p class="text-finance-muted mb-3 text-sm" role="status">
+                      If the account exists, the request is ready. The same message is shown for
+                      unknown usernames. Continue when you have the code.
+                    </p>
+                    <p class="text-sm font-medium">
+                      Resetting password for {{ $recoveryCompletion().username }}
+                    </p>
+                    <form class="flex flex-col gap-3" (submit)="completeFilesystemRecovery($event)">
+                      <app-form-field
+                        [$id]="'recovery-code'"
+                        [$label]="'Recovery code'"
+                        [$required]="true"
+                        ><input
+                          id="recovery-code"
+                          [formField]="$recoveryCompletionForm.code"
+                          autocomplete="one-time-code"
+                          spellcheck="false"
+                      /></app-form-field>
+                      <app-form-field
+                        [$id]="'recovery-password'"
+                        [$label]="'New password'"
+                        [$required]="true"
+                        ><input
+                          id="recovery-password"
+                          [formField]="$recoveryCompletionForm.password"
+                          type="password"
+                          autocomplete="new-password"
+                      /></app-form-field>
+                      <button
+                        class="btn-primary w-full"
+                        [disabled]="$recoveryLoading()"
+                        type="submit"
+                      >
+                        {{ $recoveryLoading() ? 'Please wait…' : 'Reset password' }}
+                      </button>
+                    </form>
+                  } @else {
+                    <p class="text-finance-positive text-sm" role="status">
+                      Password reset. Sign in with your new password.
+                    </p>
+                    <button class="btn-primary w-full" (click)="closeRecovery()" type="button">
+                      Return to sign in
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+          }
+
+          @if ($recoveryError(); as error) {
+            <p class="text-finance-negative mt-4 text-sm" role="alert">{{ error }}</p>
+          }
+        }
       </section>
     }
   }

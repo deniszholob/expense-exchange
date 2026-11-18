@@ -12,6 +12,7 @@ export const AuthAccountSchema = z.object({
   role: z.enum(UserRole),
   color: z.enum(UserColor).default(UserColor.Blue),
   passwordHash: z.string().min(1),
+  sessionVersion: z.number().int().nonnegative().default(0),
 });
 // #endregion
 

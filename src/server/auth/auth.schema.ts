@@ -12,6 +12,8 @@ export const PASSWORD_POLICY = {
 } as const;
 export const AUTH_NAME_MAX_LENGTH = 100;
 export const USERNAME_LENGTH = { min: 3, max: 64 } as const;
+export const PASSWORD_RESET_CODE_LENGTH = 22;
+export const PASSWORD_RESET_LIFETIME_MINUTES = 30;
 
 const CredentialsSchema = z.object({
   username: z.string().trim().min(USERNAME_LENGTH.min).max(USERNAME_LENGTH.max),
@@ -77,6 +79,29 @@ export const UpdateProfileSchema = z.object({
   color: z.enum(UserColor).optional(),
 });
 
+export const FilesystemPasswordResetRequestSchema = z.object({
+  username: z.string().trim().min(USERNAME_LENGTH.min).max(USERNAME_LENGTH.max),
+});
+
+export const FilesystemPasswordResetCompleteSchema = z.object({
+  username: z.string().trim().min(USERNAME_LENGTH.min).max(USERNAME_LENGTH.max),
+  code: z.string().length(PASSWORD_RESET_CODE_LENGTH),
+  password: z
+    .string()
+    .min(PASSWORD_POLICY.minLength)
+    .max(PASSWORD_POLICY.maxLength),
+});
+
+export const FilesystemPasswordResetChallengeSchema = z.object({
+  username: z.string().min(USERNAME_LENGTH.min).max(USERNAME_LENGTH.max),
+  code: z.string().length(PASSWORD_RESET_CODE_LENGTH),
+  expiresAt: z.number().int().positive(),
+});
+
+export const PasswordResetResponseSchema = z.object({
+  success: z.boolean(),
+});
+
 export type AuthUser = z.infer<typeof AuthUserSchema>;
 export type LoginAccount = z.infer<typeof LoginAccountSchema>;
 export type AuthStatus = z.infer<typeof AuthStatusSchema>;
@@ -87,6 +112,16 @@ export type ProfileUpdate = z.infer<typeof UpdateProfileSchema>;
 export type CreateAuthAccount = z.infer<typeof CreateAuthAccountSchema>;
 export type UpdateAuthAccount = z.infer<typeof UpdateAuthAccountSchema>;
 export type LogoutResponse = z.infer<typeof LogoutResponseSchema>;
+export type FilesystemPasswordResetRequest = z.infer<
+  typeof FilesystemPasswordResetRequestSchema
+>;
+export type FilesystemPasswordResetComplete = z.infer<
+  typeof FilesystemPasswordResetCompleteSchema
+>;
+export type FilesystemPasswordResetChallenge = z.infer<
+  typeof FilesystemPasswordResetChallengeSchema
+>;
+export type PasswordResetResponse = z.infer<typeof PasswordResetResponseSchema>;
 // #endregion
 
 // #region Persistence Schema

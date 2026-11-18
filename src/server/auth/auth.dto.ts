@@ -9,10 +9,13 @@ import type {
   AuthUser,
   CreateAuthAccount,
   Credentials,
+  FilesystemPasswordResetComplete,
+  FilesystemPasswordResetRequest,
   LoginAccount,
   LogoutResponse,
   ProfileUpdate,
   UpdateAuthAccount,
+  PasswordResetResponse,
 } from './auth.schema.js';
 // #endregion
 
@@ -63,6 +66,17 @@ export class UpdateAuthAccountDto implements UpdateAuthAccount {
   @ApiProperty({ required: false }) public password?: string;
 }
 export class LogoutResponseDto implements LogoutResponse {
+  @ApiProperty() public success!: boolean;
+}
+export class FilesystemPasswordResetRequestDto implements FilesystemPasswordResetRequest {
+  @ApiProperty() public username!: string;
+}
+export class FilesystemPasswordResetCompleteDto implements FilesystemPasswordResetComplete {
+  @ApiProperty() public username!: string;
+  @ApiProperty() public code!: string;
+  @ApiProperty() public password!: string;
+}
+export class PasswordResetResponseDto implements PasswordResetResponse {
   @ApiProperty() public success!: boolean;
 }
 // #endregion

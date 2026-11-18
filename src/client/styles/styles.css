@@ -555,6 +555,19 @@
     @apply text-finance-accent hover:text-finance-accent-hover gap-2 underline;
   }
 
+  .link-button {
+    @apply text-finance-accent inline-flex min-h-0 rounded-none border-0 bg-transparent p-0 text-left underline underline-offset-4 transition-colors;
+
+    &:hover:not(:disabled) {
+      @apply text-finance-accent-hover;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-finance-accent);
+      outline-offset: 3px;
+    }
+  }
+
   .nav-tab {
     @apply rounded-control text-finance-muted inline-flex min-h-10 items-center gap-2 px-3 py-2 text-sm font-medium no-underline transition-colors;
 

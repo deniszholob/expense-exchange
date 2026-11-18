@@ -17,6 +17,7 @@ import {
   ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiUnauthorizedResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
@@ -31,6 +32,8 @@ import {
   USERNAME_LENGTH,
   UpdateAuthAccountSchema,
   UpdateProfileSchema,
+  FilesystemPasswordResetRequestSchema,
+  FilesystemPasswordResetCompleteSchema,
 } from './auth.schema.js';
 import {
   AdminSetupDto,
@@ -43,6 +46,9 @@ import {
   ProfileUpdateDto,
   CreateAuthAccountDto,
   UpdateAuthAccountDto,
+  FilesystemPasswordResetRequestDto,
+  FilesystemPasswordResetCompleteDto,
+  PasswordResetResponseDto,
 } from './auth.dto.js';
 import { AuthGuard } from '../guards/auth.guard.js';
 import { AdminGuard } from '../guards/admin.guard.js';
@@ -63,6 +69,43 @@ export class AuthController {
   @ApiOkResponse({ type: AuthStatusDto })
   public status(): Promise<AuthStatusDto> {
     return this.auth.status();
+  }
+
+  @Post('password-reset/filesystem/request')
+  @ApiOperation({
+    summary: 'Create a filesystem-assisted password recovery request',
+    description:
+      'Creates a short-lived recovery code file in the server data directory. The response does not reveal whether the username exists.',
+  })
+  @ApiBody({ type: FilesystemPasswordResetRequestDto })
+  @ApiOkResponse({ type: PasswordResetResponseDto })
+  public async requestFilesystemPasswordReset(
+    @Body() body: FilesystemPasswordResetRequestDto,
+  ): Promise<PasswordResetResponseDto> {
+    const input = FilesystemPasswordResetRequestSchema.safeParse(body);
+    if (!input.success)
+      throw new BadRequestException(authInputMessage(input.error));
+    await this.auth.requestFilesystemPasswordReset(input.data.username);
+    return { success: true };
+  }
+
+  @Post('password-reset/filesystem/complete')
+  @ApiOperation({
+    summary: 'Complete a filesystem-assisted password recovery request',
+  })
+  @ApiBody({ type: FilesystemPasswordResetCompleteDto })
+  @ApiOkResponse({ type: PasswordResetResponseDto })
+  @ApiUnauthorizedResponse({
+    description: 'Recovery code is invalid or expired',
+  })
+  public async completeFilesystemPasswordReset(
+    @Body() body: FilesystemPasswordResetCompleteDto,
+  ): Promise<PasswordResetResponseDto> {
+    const input = FilesystemPasswordResetCompleteSchema.safeParse(body);
+    if (!input.success)
+      throw new BadRequestException(authInputMessage(input.error));
+    await this.auth.completeFilesystemPasswordReset(input.data);
+    return { success: true };
   }
 
   @Get('login-accounts')
@@ -240,6 +283,7 @@ function authInputMessage(error: ZodError): string {
     return `Username must be between ${USERNAME_LENGTH.min} and ${USERNAME_LENGTH.max} characters.`;
   if (field === 'password')
     return `Password must be between ${PASSWORD_POLICY.minLength} and ${PASSWORD_POLICY.maxLength} characters.`;
+  if (field === 'code') return 'Recovery code is invalid or expired.';
   if (field === 'name')
     return `Name must be at most ${AUTH_NAME_MAX_LENGTH} characters.`;
   return 'Invalid authentication details.';

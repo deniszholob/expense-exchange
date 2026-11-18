@@ -16,7 +16,13 @@ import {
 import { GroupMemberRepository } from '../group-member/group-member.repository.js';
 import { AuthRepository } from './auth.repository.js';
 import type { AuthAccount } from './auth-account.schema.js';
-import type { AuthUser, AuthStatus, LoginAccount } from './auth.schema.js';
+import type {
+  AuthUser,
+  AuthStatus,
+  FilesystemPasswordResetComplete,
+  LoginAccount,
+} from './auth.schema.js';
+import { PASSWORD_RESET_LIFETIME_MINUTES } from './auth.schema.js';
 import { UserRole } from './user-role.enum.js';
 import { UserColor } from './user-color.enum.js';
 // #endregion
@@ -28,6 +34,8 @@ const TOKEN_LIFETIME_DAYS = 14;
 const TOKEN_LIFETIME_HOURS = 24 * TOKEN_LIFETIME_DAYS;
 const TOKEN_LIFETIME_MINUTES = 60 * TOKEN_LIFETIME_HOURS;
 const TOKEN_LIFETIME_SECONDS = 60 * TOKEN_LIFETIME_MINUTES;
+const PASSWORD_RESET_RANDOM_BYTES = 16;
+const PASSWORD_RESET_LIFETIME_MS = PASSWORD_RESET_LIFETIME_MINUTES * 60 * 1000;
 
 interface AccountsStore {
   accounts: AuthAccount[];
@@ -65,6 +73,7 @@ export class AuthService {
         role: UserRole.Admin,
         color: UserColor.Gray,
         passwordHash: await hashPassword(password),
+        sessionVersion: 0,
       };
       store.accounts.push(account);
       return publicUser(account);
@@ -111,6 +120,7 @@ export class AuthService {
         role: UserRole.User,
         color: getNextUserColor(store.accounts),
         passwordHash: await hashPassword(password),
+        sessionVersion: 0,
       };
       store.accounts.push(account);
       return publicUser(account);
@@ -135,8 +145,10 @@ export class AuthService {
         account.username = username;
       }
       if (input.name !== undefined) account.name = input.name.trim();
-      if (input.password)
+      if (input.password) {
         account.passwordHash = await hashPassword(input.password);
+        account.sessionVersion += 1;
+      }
       return publicUser(account);
     });
   }
@@ -150,14 +162,59 @@ export class AuthService {
       throw new ConflictException(
         'Remove this account from the group before deleting it',
       );
-    return this.updateAccounts((store) => {
+    return this.updateAccounts(async (store) => {
       const index = store.accounts.findIndex((entry) => entry.id === id);
       if (index < 0) throw new ConflictException('Account does not exist');
       if (store.accounts[index]?.role === UserRole.Admin)
         throw new ConflictException(
           'The administrator account cannot be deleted here',
         );
-      return publicUser(store.accounts.splice(index, 1)[0]!);
+      const [account] = store.accounts.splice(index, 1);
+      if (!account) throw new ConflictException('Account does not exist');
+      await this.repository.deletePasswordResetChallenge(account.id);
+      return publicUser(account);
+    });
+  }
+
+  public requestFilesystemPasswordReset(username: string): Promise<void> {
+    return this.serializeAccounts(async (store) => {
+      const account = store.accounts.find(
+        (entry) => entry.username === normalizeUsername(username),
+      );
+      if (!account) return;
+      const activeChallenge = await this.repository.readPasswordResetChallenge(
+        account.id,
+      );
+      if (activeChallenge && activeChallenge.expiresAt > Date.now()) return;
+      await this.repository.writePasswordResetChallenge(account.id, {
+        username: account.username,
+        code: randomBytes(PASSWORD_RESET_RANDOM_BYTES).toString('base64url'),
+        expiresAt: Date.now() + PASSWORD_RESET_LIFETIME_MS,
+      });
+    }, false);
+  }
+
+  public completeFilesystemPasswordReset(
+    input: FilesystemPasswordResetComplete,
+  ): Promise<void> {
+    return this.updateAccounts(async (store) => {
+      const account = store.accounts.find(
+        (entry) => entry.username === normalizeUsername(input.username),
+      );
+      const challenge = account
+        ? await this.repository.readPasswordResetChallenge(account.id)
+        : undefined;
+      if (
+        !account ||
+        !challenge ||
+        challenge.username !== account.username ||
+        challenge.expiresAt <= Date.now() ||
+        !constantTimeEquals(challenge.code, input.code)
+      )
+        throw new UnauthorizedException('Invalid or expired recovery code.');
+      await this.repository.deletePasswordResetChallenge(account.id);
+      account.passwordHash = await hashPassword(input.password);
+      account.sessionVersion += 1;
     });
   }
 
@@ -172,7 +229,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid username or password');
     return {
       user: publicUser(account),
-      token: await this.createToken(account.id),
+      token: await this.createToken(account.id, account.sessionVersion),
     };
   }
 
@@ -184,7 +241,7 @@ export class AuthService {
     const expected = await this.sign(payload);
     if (!constantTimeEquals(signature, expected))
       throw new UnauthorizedException('Invalid session');
-    let claims: { id: string; expires: number };
+    let claims: { id: string; expires: number; sessionVersion?: number };
     try {
       claims = JSON.parse(
         Buffer.from(payload, 'base64url').toString('utf8'),
@@ -198,6 +255,8 @@ export class AuthService {
       (entry) => entry.id === claims.id,
     );
     if (!account) throw new UnauthorizedException('Account is unavailable');
+    if ((claims.sessionVersion ?? 0) !== account.sessionVersion)
+      throw new UnauthorizedException('Session expired');
     return publicUser(account);
   }
 
@@ -232,10 +291,14 @@ export class AuthService {
     });
   }
 
-  private async createToken(id: string): Promise<string> {
+  private async createToken(
+    id: string,
+    sessionVersion: number,
+  ): Promise<string> {
     const payload = Buffer.from(
       JSON.stringify({
         id,
+        sessionVersion,
         expires: Date.now() + TOKEN_LIFETIME_SECONDS * 1000,
       }),
     ).toString('base64url');
@@ -258,10 +321,17 @@ export class AuthService {
   private updateAccounts<T>(
     operation: (store: AccountsStore) => Promise<T> | T,
   ): Promise<T> {
+    return this.serializeAccounts(operation, true);
+  }
+
+  private serializeAccounts<T>(
+    operation: (store: AccountsStore) => Promise<T> | T,
+    persist: boolean,
+  ): Promise<T> {
     const result = this.accountWriteQueue.then(async () => {
       const store = await this.readAccounts();
       const output = await operation(store);
-      await this.writeAccounts(store);
+      if (persist) await this.writeAccounts(store);
       return output;
     });
     this.accountWriteQueue = result.then(

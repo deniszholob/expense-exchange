@@ -126,14 +126,13 @@ export class AppService {
 
   public signOut(): void {
     if (this.$dataSource() === DataSource.Local) return;
-    void firstValueFrom(this.authApi.authControllerLogout())
-      .catch(() => undefined)
-      .finally(() => {
-        this.$currentUser.set(undefined);
-        this.$groupMembersResource.set(undefined);
-        this.$transactionsResource.set(undefined);
-        this.$externalParticipantsResource.set(undefined);
-      });
+    this.$currentUser.set(undefined);
+    this.$groupMembersResource.set(undefined);
+    this.$transactionsResource.set(undefined);
+    this.$externalParticipantsResource.set(undefined);
+    void firstValueFrom(this.authApi.authControllerLogout()).catch(
+      () => undefined,
+    );
   }
 
   public async signIn(username: string, password: string): Promise<void> {
@@ -194,6 +193,26 @@ export class AppService {
     );
     this.$currentUser.set(user);
     this.refreshGroupMembers();
+  }
+
+  public async requestFilesystemPasswordReset(username: string): Promise<void> {
+    await firstValueFrom(
+      this.authApi.authControllerRequestFilesystemPasswordReset({ username }),
+    );
+  }
+
+  public async completeFilesystemPasswordReset(
+    username: string,
+    code: string,
+    password: string,
+  ): Promise<void> {
+    await firstValueFrom(
+      this.authApi.authControllerCompleteFilesystemPasswordReset({
+        username,
+        code,
+        password,
+      }),
+    );
   }
 
   public readonly authenticationReady: Promise<void> =

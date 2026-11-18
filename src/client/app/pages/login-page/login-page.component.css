@@ -1,0 +1,28 @@
+.login-card {
+  max-width: 28rem;
+}
+
+.recovery-method-options,
+.recovery-detail-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (orientation: landscape) and (min-width: 36rem) {
+  .login-card-wide {
+    max-width: 72rem;
+  }
+
+  .recovery-method-options {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .recovery-detail-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    align-items: start;
+    gap: 1.5rem;
+  }
+}

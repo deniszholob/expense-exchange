@@ -5,6 +5,117 @@
  * Self-hosted Expense Exchange API
  * OpenAPI spec version: 1.0.0
  */
+export interface AuthStatusDto {
+  setupRequired: boolean;
+}
+
+export interface FilesystemPasswordResetRequestDto {
+  username: string;
+}
+
+export interface PasswordResetResponseDto {
+  success: boolean;
+}
+
+export interface FilesystemPasswordResetCompleteDto {
+  username: string;
+  code: string;
+  password: string;
+}
+
+export enum UserRole {
+  Admin = 'Admin',
+  User = 'User',
+}
+export enum UserColor {
+  Blue = 'Blue',
+  Cyan = 'Cyan',
+  Emerald = 'Emerald',
+  Amber = 'Amber',
+  Rose = 'Rose',
+  Violet = 'Violet',
+  Gray = 'Gray',
+}
+export interface LoginAccountDto {
+  username: string;
+  role: UserRole;
+  color: UserColor;
+}
+
+export interface AuthUserDto {
+  id: string;
+  name: string;
+  username: string;
+  role: UserRole;
+  color: UserColor;
+}
+
+export interface CreateAuthAccountDto {
+  username: string;
+  password: string;
+  name?: string;
+}
+
+export interface UpdateAuthAccountDto {
+  name?: string;
+  username?: string;
+  password?: string;
+}
+
+export interface AdminSetupDto {
+  username: string;
+  password: string;
+  name?: string;
+}
+
+export interface AuthResponseDto {
+  user: AuthUserDto;
+}
+
+export interface CredentialsDto {
+  username: string;
+  password: string;
+}
+
+export interface LogoutResponseDto {
+  success: boolean;
+}
+
+export interface ProfileUpdateDto {
+  name?: string;
+  username: string;
+  password?: string;
+  color?: UserColor;
+}
+
+export interface GroupMemberDto {
+  id: string;
+  name: string;
+  username?: string;
+  color?: UserColor;
+}
+
+export interface AddGroupMemberDto {
+  accountId: string;
+}
+
+export interface ExternalParticipantDto {
+  /** @minLength 1 */
+  id: string;
+  /** @minLength 1 */
+  name: string;
+}
+
+export interface CreateExternalParticipantDto {
+  /** @minLength 1 */
+  name: string;
+}
+
+export interface UpdateExternalParticipantDto {
+  /** @minLength 1 */
+  name: string;
+}
+
 export enum TransactionType {
   Expense = 'Expense',
   Income = 'Income',
@@ -58,86 +169,6 @@ export interface CreateTransactionDto {
   note?: string;
   /** @minLength 1 */
   linkedTransactionId?: string;
-}
-
-export enum UserColor {
-  Blue = 'Blue',
-  Cyan = 'Cyan',
-  Emerald = 'Emerald',
-  Amber = 'Amber',
-  Rose = 'Rose',
-  Violet = 'Violet',
-  Gray = 'Gray',
-}
-export interface GroupMemberDto {
-  id: string;
-  name: string;
-  username?: string;
-  color?: UserColor;
-}
-
-export interface AddGroupMemberDto {
-  accountId: string;
-}
-
-export interface AuthStatusDto {
-  setupRequired: boolean;
-}
-
-export enum UserRole {
-  Admin = 'Admin',
-  User = 'User',
-}
-export interface LoginAccountDto {
-  username: string;
-  role: UserRole;
-  color: UserColor;
-}
-
-export interface AuthUserDto {
-  id: string;
-  name: string;
-  username: string;
-  role: UserRole;
-  color: UserColor;
-}
-
-export interface CreateAuthAccountDto {
-  username: string;
-  password: string;
-  name?: string;
-}
-
-export interface UpdateAuthAccountDto {
-  name?: string;
-  username?: string;
-  password?: string;
-}
-
-export interface AdminSetupDto {
-  username: string;
-  password: string;
-  name?: string;
-}
-
-export interface AuthResponseDto {
-  user: AuthUserDto;
-}
-
-export interface CredentialsDto {
-  username: string;
-  password: string;
-}
-
-export interface LogoutResponseDto {
-  success: boolean;
-}
-
-export interface ProfileUpdateDto {
-  name?: string;
-  username: string;
-  password?: string;
-  color?: UserColor;
 }
 
 export enum RecurringTransactionType {
@@ -235,23 +266,6 @@ export interface MarkRecurringOccurrencePaidDto {
   /** @exclusiveMinimum 0 */
   amount: number;
   payDate: string;
-}
-
-export interface ExternalParticipantDto {
-  /** @minLength 1 */
-  id: string;
-  /** @minLength 1 */
-  name: string;
-}
-
-export interface CreateExternalParticipantDto {
-  /** @minLength 1 */
-  name: string;
-}
-
-export interface UpdateExternalParticipantDto {
-  /** @minLength 1 */
-  name: string;
 }
 
 export type RecurringControllerDeleteRuleParams = {

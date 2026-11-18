@@ -19,8 +19,11 @@ import type {
   AuthUserDto,
   CreateAuthAccountDto,
   CredentialsDto,
+  FilesystemPasswordResetCompleteDto,
+  FilesystemPasswordResetRequestDto,
   LoginAccountDto,
   LogoutResponseDto,
+  PasswordResetResponseDto,
   ProfileUpdateDto,
   UpdateAuthAccountDto,
 } from '../expense-exchange-api.schemas';
@@ -109,6 +112,123 @@ export class AuthService {
       ...(options as Omit<NonNullable<typeof options>, 'observe'>),
       observe: 'body',
     });
+  }
+  /**
+   * Creates a short-lived recovery code file in the server data directory. The response does not reveal whether the username exists.
+   * @summary Create a filesystem-assisted password recovery request
+   */
+  authControllerRequestFilesystemPasswordReset<
+    TData = PasswordResetResponseDto,
+  >(
+    filesystemPasswordResetRequestDto: FilesystemPasswordResetRequestDto,
+    options?: HttpClientBodyOptions,
+  ): Observable<TData>;
+  authControllerRequestFilesystemPasswordReset<
+    TData = PasswordResetResponseDto,
+  >(
+    filesystemPasswordResetRequestDto: FilesystemPasswordResetRequestDto,
+    options?: HttpClientEventOptions,
+  ): Observable<HttpEvent<TData>>;
+  authControllerRequestFilesystemPasswordReset<
+    TData = PasswordResetResponseDto,
+  >(
+    filesystemPasswordResetRequestDto: FilesystemPasswordResetRequestDto,
+    options?: HttpClientResponseOptions,
+  ): Observable<AngularHttpResponse<TData>>;
+  authControllerRequestFilesystemPasswordReset<
+    TData = PasswordResetResponseDto,
+  >(
+    filesystemPasswordResetRequestDto: FilesystemPasswordResetRequestDto,
+    options?: HttpClientObserveOptions,
+  ): Observable<TData | HttpEvent<TData> | AngularHttpResponse<TData>> {
+    if (options?.observe === 'events') {
+      return this.http.post<TData>(
+        `${this.baseUrl}/api/auth/password-reset/filesystem/request`,
+        filesystemPasswordResetRequestDto,
+        {
+          ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+          observe: 'events',
+        },
+      );
+    }
+
+    if (options?.observe === 'response') {
+      return this.http.post<TData>(
+        `${this.baseUrl}/api/auth/password-reset/filesystem/request`,
+        filesystemPasswordResetRequestDto,
+        {
+          ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+          observe: 'response',
+        },
+      );
+    }
+
+    return this.http.post<TData>(
+      `${this.baseUrl}/api/auth/password-reset/filesystem/request`,
+      filesystemPasswordResetRequestDto,
+      {
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'body',
+      },
+    );
+  }
+  /**
+   * @summary Complete a filesystem-assisted password recovery request
+   */
+  authControllerCompleteFilesystemPasswordReset<
+    TData = PasswordResetResponseDto,
+  >(
+    filesystemPasswordResetCompleteDto: FilesystemPasswordResetCompleteDto,
+    options?: HttpClientBodyOptions,
+  ): Observable<TData>;
+  authControllerCompleteFilesystemPasswordReset<
+    TData = PasswordResetResponseDto,
+  >(
+    filesystemPasswordResetCompleteDto: FilesystemPasswordResetCompleteDto,
+    options?: HttpClientEventOptions,
+  ): Observable<HttpEvent<TData>>;
+  authControllerCompleteFilesystemPasswordReset<
+    TData = PasswordResetResponseDto,
+  >(
+    filesystemPasswordResetCompleteDto: FilesystemPasswordResetCompleteDto,
+    options?: HttpClientResponseOptions,
+  ): Observable<AngularHttpResponse<TData>>;
+  authControllerCompleteFilesystemPasswordReset<
+    TData = PasswordResetResponseDto,
+  >(
+    filesystemPasswordResetCompleteDto: FilesystemPasswordResetCompleteDto,
+    options?: HttpClientObserveOptions,
+  ): Observable<TData | HttpEvent<TData> | AngularHttpResponse<TData>> {
+    if (options?.observe === 'events') {
+      return this.http.post<TData>(
+        `${this.baseUrl}/api/auth/password-reset/filesystem/complete`,
+        filesystemPasswordResetCompleteDto,
+        {
+          ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+          observe: 'events',
+        },
+      );
+    }
+
+    if (options?.observe === 'response') {
+      return this.http.post<TData>(
+        `${this.baseUrl}/api/auth/password-reset/filesystem/complete`,
+        filesystemPasswordResetCompleteDto,
+        {
+          ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+          observe: 'response',
+        },
+      );
+    }
+
+    return this.http.post<TData>(
+      `${this.baseUrl}/api/auth/password-reset/filesystem/complete`,
+      filesystemPasswordResetCompleteDto,
+      {
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'body',
+      },
+    );
   }
   /**
    * @summary List usernames and roles for the sign-in selector
@@ -488,7 +608,7 @@ export class AuthService {
     });
   }
   /**
-   * @summary Update the signed-in display name, username, or password
+   * @summary Update the signed-in profile name, username, password, or color
    */
   authControllerUpdateProfile<TData = AuthUserDto>(
     profileUpdateDto: ProfileUpdateDto,
@@ -540,6 +660,10 @@ export class AuthService {
 }
 
 export type AuthControllerStatusClientResult = NonNullable<AuthStatusDto>;
+export type AuthControllerRequestFilesystemPasswordResetClientResult =
+  NonNullable<PasswordResetResponseDto>;
+export type AuthControllerCompleteFilesystemPasswordResetClientResult =
+  NonNullable<PasswordResetResponseDto>;
 export type AuthControllerListLoginAccountsClientResult = NonNullable<
   LoginAccountDto[]
 >;
