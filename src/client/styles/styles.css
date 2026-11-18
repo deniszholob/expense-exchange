@@ -514,7 +514,7 @@
   }
 
   .app-footer-inner {
-    @apply flex items-center justify-between;
+    @apply flex flex-wrap items-center justify-between gap-x-4 gap-y-1;
   }
 
   .app-footer-brand-mark {

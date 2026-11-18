@@ -48,52 +48,5 @@
   <main class="min-h-0 flex-1 overflow-y-auto py-4 sm:py-6">
     <router-outlet></router-outlet>
   </main>
-  <footer class="app-footer-shell shrink-0 border-t">
-    <div class="container-fluid gap-0 py-1">
-      <div class="app-footer-inner section-container">
-        <div class="flex items-center gap-2">
-          <span
-            class="app-footer-brand-mark group"
-            tabindex="0"
-            aria-label="Expense Exchange"
-            aria-describedby="app-name-tooltip"
-          >
-            <img
-              class="size-6 object-contain"
-              src="assets/expense-exchange-icon.png"
-              width="16"
-              height="16"
-              alt=""
-              aria-hidden="true"
-            />
-            <span
-              class="rounded-control border-finance-border bg-finance-raised text-finance-text pointer-events-none invisible absolute bottom-full left-0 z-50 mb-2 w-max border px-2.5 py-1.5 text-xs opacity-0 shadow-lg transition-opacity group-hover:visible group-hover:opacity-100 group-focus-visible:visible group-focus-visible:opacity-100"
-              id="app-name-tooltip"
-              role="tooltip"
-              >Expense Exchange</span
-            >
-          </span>
-          <p class="text-finance-muted text-xs">
-            Made by
-            <a class="link" target="_blank" rel="noopener" href="https://deniszholob.com/"
-              >deniszholob.com</a
-            >
-          </p>
-        </div>
-        <span class="app-footer-version group" tabindex="0" aria-describedby="app-build-tooltip">
-          v{{ APP_BUILD_VERSION }}
-          <span
-            class="rounded-control border-finance-border bg-finance-raised text-finance-text pointer-events-none invisible absolute right-0 bottom-full z-50 mb-2 w-max max-w-[calc(100vw-2rem)] border px-3 py-2 text-left text-xs opacity-0 shadow-xl transition-opacity group-hover:visible group-hover:opacity-100 group-focus-visible:visible group-focus-visible:opacity-100"
-            id="app-build-tooltip"
-            role="tooltip"
-          >
-            <span class="block">Version {{ APP_BUILD_VERSION }}</span>
-            <span class="block whitespace-nowrap"
-              >Build date: {{ APP_BUILD_DATE | date: "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" : 'UTC' }}</span
-            >
-          </span>
-        </span>
-      </div>
-    </div>
-  </footer>
+  <app-footer></app-footer>
 </div>
