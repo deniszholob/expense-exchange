@@ -108,22 +108,14 @@
         text-align: center;
       }
       .app-loading-mark {
-        display: grid;
-        width: 52px;
-        height: 52px;
+        width: 64px;
+        height: 64px;
         margin: 0 auto 18px;
-        place-items: center;
-        border: 1px solid color-mix(in srgb, var(--color-finance-accent, #83b487) 30%, transparent);
-        border-radius: 14px;
-        background: color-mix(
-          in srgb,
-          var(--color-finance-accent, #83b487) 12%,
-          var(--color-finance-raised, #242a2c)
-        );
       }
       .app-loading-mark img {
-        width: 32px;
-        height: 32px;
+        display: block;
+        width: 64px;
+        height: 64px;
         object-fit: contain;
       }
       .app-loading-title {
@@ -207,7 +199,7 @@
       <div class="app-loading-screen" aria-busy="true">
         <section class="app-loading-panel" aria-labelledby="app-loading-title">
           <div class="app-loading-mark" aria-hidden="true">
-            <img src="assets/expense-exchange-icon.png" alt="" width="32" height="32" />
+            <img src="assets/expense-exchange-icon.png" alt="" width="64" height="64" />
           </div>
           <h1 class="app-loading-title" id="app-loading-title">Expense Exchange</h1>
           <p class="app-loading-status" role="status">
