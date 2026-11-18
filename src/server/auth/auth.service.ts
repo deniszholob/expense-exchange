@@ -222,6 +222,12 @@ export class AuthService {
     );
     if (!account || !passwordIsValid)
       throw new UnauthorizedException('Invalid username or password');
+    if (this.passwordHasher.needsRehash(account.passwordHash))
+      await this.upgradePasswordHash(
+        account.id,
+        account.passwordHash,
+        password,
+      );
     return {
       user: publicUser(account),
       token: await this.createToken(account.id, account.sessionVersion),
@@ -292,6 +298,24 @@ export class AuthService {
   ): Promise<void> {
     account.passwordHash = await this.passwordHasher.hash(password);
     account.sessionVersion += 1;
+  }
+
+  /** Rehashes a verified password without invalidating sessions for the same password. */
+  private upgradePasswordHash(
+    accountId: string,
+    verifiedHash: string,
+    password: string,
+  ): Promise<void> {
+    return this.updateAccounts(async (store) => {
+      const account = store.accounts.find((entry) => entry.id === accountId);
+      if (
+        !account ||
+        account.passwordHash !== verifiedHash ||
+        !this.passwordHasher.needsRehash(account.passwordHash)
+      )
+        return;
+      account.passwordHash = await this.passwordHasher.hash(password);
+    });
   }
 
   private async createToken(
