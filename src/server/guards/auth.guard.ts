@@ -17,10 +17,17 @@ export class AuthGuard implements CanActivate {
 
   public async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
-    const token = readCookie(request, SESSION_COOKIE_NAME);
+    const token =
+      readBearerToken(request) ?? readCookie(request, SESSION_COOKIE_NAME);
     request.authUser = await this.auth.authenticate(token);
     return true;
   }
+}
+
+function readBearerToken(request: Request): string | undefined {
+  const authorization = request.headers.authorization;
+  if (!authorization?.startsWith('Bearer ')) return undefined;
+  return authorization.slice('Bearer '.length);
 }
 
 function readCookie(request: Request, name: string): string | undefined {

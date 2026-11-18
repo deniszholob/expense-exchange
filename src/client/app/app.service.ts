@@ -28,6 +28,7 @@ import {
 } from 'src/client/api/generated/expense-exchange-api.schemas';
 import { DATA_SOURCE_INFO, DataSource } from './shared/data-source.enum';
 import { getConfiguredRemoteApiUrl } from './shared/remote-api-config';
+import { AuthSessionService } from './shared/auth-session.service';
 import { getHttpErrorMessage } from './shared/http-error-message';
 import { LocalTransactionSchema } from 'src/client/app/shared/local-transaction.schema';
 // #endregion
@@ -42,6 +43,7 @@ const LOCAL_USER_NAME = 'Local';
 @Injectable({ providedIn: 'root' })
 export class AppService {
   private readonly authApi = inject(AuthApiService);
+  private readonly authSession = inject(AuthSessionService);
   private readonly externalParticipantsApi = inject(
     ExternalParticipantsService,
   );
@@ -130,6 +132,7 @@ export class AppService {
 
   public signOut(): void {
     if (this.$dataSource() === DataSource.Local) return;
+    this.authSession.setAccessToken(undefined);
     this.$currentUser.set(undefined);
     this.$groupMembersResource.set(undefined);
     this.$transactionsResource.set(undefined);
@@ -145,6 +148,7 @@ export class AppService {
       const result = await firstValueFrom(
         this.authApi.authControllerLogin({ username, password }),
       );
+      this.authSession.setAccessToken(result.accessToken);
       this.$currentUser.set(result.user);
       this.ensureRemoteResources();
     } catch (error: unknown) {
@@ -163,6 +167,7 @@ export class AppService {
       const result = await firstValueFrom(
         this.authApi.authControllerSetup({ name, username, password }),
       );
+      this.authSession.setAccessToken(result.accessToken);
       this.$currentUser.set(result.user);
       this.$authSetupRequired.set(false);
       this.ensureRemoteResources();
@@ -224,6 +229,7 @@ export class AppService {
 
   public async connectToRemoteApi(): Promise<void> {
     const checkId = ++this.remoteConnectionCheckId;
+    this.authSession.setAccessToken(undefined);
     this.$authStatusReady.set(false);
     this.$authError.set(undefined);
     this.$apiHealthy.set(undefined);

@@ -38,7 +38,10 @@ export const LoginAccountSchema = z.object({
 });
 
 export const AuthStatusSchema = z.object({ setupRequired: z.boolean() });
-export const AuthResponseSchema = z.object({ user: AuthUserSchema });
+export const AuthResponseSchema = z.object({
+  user: AuthUserSchema,
+  accessToken: z.string().min(1).optional(),
+});
 export const LogoutResponseSchema = z.object({ success: z.boolean() });
 
 export const AdminSetupSchema = CredentialsSchema.extend({

@@ -205,7 +205,7 @@ export class AuthController {
       input.data.password,
     );
     setSessionCookie(response, session.token, request);
-    return { user };
+    return authResponse(user, session.token, request);
   }
 
   @Post('login')
@@ -276,7 +276,7 @@ export class AuthController {
   ): Promise<AuthResponseDto> {
     const session = await this.auth.login(username, password);
     setSessionCookie(response, session.token, request);
-    return { user: session.user };
+    return authResponse(session.user, session.token, request);
   }
 }
 // #endregion
@@ -304,6 +304,17 @@ function setSessionCookie(
     maxAge: SESSION_LIFETIME_MS,
   });
 }
+
+function authResponse(
+  user: AuthUser,
+  token: string,
+  request: Request,
+): AuthResponseDto {
+  return request.headers['x-expense-exchange-client'] === 'electron'
+    ? { user, accessToken: token }
+    : { user };
+}
+
 function cookieOptions(request: Request): {
   httpOnly: true;
   sameSite: 'none' | 'lax';

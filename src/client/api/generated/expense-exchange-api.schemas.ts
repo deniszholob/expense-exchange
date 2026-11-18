@@ -70,6 +70,7 @@ export interface AdminSetupDto {
 
 export interface AuthResponseDto {
   user: AuthUserDto;
+  accessToken?: string;
 }
 
 export interface CredentialsDto {

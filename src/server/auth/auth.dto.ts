@@ -1,5 +1,5 @@
 // #region Imports
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { UserRole } from './user-role.enum.js';
 import { UserColor } from './user-color.enum.js';
 import type {
@@ -46,6 +46,7 @@ export class AdminSetupDto extends CredentialsDto implements AdminSetup {
 }
 export class AuthResponseDto implements AuthResponse {
   @ApiProperty({ type: AuthUserDto }) public user!: AuthUserDto;
+  @ApiPropertyOptional() public accessToken?: string;
 }
 export class ProfileUpdateDto implements ProfileUpdate {
   @ApiProperty({ required: false }) public name?: string;
