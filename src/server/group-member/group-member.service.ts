@@ -1,8 +1,13 @@
 // #region Imports
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
+import { AuthService } from '../auth/auth.service.js';
+import { UserRole } from '../auth/user-role.enum.js';
+import { ParticipantReferenceService } from '../services/participant-reference.service.js';
 import { GroupMemberRepository } from './group-member.repository.js';
-import { TransactionRepository } from '../transactions/transaction.repository.js';
-import { RecurringRepository } from '../recurring/recurring.repository.js';
 import type {
   GroupMemberDto,
   GroupMemberProfileDto,
@@ -14,12 +19,58 @@ import type {
 export class GroupMemberService {
   public constructor(
     private readonly repository: GroupMemberRepository,
-    private readonly transactions: TransactionRepository,
-    private readonly recurring: RecurringRepository,
+    private readonly auth: AuthService,
+    private readonly participantReferences: ParticipantReferenceService,
   ) {}
 
-  public getMembers(): Promise<GroupMemberDto[]> {
-    return this.repository.getGroupMembers();
+  public async getMembers(): Promise<GroupMemberDto[]> {
+    const [members, accounts] = await Promise.all([
+      this.repository.getGroupMembers(),
+      this.auth.listAccounts(),
+    ]);
+    const adminIds = new Set(
+      accounts
+        .filter((account) => account.role === UserRole.Admin)
+        .map((account) => account.id),
+    );
+    const accountsById = new Map(
+      accounts.map((account) => [account.id, account]),
+    );
+    return members
+      .filter((member) => !adminIds.has(member.id))
+      .map((member) => {
+        const account = accountsById.get(member.id);
+        return {
+          ...member,
+          ...(account
+            ? {
+                name: account.name,
+                username: account.username,
+                color: account.color,
+              }
+            : {}),
+        };
+      });
+  }
+
+  public async addAccountMember(accountId: string): Promise<GroupMemberDto> {
+    const account = await this.auth.getAccount(accountId);
+    if (account.role === UserRole.Admin)
+      throw new ForbiddenException(
+        'Administrator accounts cannot be added to the group',
+      );
+    const members = await this.repository.getGroupMembers();
+    if (members.some((member) => member.id === accountId))
+      throw new BadRequestException('This account is already in the group');
+    const member = await this.repository.createGroupMember(
+      { name: account.name || account.username },
+      account.id,
+    );
+    return {
+      ...member,
+      username: account.username,
+      color: account.color,
+    };
   }
 
   public addMember(
@@ -34,36 +85,7 @@ export class GroupMemberService {
   }
 
   private async removeMemberWhenUnused(id: string): Promise<GroupMemberDto> {
-    const [transactions, rules, occurrences] = await Promise.all([
-      this.transactions.getTransactions(),
-      this.recurring.getRules(),
-      this.recurring.getOccurrences(),
-    ]);
-    if (
-      transactions.some(
-        (transaction) =>
-          transaction.targetParticipantId === id ||
-          transaction.beneficiaryParticipantIds.includes(id),
-      )
-    )
-      throw new ConflictException(
-        'Remove this member from their transactions before removing them from the group',
-      );
-    if (
-      rules.some(
-        (rule) =>
-          rule.targetParticipantId === id ||
-          rule.beneficiaryParticipantIds.includes(id),
-      ) ||
-      occurrences.some(
-        (occurrence) =>
-          occurrence.targetParticipantId === id ||
-          occurrence.beneficiaryParticipantIds.includes(id),
-      )
-    )
-      throw new ConflictException(
-        'Remove this member from their recurring rules and occurrence history before removing them from the group',
-      );
+    await this.participantReferences.assertGroupMemberUnused(id);
     return this.repository.deleteGroupMember(id);
   }
 }

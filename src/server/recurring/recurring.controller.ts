@@ -40,13 +40,10 @@ import {
   UpdateRecurringRuleDto,
 } from './recurring.dto.js';
 import { RecurringService } from './recurring.service.js';
+import { ParticipantValidationService } from '../services/participant-validation.service.js';
 import { AuthGuard } from '../guards/auth.guard.js';
 import type { AuthenticatedRequest } from '../guards/auth.guard.js';
 import { GroupMemberGuard } from '../guards/group-member.guard.js';
-import { GroupMemberService } from '../group-member/group-member.service.js';
-import { AuthService } from '../auth/auth.service.js';
-import { UserRole } from '../auth/user-role.enum.js';
-import { ExternalParticipantService } from '../external-participant/external-participant.service.js';
 // #endregion
 
 // #region Controller
@@ -56,9 +53,7 @@ import { ExternalParticipantService } from '../external-participant/external-par
 export class RecurringController {
   public constructor(
     private readonly recurring: RecurringService,
-    private readonly groupMembers: GroupMemberService,
-    private readonly externalParticipants: ExternalParticipantService,
-    private readonly auth: AuthService,
+    private readonly participantValidation: ParticipantValidationService,
   ) {}
 
   @Get('rules')
@@ -79,7 +74,10 @@ export class RecurringController {
     @Req() request: AuthenticatedRequest,
   ): Promise<RecurringRule> {
     const input = validateRule(body);
-    await this.validateParticipants(input);
+    await this.validateParticipants(
+      input.targetParticipantId,
+      input.beneficiaryParticipantIds,
+    );
     return this.recurring.createRule(input, request.authUser.id);
   }
 
@@ -93,7 +91,10 @@ export class RecurringController {
     @Req() request: AuthenticatedRequest,
   ): Promise<RecurringRule> {
     const input = validateUpdateRule(body);
-    await this.validateParticipants(input);
+    await this.validateParticipants(
+      input.targetParticipantId,
+      input.beneficiaryParticipantIds,
+    );
     return this.recurring.updateRule(id, input, request.authUser.id);
   }
 
@@ -163,33 +164,14 @@ export class RecurringController {
     );
   }
 
-  private async validateParticipants(
-    input: CreateRecurringRule,
+  private validateParticipants(
+    targetParticipantId: string,
+    beneficiaryParticipantIds: readonly string[],
   ): Promise<void> {
-    const [members, accounts, externalParticipants] = await Promise.all([
-      this.groupMembers.getMembers(),
-      this.auth.listAccounts(),
-      this.externalParticipants.getParticipants(),
-    ]);
-    const adminIds = new Set(
-      accounts
-        .filter((account) => account.role === UserRole.Admin)
-        .map((account) => account.id),
+    return this.participantValidation.assertCurrentGroupParticipants(
+      [targetParticipantId, ...beneficiaryParticipantIds],
+      'Recurring rules can only include current group participants',
     );
-    const memberIds = new Set(
-      members
-        .filter((member) => !adminIds.has(member.id))
-        .map((member) => member.id)
-        .concat(externalParticipants.map((participant) => participant.id)),
-    );
-    if (
-      [input.targetParticipantId, ...input.beneficiaryParticipantIds].some(
-        (id) => !memberIds.has(id),
-      )
-    )
-      throw new BadRequestException(
-        'Recurring rules can only include current group participants',
-      );
   }
 }
 // #endregion

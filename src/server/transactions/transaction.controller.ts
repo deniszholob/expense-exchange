@@ -23,13 +23,10 @@ import type {
   CreateTransaction,
   Transaction,
 } from '../../util/transaction.schema.js';
-import { UserRole } from '../auth/user-role.enum.js';
+import { ParticipantValidationService } from '../services/participant-validation.service.js';
 import { AuthGuard } from '../guards/auth.guard.js';
 import type { AuthenticatedRequest } from '../guards/auth.guard.js';
-import { AuthService } from '../auth/auth.service.js';
 import { GroupMemberGuard } from '../guards/group-member.guard.js';
-import { GroupMemberService } from '../group-member/group-member.service.js';
-import { ExternalParticipantService } from '../external-participant/external-participant.service.js';
 import { CreateTransactionDto, TransactionDto } from './transaction.dto.js';
 import { TransactionService } from './transaction.service.js';
 // #endregion
@@ -41,9 +38,7 @@ import { TransactionService } from './transaction.service.js';
 export class TransactionController {
   public constructor(
     private readonly transactions: TransactionService,
-    private readonly groupMembers: GroupMemberService,
-    private readonly externalParticipants: ExternalParticipantService,
-    private readonly auth: AuthService,
+    private readonly participantValidation: ParticipantValidationService,
   ) {}
 
   @Get()
@@ -64,7 +59,10 @@ export class TransactionController {
     @Req() request: AuthenticatedRequest,
   ): Promise<Transaction> {
     const input = validateTransaction(body);
-    await this.validateGroupParticipants(input);
+    await this.participantValidation.assertCurrentGroupParticipants(
+      [input.targetParticipantId, ...input.beneficiaryParticipantIds],
+      'Transactions can only include current group participants',
+    );
     await this.transactions.validateLinkedTransaction(input);
     return this.transactions.createTransaction(input, request.authUser.id);
   }
@@ -79,7 +77,10 @@ export class TransactionController {
     @Req() request: AuthenticatedRequest,
   ): Promise<Transaction> {
     const input = validateTransaction(body);
-    await this.validateGroupParticipants(input);
+    await this.participantValidation.assertCurrentGroupParticipants(
+      [input.targetParticipantId, ...input.beneficiaryParticipantIds],
+      'Transactions can only include current group participants',
+    );
     await this.transactions.validateLinkedTransaction(input);
     return this.transactions.updateTransaction(id, input, request.authUser.id);
   }
@@ -92,35 +93,6 @@ export class TransactionController {
     @Req() request: AuthenticatedRequest,
   ): Promise<Transaction> {
     return this.transactions.deleteTransaction(id, request.authUser.id);
-  }
-
-  private async validateGroupParticipants(
-    input: CreateTransaction,
-  ): Promise<void> {
-    const [members, accounts, externalParticipants] = await Promise.all([
-      this.groupMembers.getMembers(),
-      this.auth.listAccounts(),
-      this.externalParticipants.getParticipants(),
-    ]);
-    const adminIds = new Set(
-      accounts
-        .filter((account) => account.role === UserRole.Admin)
-        .map((account) => account.id),
-    );
-    const memberIds = new Set(
-      members
-        .filter((member) => !adminIds.has(member.id))
-        .map((member) => member.id)
-        .concat(externalParticipants.map((participant) => participant.id)),
-    );
-    if (
-      [input.targetParticipantId, ...input.beneficiaryParticipantIds].some(
-        (id) => !memberIds.has(id),
-      )
-    )
-      throw new BadRequestException(
-        'Transactions can only include current group participants',
-      );
   }
 }
 // #endregion

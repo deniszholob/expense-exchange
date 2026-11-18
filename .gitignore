@@ -9,6 +9,7 @@ dist/
 dist-storybook/
 tmp
 /out-tsc
+.tmp/
 
 # Local development scratch files
 .dev/

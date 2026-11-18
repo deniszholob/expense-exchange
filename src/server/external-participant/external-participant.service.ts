@@ -1,13 +1,12 @@
 // #region Imports
-import { ConflictException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { ParticipantReferenceService } from '../services/participant-reference.service.js';
 import type {
   CreateExternalParticipant,
   ExternalParticipant,
   UpdateExternalParticipant,
 } from './external-participant.schema.js';
 import { ExternalParticipantRepository } from './external-participant.repository.js';
-import { TransactionRepository } from '../transactions/transaction.repository.js';
-import { RecurringRepository } from '../recurring/recurring.repository.js';
 // #endregion
 
 // #region Service
@@ -15,8 +14,7 @@ import { RecurringRepository } from '../recurring/recurring.repository.js';
 export class ExternalParticipantService {
   public constructor(
     private readonly repository: ExternalParticipantRepository,
-    private readonly transactions: TransactionRepository,
-    private readonly recurring: RecurringRepository,
+    private readonly participantReferences: ParticipantReferenceService,
   ) {}
 
   public getParticipants(): Promise<ExternalParticipant[]> {
@@ -37,30 +35,7 @@ export class ExternalParticipantService {
   }
 
   public async deleteParticipant(id: string): Promise<ExternalParticipant> {
-    const [transactions, rules, occurrences] = await Promise.all([
-      this.transactions.getTransactions(),
-      this.recurring.getRules(),
-      this.recurring.getOccurrences(),
-    ]);
-    const transactionInUse = transactions.some(
-      (transaction) =>
-        transaction.targetParticipantId === id ||
-        transaction.beneficiaryParticipantIds.includes(id),
-    );
-    const ruleInUse = rules.some(
-      (rule) =>
-        rule.targetParticipantId === id ||
-        rule.beneficiaryParticipantIds.includes(id),
-    );
-    const occurrenceInUse = occurrences.some(
-      (occurrence) =>
-        occurrence.targetParticipantId === id ||
-        occurrence.beneficiaryParticipantIds.includes(id),
-    );
-    if (transactionInUse || ruleInUse || occurrenceInUse)
-      throw new ConflictException(
-        'This participant is referenced by transaction or recurring history and cannot be deleted',
-      );
+    await this.participantReferences.assertExternalParticipantUnused(id);
     return this.repository.deleteParticipant(id);
   }
 }

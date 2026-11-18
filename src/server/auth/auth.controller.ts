@@ -180,11 +180,10 @@ export class AuthController {
   }
 
   @Get('me')
+  @UseGuards(AuthGuard)
   @ApiOkResponse({ type: AuthUserDto })
-  public async me(@Req() request: Request): Promise<AuthUserDto> {
-    return this.auth.authenticate(
-      readCookie(request, 'expense_exchange_session'),
-    );
+  public me(@Req() request: AuthenticatedRequest): AuthUserDto {
+    return request.authUser;
   }
 
   @Post('logout')
@@ -198,6 +197,7 @@ export class AuthController {
   }
 
   @Post('profile')
+  @UseGuards(AuthGuard)
   @ApiBody({ type: ProfileUpdateDto })
   @ApiOperation({
     summary: 'Update the signed-in profile name, username, password, or color',
@@ -205,18 +205,15 @@ export class AuthController {
   @ApiOkResponse({ type: AuthUserDto })
   public async updateProfile(
     @Body() body: ProfileUpdateDto,
-    @Req() request: Request,
+    @Req() request: AuthenticatedRequest,
   ): Promise<AuthUserDto> {
-    const user = await this.auth.authenticate(
-      readCookie(request, 'expense_exchange_session'),
-    );
     const input = UpdateProfileSchema.safeParse(body);
     if (!input.success)
       throw new BadRequestException(
         'Username must be 3–64 characters and a new password must be at least 10 characters',
       );
     return this.auth.updateProfile(
-      user.id,
+      request.authUser.id,
       input.data.name,
       input.data.username,
       input.data.password ?? '',
@@ -270,14 +267,5 @@ function cookieOptions(request: Request): {
     secure,
     path: '/',
   };
-}
-function readCookie(request: Request, name: string): string | undefined {
-  const cookieHeader = request.headers.cookie;
-  if (!cookieHeader) return undefined;
-  const match = cookieHeader
-    .split(';')
-    .map((part) => part.trim())
-    .find((part) => part.startsWith(`${name}=`));
-  return match?.slice(name.length + 1);
 }
 // #endregion
