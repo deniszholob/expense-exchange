@@ -1,16 +1,13 @@
 // #region Imports
-import {
-  createHmac,
-  randomBytes,
-  randomUUID,
-  timingSafeEqual,
-} from 'node:crypto';
+import { randomBytes, randomUUID, timingSafeEqual } from 'node:crypto';
 import {
   BadRequestException,
   ConflictException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { JwtSigner, JwtVerifier } from '@nestjs/authentication';
+import type { JwtClaims } from '@nestjs/authentication';
 import { PasswordHasher } from '@nestjs/authentication';
 import { GroupMemberRepository } from '../group-member/group-member.repository.js';
 import { AuthRepository } from './auth.repository.js';
@@ -236,27 +233,35 @@ export class AuthService {
 
   public async authenticate(token: string | undefined): Promise<AuthUser> {
     if (!token) throw new UnauthorizedException('Sign in required');
-    const [payload, signature] = token.split('.');
-    if (!payload || !signature)
-      throw new UnauthorizedException('Invalid session');
-    const expected = await this.sign(payload);
-    if (!constantTimeEquals(signature, expected))
-      throw new UnauthorizedException('Invalid session');
-    let claims: { id: string; expires: number; sessionVersion?: number };
+
+    let claims: JwtClaims;
     try {
-      claims = JSON.parse(
-        Buffer.from(payload, 'base64url').toString('utf8'),
-      ) as { id: string; expires: number };
+      claims = await new JwtVerifier({
+        key: await this.repository.readSessionSecret(),
+        algorithms: ['HS256'],
+      }).verify(token);
     } catch {
       throw new UnauthorizedException('Invalid session');
     }
-    if (claims.expires < Date.now())
-      throw new UnauthorizedException('Session expired');
+
+    if (
+      typeof claims.sub !== 'string' ||
+      !isSessionVersion(claims['sessionVersion'])
+    )
+      throw new UnauthorizedException('Invalid session');
+
+    return this.findSessionAccount(claims.sub, claims['sessionVersion']);
+  }
+
+  private async findSessionAccount(
+    id: string,
+    sessionVersion: number,
+  ): Promise<AuthUser> {
     const account = (await this.readAccounts()).accounts.find(
-      (entry) => entry.id === claims.id,
+      (entry) => entry.id === id,
     );
     if (!account) throw new UnauthorizedException('Account is unavailable');
-    if ((claims.sessionVersion ?? 0) !== account.sessionVersion)
+    if (sessionVersion !== account.sessionVersion)
       throw new UnauthorizedException('Session expired');
     return publicUser(account);
   }
@@ -322,19 +327,12 @@ export class AuthService {
     id: string,
     sessionVersion: number,
   ): Promise<string> {
-    const payload = Buffer.from(
-      JSON.stringify({
-        id,
-        sessionVersion,
-        expires: Date.now() + SESSION_LIFETIME_MS,
-      }),
-    ).toString('base64url');
-    return `${payload}.${await this.sign(payload)}`;
-  }
-
-  private async sign(value: string): Promise<string> {
-    const secret = await this.repository.readSessionSecret();
-    return createHmac('sha256', secret).update(value).digest('base64url');
+    const lifetimeSeconds = SESSION_LIFETIME_MS / 1000;
+    return new JwtSigner({
+      key: await this.repository.readSessionSecret(),
+      alg: 'HS256',
+      ttl: `${lifetimeSeconds}s`,
+    }).sign({ sub: id, sessionVersion });
   }
 
   private async readAccounts(): Promise<AccountsStore> {
@@ -381,6 +379,10 @@ function publicUser(account: AuthAccount): AuthUser {
   };
 }
 
+function isSessionVersion(value: unknown): value is number {
+  return typeof value === 'number' && Number.isInteger(value) && value >= 0;
+}
+
 function getNextUserColor(accounts: readonly AuthAccount[]): UserColor {
   const choices = [
     UserColor.Blue,
@@ -407,6 +409,7 @@ function getNextUserColor(accounts: readonly AuthAccount[]): UserColor {
 function normalizeUsername(username: string): string {
   return username.trim().toLowerCase();
 }
+
 function constantTimeEquals(left: string, right: string): boolean {
   const leftBuffer = Buffer.from(left);
   const rightBuffer = Buffer.from(right);
