@@ -140,10 +140,7 @@ export class AuthService {
         account.username = username;
       }
       if (input.name !== undefined) account.name = input.name.trim();
-      if (input.password) {
-        account.passwordHash = await this.passwordHasher.hash(input.password);
-        account.sessionVersion += 1;
-      }
+      if (input.password) await this.replacePassword(account, input.password);
       return publicUser(account);
     });
   }
@@ -208,8 +205,7 @@ export class AuthService {
       )
         throw new UnauthorizedException('Invalid or expired recovery code.');
       await this.repository.deletePasswordResetChallenge(account.id);
-      account.passwordHash = await this.passwordHasher.hash(input.password);
-      account.sessionVersion += 1;
+      await this.replacePassword(account, input.password);
     });
   }
 
@@ -284,10 +280,18 @@ export class AuthService {
         );
       if (account.role === UserRole.User && color !== undefined)
         account.color = color;
-      if (password.length > 0)
-        account.passwordHash = await this.passwordHasher.hash(password);
+      if (password.length > 0) await this.replacePassword(account, password);
       return publicUser(account);
     });
+  }
+
+  /** Hashes a replacement password and invalidates sessions signed with the previous one. */
+  private async replacePassword(
+    account: AuthAccount,
+    password: string,
+  ): Promise<void> {
+    account.passwordHash = await this.passwordHasher.hash(password);
+    account.sessionVersion += 1;
   }
 
   private async createToken(
