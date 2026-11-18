@@ -178,7 +178,6 @@ export class RecurringRuleDetailsComponent {
   protected readonly $ruleForm = form(this.$ruleValue, (path) => {
     required(path.type);
     required(path.name);
-    minLength(path.name, 2);
     required(path.targetParticipantId);
     minLength(path.beneficiaryParticipantIds, 1, {
       message: 'Select at least one beneficiary.',

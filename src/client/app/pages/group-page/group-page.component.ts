@@ -7,7 +7,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { FormField, form, minLength, required } from '@angular/forms/signals';
+import { FormField, form, required } from '@angular/forms/signals';
 import {
   LucideCheck,
   LucidePencil,
@@ -24,6 +24,7 @@ import {
 import { AuthService } from 'src/client/api/generated/auth/auth.service';
 import { GroupMembersService } from 'src/client/api/generated/group-members/group-members.service';
 import { AppService } from 'src/client/app/app.service';
+import { getHttpErrorMessage } from 'src/client/app/shared/http-error-message';
 import { DataSource } from 'src/client/app/shared/data-source.enum';
 import { PageLayoutComponent } from 'src/client/app/layout';
 import {
@@ -109,7 +110,6 @@ export class GroupPageComponent {
     this.$externalParticipantData,
     (path) => {
       required(path.name);
-      minLength(path.name, 1);
     },
   );
   protected readonly $editingExternalParticipantId = signal<string | undefined>(
@@ -149,7 +149,7 @@ export class GroupPageComponent {
       await this.loadAccounts();
     } catch (error: unknown) {
       this.$error.set(
-        error instanceof Error ? error.message : 'Unable to add group member.',
+        getHttpErrorMessage(error, 'Unable to add group member.'),
       );
     }
   }
@@ -179,9 +179,7 @@ export class GroupPageComponent {
       }
     } catch (error: unknown) {
       this.$error.set(
-        error instanceof Error
-          ? error.message
-          : 'Unable to remove group member.',
+        getHttpErrorMessage(error, 'Unable to remove group member.'),
       );
     }
   }
@@ -200,9 +198,7 @@ export class GroupPageComponent {
       this.$externalParticipantError.set(undefined);
     } catch (error: unknown) {
       this.$externalParticipantError.set(
-        error instanceof Error
-          ? error.message
-          : 'Unable to save external participant.',
+        getHttpErrorMessage(error, 'Unable to save external participant.'),
       );
     }
   }
@@ -224,9 +220,7 @@ export class GroupPageComponent {
       this.$externalParticipantError.set(undefined);
     } catch (error: unknown) {
       this.$externalParticipantError.set(
-        error instanceof Error
-          ? error.message
-          : 'Unable to delete external participant.',
+        getHttpErrorMessage(error, 'Unable to delete external participant.'),
       );
     }
   }

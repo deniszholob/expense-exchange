@@ -29,6 +29,7 @@ import {
   PageLayoutComponent,
 } from 'src/client/app/layout';
 import { AppService } from 'src/client/app/app.service';
+import { getHttpErrorMessage } from 'src/client/app/shared/http-error-message';
 import { DataSource } from 'src/client/app/shared/data-source.enum';
 import {
   TransactionListFilter,
@@ -79,6 +80,7 @@ export class TransactionsPageComponent extends DetailsPageDirective {
   protected readonly $newTransactionType = signal<TransactionType>(
     TransactionType.Expense,
   );
+  protected readonly $actionError = signal<string | undefined>(undefined);
   protected readonly $scopeOptions = computed(() =>
     TRANSACTION_SCOPE_INFO_OPTIONS.map(({ id, display }) => ({
       value: id,
@@ -247,6 +249,7 @@ export class TransactionsPageComponent extends DetailsPageDirective {
   }
 
   protected async onDeleteTransaction(row: TransactionRow): Promise<void> {
+    this.$actionError.set(undefined);
     try {
       if (this.appService.$dataSource() === DataSource.Local)
         this.appService.removeLocalTransaction(row.id);
@@ -257,7 +260,9 @@ export class TransactionsPageComponent extends DetailsPageDirective {
         this.appService.refreshTransactions();
       }
     } catch (error: unknown) {
-      console.error(error);
+      this.$actionError.set(
+        getHttpErrorMessage(error, 'Unable to delete transaction.'),
+      );
     }
   }
 
@@ -266,6 +271,7 @@ export class TransactionsPageComponent extends DetailsPageDirective {
   }
 
   protected async onSaveTransaction(data: CreateTransactionDto): Promise<void> {
+    this.$actionError.set(undefined);
     try {
       const existing = this.$transaction();
       if (this.appService.$dataSource() === DataSource.Local) {
@@ -309,7 +315,9 @@ export class TransactionsPageComponent extends DetailsPageDirective {
       await this.router.navigate(['..'], { relativeTo: this.activatedRoute });
       if (draftKey) removeSessionFormDraft(draftKey);
     } catch (error: unknown) {
-      console.error('Unable to save transaction', error);
+      this.$actionError.set(
+        getHttpErrorMessage(error, 'Unable to save transaction.'),
+      );
     }
   }
 }

@@ -7,13 +7,7 @@ import {
   signal,
 } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import {
-  FormField,
-  form,
-  maxLength,
-  minLength,
-  required,
-} from '@angular/forms/signals';
+import { FormField, form, required } from '@angular/forms/signals';
 import { PageLayoutComponent } from 'src/client/app/layout';
 import { AppService } from 'src/client/app/app.service';
 import { PageRoute } from 'src/client/app/app.info';
@@ -52,11 +46,7 @@ export class LoginPageComponent {
   });
   protected readonly $form = form(this.$credentials, (path) => {
     required(path.username);
-    minLength(path.username, 3);
-    maxLength(path.username, 64);
     required(path.password);
-    minLength(path.password, 10);
-    maxLength(path.password, 200);
   });
   protected readonly $loading = signal(false);
   protected readonly $error = this.appService.$authError;

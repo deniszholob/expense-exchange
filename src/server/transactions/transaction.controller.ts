@@ -101,7 +101,13 @@ export class TransactionController {
 function validateTransaction(body: CreateTransaction): CreateTransaction {
   const result = CreateTransactionSchema.safeParse(body);
   if (!result.success)
-    throw new BadRequestException('Invalid transaction data');
+    throw new BadRequestException(
+      result.error.issues.map((issue) => {
+        const field =
+          issue.path.length > 0 ? issue.path.join('.') : 'transaction';
+        return `${field}: ${issue.message}`;
+      }),
+    );
   return result.data;
 }
 

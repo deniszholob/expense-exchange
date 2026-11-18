@@ -16,7 +16,7 @@ import {
 import { GroupMemberRepository } from '../group-member/group-member.repository.js';
 import { AuthRepository } from './auth.repository.js';
 import type { AuthAccount } from './auth-account.schema.js';
-import type { AuthUser, LoginAccount } from './auth.schema.js';
+import type { AuthUser, AuthStatus, LoginAccount } from './auth.schema.js';
 import { UserRole } from './user-role.enum.js';
 import { UserColor } from './user-color.enum.js';
 // #endregion
@@ -43,7 +43,7 @@ export class AuthService {
     private readonly groupMembers: GroupMemberRepository,
   ) {}
 
-  public async status(): Promise<{ setupRequired: boolean }> {
+  public async status(): Promise<AuthStatus> {
     return { setupRequired: (await this.readAccounts()).accounts.length === 0 };
   }
 

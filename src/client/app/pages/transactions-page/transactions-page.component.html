@@ -1,4 +1,9 @@
 <app-page-layout [$fillHeight]="$pageState() === DetailsPageState.NO_PARAMS">
+  @if ($actionError(); as error) {
+    <p class="text-finance-negative px-4 pt-3 text-sm" role="alert">
+      {{ error }}
+    </p>
+  }
   @switch ($pageState()) {
     @case (DetailsPageState.LOADING) {
       <div

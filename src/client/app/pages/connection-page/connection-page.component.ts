@@ -7,13 +7,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import {
-  FormField,
-  form,
-  maxLength,
-  minLength,
-  required,
-} from '@angular/forms/signals';
+import { FormField, form, required } from '@angular/forms/signals';
 import { Router } from '@angular/router';
 import { PageLayoutComponent } from 'src/client/app/layout';
 import { AppService } from 'src/client/app/app.service';
@@ -83,12 +77,7 @@ export class ConnectionPageComponent {
   });
   protected readonly $authForm = form(this.$authData, (path) => {
     required(path.username);
-    minLength(path.username, 3);
-    maxLength(path.username, 64);
     required(path.password);
-    minLength(path.password, 10);
-    maxLength(path.password, 200);
-    maxLength(path.name, 100);
   });
 
   protected selectSource(event: Event): void {
@@ -212,7 +201,7 @@ export class ConnectionPageComponent {
     this.$authFormError.set(undefined);
     if (this.$authForm().invalid()) {
       this.$authFormError.set(
-        'Enter a username (3–64 characters) and a password (10–200 characters).',
+        'Complete the required fields with valid values.',
       );
       return;
     }

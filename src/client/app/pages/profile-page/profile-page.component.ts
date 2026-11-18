@@ -12,12 +12,13 @@ import { Router } from '@angular/router';
 import { LucideLogOut } from '@lucide/angular';
 import { PageLayoutComponent } from 'src/client/app/layout';
 import { AppService } from 'src/client/app/app.service';
+import { getHttpErrorMessage } from 'src/client/app/shared/http-error-message';
 import { PageRoute } from 'src/client/app/app.info';
 import {
   UserColor,
   UserRole,
 } from 'src/client/api/generated/expense-exchange-api.schemas';
-import { form, maxLength, minLength, required } from '@angular/forms/signals';
+import { form, required } from '@angular/forms/signals';
 import { AccountFieldsComponent } from '../../components/forms/account-fields/account-fields.component';
 import { UserIdentityComponent } from '../../components/user-identity/user-identity.component';
 import { DataSource } from '../../shared/data-source.enum';
@@ -70,10 +71,7 @@ export class ProfilePageComponent {
     );
   });
   protected readonly $form = form(this.$profileFields, (path) => {
-    maxLength(path.name, 100);
     required(path.username);
-    minLength(path.username, 3);
-    maxLength(path.username, 64);
     required(path.color);
   });
   protected readonly $saved = signal(false);
@@ -95,9 +93,7 @@ export class ProfilePageComponent {
       this.$saved.set(true);
       this.$error.set(undefined);
     } catch (error: unknown) {
-      this.$error.set(
-        error instanceof Error ? error.message : 'Unable to update profile.',
-      );
+      this.$error.set(getHttpErrorMessage(error, 'Unable to update profile.'));
     }
   }
 

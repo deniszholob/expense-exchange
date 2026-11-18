@@ -6,13 +6,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import {
-  FormField,
-  form,
-  maxLength,
-  minLength,
-  required,
-} from '@angular/forms/signals';
+import { FormField, form, required } from '@angular/forms/signals';
 import {
   LucidePencil,
   LucideTrash2,
@@ -82,13 +76,8 @@ export class UserManagementPageComponent {
     password: '',
   });
   protected readonly $form = form(this.$accountData, (path) => {
-    maxLength(path.name, 100);
     required(path.username);
-    minLength(path.username, 3);
-    maxLength(path.username, 64);
     required(path.password);
-    minLength(path.password, 10);
-    maxLength(path.password, 200);
   });
   protected readonly $accountFormError = signal<string | undefined>(undefined);
   protected readonly $accountSaving = signal(false);
@@ -100,12 +89,7 @@ export class UserManagementPageComponent {
     password: '',
   });
   protected readonly $editForm = form(this.$editData, (path) => {
-    maxLength(path.name, 100);
     required(path.username);
-    minLength(path.username, 3);
-    maxLength(path.username, 64);
-    minLength(path.password, 10);
-    maxLength(path.password, 200);
   });
 
   public constructor() {
@@ -117,7 +101,7 @@ export class UserManagementPageComponent {
     this.$accountFormError.set(undefined);
     if (this.$form().invalid()) {
       this.$accountFormError.set(
-        'Enter a username (3–64 characters) and an initial password (10–200 characters).',
+        'Complete the required fields with valid values.',
       );
       return;
     }

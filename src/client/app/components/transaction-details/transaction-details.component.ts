@@ -175,7 +175,6 @@ export class TransactionDetailsComponent {
   );
   protected readonly $form = form(this.$transactionData, (path) => {
     required(path.name);
-    minLength(path.name, 2);
     required(path.amount);
     min(path.amount, 0.01);
     required(path.postDate);

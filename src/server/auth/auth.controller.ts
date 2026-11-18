@@ -20,11 +20,15 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
+import type { ZodError } from 'zod';
 import { AuthService } from './auth.service.js';
 import {
   AdminSetupSchema,
+  AUTH_NAME_MAX_LENGTH,
   CreateAuthAccountSchema,
   LoginCredentialsSchema,
+  PASSWORD_POLICY,
+  USERNAME_LENGTH,
   UpdateAuthAccountSchema,
   UpdateProfileSchema,
 } from './auth.schema.js';
@@ -94,9 +98,7 @@ export class AuthController {
   ): Promise<AuthUserDto> {
     const input = CreateAuthAccountSchema.safeParse(body);
     if (!input.success)
-      throw new BadRequestException(
-        'Provide a username and password of at least 10 characters',
-      );
+      throw new BadRequestException(authInputMessage(input.error));
     return this.auth.createAccount(
       input.data.name,
       input.data.username,
@@ -114,7 +116,7 @@ export class AuthController {
   ): Promise<AuthUserDto> {
     const input = UpdateAuthAccountSchema.safeParse(body);
     if (!input.success)
-      throw new BadRequestException('Invalid account updates');
+      throw new BadRequestException(authInputMessage(input.error));
     return this.auth.updateManagedAccount(id, input.data);
   }
 
@@ -136,9 +138,7 @@ export class AuthController {
   ): Promise<AuthResponseDto> {
     const input = AdminSetupSchema.safeParse(body);
     if (!input.success)
-      throw new BadRequestException(
-        'Provide a username and password of at least 10 characters',
-      );
+      throw new BadRequestException(authInputMessage(input.error));
     const status = await this.auth.status();
     if (!status.setupRequired)
       return this.loginCredentials(
@@ -170,7 +170,8 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response,
   ): Promise<AuthResponseDto> {
     const input = LoginCredentialsSchema.safeParse(body);
-    if (!input.success) throw new BadRequestException('Invalid credentials');
+    if (!input.success)
+      throw new BadRequestException(authInputMessage(input.error));
     return this.loginCredentials(
       input.data.username,
       input.data.password,
@@ -209,9 +210,7 @@ export class AuthController {
   ): Promise<AuthUserDto> {
     const input = UpdateProfileSchema.safeParse(body);
     if (!input.success)
-      throw new BadRequestException(
-        'Username must be 3–64 characters and a new password must be at least 10 characters',
-      );
+      throw new BadRequestException(authInputMessage(input.error));
     return this.auth.updateProfile(
       request.authUser.id,
       input.data.name,
@@ -235,6 +234,17 @@ export class AuthController {
 // #endregion
 
 // #region Helpers
+function authInputMessage(error: ZodError): string {
+  const field = error.issues.find((issue) => issue.path.length > 0)?.path[0];
+  if (field === 'username')
+    return `Username must be between ${USERNAME_LENGTH.min} and ${USERNAME_LENGTH.max} characters.`;
+  if (field === 'password')
+    return `Password must be between ${PASSWORD_POLICY.minLength} and ${PASSWORD_POLICY.maxLength} characters.`;
+  if (field === 'name')
+    return `Name must be at most ${AUTH_NAME_MAX_LENGTH} characters.`;
+  return 'Invalid authentication details.';
+}
+
 function setSessionCookie(
   response: Response,
   token: string,
