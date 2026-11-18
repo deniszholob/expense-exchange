@@ -9,7 +9,6 @@ import {
   Post,
   Put,
   Query,
-  Req,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -42,7 +41,8 @@ import {
 import { RecurringService } from './recurring.service.js';
 import { ParticipantValidationService } from '../services/participant-validation.service.js';
 import { AuthGuard } from '../guards/auth.guard.js';
-import type { AuthenticatedRequest } from '../guards/auth.guard.js';
+import { CurrentUser } from '../auth/current-user.decorator.js';
+import type { AuthUser } from '../auth/auth.schema.js';
 import { GroupMemberGuard } from '../guards/group-member.guard.js';
 // #endregion
 
@@ -60,9 +60,9 @@ export class RecurringController {
   @ApiOperation({ summary: 'List recurring rules visible to the current user' })
   @ApiOkResponse({ type: RecurringRuleDto, isArray: true })
   public getRules(
-    @Req() request: AuthenticatedRequest,
+    @CurrentUser() currentUser: AuthUser,
   ): Promise<RecurringRule[]> {
-    return this.recurring.getRules(request.authUser.id);
+    return this.recurring.getRules(currentUser.id);
   }
 
   @Post('rules')
@@ -71,14 +71,14 @@ export class RecurringController {
   @ApiCreatedResponse({ type: RecurringRuleDto })
   public async createRule(
     @Body() body: CreateRecurringRule,
-    @Req() request: AuthenticatedRequest,
+    @CurrentUser() currentUser: AuthUser,
   ): Promise<RecurringRule> {
     const input = validateRule(body);
     await this.validateParticipants(
       input.targetParticipantId,
       input.beneficiaryParticipantIds,
     );
-    return this.recurring.createRule(input, request.authUser.id);
+    return this.recurring.createRule(input, currentUser.id);
   }
 
   @Put('rules/:id')
@@ -88,14 +88,14 @@ export class RecurringController {
   public async updateRule(
     @Param('id') id: string,
     @Body() body: UpdateRecurringRule,
-    @Req() request: AuthenticatedRequest,
+    @CurrentUser() currentUser: AuthUser,
   ): Promise<RecurringRule> {
     const input = validateUpdateRule(body);
     await this.validateParticipants(
       input.targetParticipantId,
       input.beneficiaryParticipantIds,
     );
-    return this.recurring.updateRule(id, input, request.authUser.id);
+    return this.recurring.updateRule(id, input, currentUser.id);
   }
 
   @Delete('rules/:id')
@@ -114,7 +114,7 @@ export class RecurringController {
   @ApiOkResponse({ type: RecurringRuleDto })
   public deleteRule(
     @Param('id') id: string,
-    @Req() request: AuthenticatedRequest,
+    @CurrentUser() currentUser: AuthUser,
     @Query('deleteHistory') deleteHistory?: string,
   ): Promise<RecurringRule> {
     if (
@@ -124,7 +124,7 @@ export class RecurringController {
       throw new BadRequestException('deleteHistory must be true or false');
     return this.recurring.deleteRule(
       id,
-      request.authUser.id,
+      currentUser.id,
       deleteHistory === 'true',
     );
   }
@@ -136,9 +136,9 @@ export class RecurringController {
   })
   @ApiOkResponse({ type: RecurringOccurrenceDto, isArray: true })
   public getOccurrences(
-    @Req() request: AuthenticatedRequest,
+    @CurrentUser() currentUser: AuthUser,
   ): Promise<RecurringOccurrence[]> {
-    return this.recurring.getOccurrences(request.authUser.id);
+    return this.recurring.getOccurrences(currentUser.id);
   }
 
   @Put('occurrences/:id/paid')
@@ -150,18 +150,14 @@ export class RecurringController {
   public async markOccurrencePaid(
     @Param('id') id: string,
     @Body() body: MarkRecurringOccurrencePaid,
-    @Req() request: AuthenticatedRequest,
+    @CurrentUser() currentUser: AuthUser,
   ): Promise<RecurringOccurrence> {
     const payment = MarkRecurringOccurrencePaidSchema.safeParse(body);
     if (!payment.success)
       throw new BadRequestException(
         'Enter a valid amount and, for manual payments, a valid payment date',
       );
-    return this.recurring.markOccurrencePaid(
-      id,
-      payment.data,
-      request.authUser.id,
-    );
+    return this.recurring.markOccurrencePaid(id, payment.data, currentUser.id);
   }
 
   private validateParticipants(

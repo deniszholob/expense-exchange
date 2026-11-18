@@ -8,7 +8,6 @@ import {
   Param,
   Post,
   Put,
-  Req,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -25,8 +24,9 @@ import type {
 } from '../../util/transaction.schema.js';
 import { ParticipantValidationService } from '../services/participant-validation.service.js';
 import { AuthGuard } from '../guards/auth.guard.js';
-import type { AuthenticatedRequest } from '../guards/auth.guard.js';
 import { GroupMemberGuard } from '../guards/group-member.guard.js';
+import { CurrentUser } from '../auth/current-user.decorator.js';
+import type { AuthUser } from '../auth/auth.schema.js';
 import { CreateTransactionDto, TransactionDto } from './transaction.dto.js';
 import { TransactionService } from './transaction.service.js';
 // #endregion
@@ -45,9 +45,9 @@ export class TransactionController {
   @ApiOperation({ summary: 'List accessible transactions' })
   @ApiOkResponse({ type: TransactionDto, isArray: true })
   public getTransactions(
-    @Req() request: AuthenticatedRequest,
+    @CurrentUser() currentUser: AuthUser,
   ): Promise<Transaction[]> {
-    return this.transactions.getTransactions(request.authUser.id);
+    return this.transactions.getTransactions(currentUser.id);
   }
 
   @Post()
@@ -56,7 +56,7 @@ export class TransactionController {
   @ApiCreatedResponse({ type: TransactionDto })
   public async createTransaction(
     @Body() body: CreateTransaction,
-    @Req() request: AuthenticatedRequest,
+    @CurrentUser() currentUser: AuthUser,
   ): Promise<Transaction> {
     const input = validateTransaction(body);
     await this.participantValidation.assertCurrentGroupParticipants(
@@ -64,7 +64,7 @@ export class TransactionController {
       'Transactions can only include current group participants',
     );
     await this.transactions.validateLinkedTransaction(input);
-    return this.transactions.createTransaction(input, request.authUser.id);
+    return this.transactions.createTransaction(input, currentUser.id);
   }
 
   @Put(':id')
@@ -74,7 +74,7 @@ export class TransactionController {
   public async updateTransaction(
     @Param('id') id: string,
     @Body() body: CreateTransaction,
-    @Req() request: AuthenticatedRequest,
+    @CurrentUser() currentUser: AuthUser,
   ): Promise<Transaction> {
     const input = validateTransaction(body);
     await this.participantValidation.assertCurrentGroupParticipants(
@@ -82,7 +82,7 @@ export class TransactionController {
       'Transactions can only include current group participants',
     );
     await this.transactions.validateLinkedTransaction(input);
-    return this.transactions.updateTransaction(id, input, request.authUser.id);
+    return this.transactions.updateTransaction(id, input, currentUser.id);
   }
 
   @Delete(':id')
@@ -90,9 +90,9 @@ export class TransactionController {
   @ApiOkResponse({ type: TransactionDto })
   public deleteTransaction(
     @Param('id') id: string,
-    @Req() request: AuthenticatedRequest,
+    @CurrentUser() currentUser: AuthUser,
   ): Promise<Transaction> {
-    return this.transactions.deleteTransaction(id, request.authUser.id);
+    return this.transactions.deleteTransaction(id, currentUser.id);
   }
 }
 // #endregion

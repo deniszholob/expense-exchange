@@ -52,8 +52,9 @@ import {
 } from './auth.dto.js';
 import { AuthGuard } from '../guards/auth.guard.js';
 import { AdminGuard } from '../guards/admin.guard.js';
-import type { AuthenticatedRequest } from '../guards/auth.guard.js';
 import { UserRole } from './user-role.enum.js';
+import { CurrentUser } from './current-user.decorator.js';
+import type { AuthUser } from './auth.schema.js';
 import {
   SESSION_COOKIE_NAME,
   SESSION_LIFETIME_MS,
@@ -128,10 +129,10 @@ export class AuthController {
   })
   @ApiOkResponse({ type: AuthUserDto, isArray: true })
   public async listAccounts(
-    @Req() request: AuthenticatedRequest,
+    @CurrentUser() currentUser: AuthUser,
   ): Promise<AuthUserDto[]> {
     const accounts = await this.auth.listAccounts();
-    return request.authUser.role === UserRole.Admin
+    return currentUser.role === UserRole.Admin
       ? accounts
       : accounts.filter((account) => account.role !== UserRole.Admin);
   }
@@ -230,8 +231,8 @@ export class AuthController {
   @Get('me')
   @UseGuards(AuthGuard)
   @ApiOkResponse({ type: AuthUserDto })
-  public me(@Req() request: AuthenticatedRequest): AuthUserDto {
-    return request.authUser;
+  public me(@CurrentUser() currentUser: AuthUser): AuthUserDto {
+    return currentUser;
   }
 
   @Post('logout')
@@ -253,13 +254,13 @@ export class AuthController {
   @ApiOkResponse({ type: AuthUserDto })
   public async updateProfile(
     @Body() body: ProfileUpdateDto,
-    @Req() request: AuthenticatedRequest,
+    @CurrentUser() currentUser: AuthUser,
   ): Promise<AuthUserDto> {
     const input = UpdateProfileSchema.safeParse(body);
     if (!input.success)
       throw new BadRequestException(authInputMessage(input.error));
     return this.auth.updateProfile(
-      request.authUser.id,
+      currentUser.id,
       input.data.name,
       input.data.username,
       input.data.password ?? '',
