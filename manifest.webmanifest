@@ -3,8 +3,8 @@
   "name": "Expense Exchange",
   "short_name": "Expense Exchange",
   "description": "Tool to keep track of expenses for multiple people",
-  "theme_color": "#ffffff",
-  "background_color": "#000000",
+  "theme_color": "#15191b",
+  "background_color": "#15191b",
   "display": "standalone",
   "scope": "./",
   "start_url": "./?utm_source=homescreen",
@@ -14,20 +14,18 @@
   "prefer_related_applications": false,
   "screenshots": [
     {
-      "src": "assets/screenshots/screenshot_500x850.png",
-      "sizes": "500x850",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Expense Exchange Mobile",
-      "description": "Tool to keep track of expenses for multiple people"
-    },
-    {
-      "src": "assets/screenshots/screenshot_1280x720.png",
+      "src": "assets/screenshots/expense-exchange-screenshot-landscape-1280x720.png",
       "sizes": "1280x720",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "Expense Exchange Desktop",
-      "description": "Tool to keep track of expenses for multiple people"
+      "label": "Expense Exchange desktop overview"
+    },
+    {
+      "src": "assets/screenshots/expense-exchange-screenshot-portrait-390x844.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Expense Exchange mobile overview"
     }
   ],
   "icons": [
@@ -63,7 +61,7 @@
     },
     {
       "src": "mstile-150x150.png",
-      "sizes": "270x270",
+      "sizes": "150x150",
       "type": "image/png"
     },
     {

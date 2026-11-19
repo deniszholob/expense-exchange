@@ -1,0 +1,2 @@
+import"./main-Q6OLUEBG.js";import{r as Cj,w as Wd}from"./chunk-BUGbcAnw.js";import{Ot as WD,Sr as sl,l as CI,pr as rh,r as $i}from"./chunk-MV-nKHgO.js";var g=(()=>{class e{static{this.ɵfac=function(t){return new(t||e)}}static{this.ɵcmp=CI({type:e,selectors:[[`app-dev-page`]],hostAttrs:[1,`contents`],decls:4,vars:0,template:function(t,c){t&1&&($i(0,`app-page-layout`),WD(1,` Space for testing out code. `),rh(2,`br`),WD(3,`Do not save changes to repo
+`),sl())},dependencies:[Wd,Cj],encapsulation:2})}}return e})();export{g as DevPageComponent};

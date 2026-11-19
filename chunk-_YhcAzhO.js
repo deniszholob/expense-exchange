@@ -1,0 +1,1 @@
+var r;(function(o){o.Group=`Group`,o.MyShare=`MyShare`})(r||(r={}));var e=Object.values(r);var p={[r.Group]:{id:r.Group,display:`Group`},[r.MyShare]:{id:r.MyShare,display:`My share`}};var t=e.map(o=>p[o]);export{t as n,r as t};

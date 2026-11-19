@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- 
+<!--
   Initializing with dark class so tailwind knowns to bring in dark mode classes if used.
   Toggle class via code to switch modes.
 -->
@@ -9,6 +9,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="author" content="Denis Zholob">
+    <meta name="application-build" content="v0.1.0 - 2026-11-19T00:49:45.323Z (1795049385323)" data-version="0.1.0" data-date="1795049385323" />
     <meta name="keywords" content="Denis, Zholob, Finance">
     <meta name="title" content="Expense Exchange">
     <meta name="description" content="Tool to keep track of expenses for multiple people">
@@ -16,21 +17,21 @@
     <!-- Google / Search Engine Tags -->
     <meta itemprop="name" content="Expense Exchange">
     <meta itemprop="description" content="Tool to keep track of expenses for multiple people">
-    <meta itemprop="image" content="https://deniszholob.github.io/expense-exchange/assets/icons/splash.png">
+    <meta itemprop="image" content="https://deniszholob.github.io/expense-exchange/assets/expense-exchange-splash.png">
 
     <!-- Facebook Meta Tags -->
     <meta property="og:url" content="https://deniszholob.github.io/expense-exchange/">
     <meta property="og:type" content="website">
     <meta property="og:title" content="Expense Exchange">
     <meta property="og:description" content="Tool to keep track of expenses for multiple people">
-    <meta property="og:image" content="https://deniszholob.github.io/expense-exchange/assets/icons/splash.png">
+    <meta property="og:image" content="https://deniszholob.github.io/expense-exchange/assets/expense-exchange-splash.png">
     <meta property="og:author" content="Denis Zholob">
 
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Expense Exchange">
     <meta name="twitter:description" content="Tool to keep track of expenses for multiple people">
-    <meta name="twitter:image" content="https://deniszholob.github.io/expense-exchange/assets/icons/splash.png">
+    <meta name="twitter:image" content="https://deniszholob.github.io/expense-exchange/assets/expense-exchange-splash.png">
     <meta name="twitter:site" content="@deniszholob">
     <meta name="twitter:creator" content="@deniszholob">
 
@@ -40,25 +41,22 @@
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-    <link rel="apple-touch-startup-image" href="assets/icons/splash.jpg">
-    <link rel="mask-icon" href="safari-pinned-tab.svg" color="#ffffff">
-    <meta name="msapplication-TileColor" content="#ffffff">
+    <link rel="apple-touch-startup-image" href="assets/expense-exchange-splash.png">
+    <link rel="mask-icon" href="safari-pinned-tab.svg" color="#15191B">
+    <meta name="msapplication-TileColor" content="#15191B">
     <base href="/expense-exchange/">
 
     <!-- PWA -->
     <link rel="manifest" href="manifest.webmanifest">
-    <meta name="theme-color" content="#ffffff">
+    <meta name="theme-color" content="#15191B">
 
     <!-- Meta Tags Generated via http://heymeta.com -->
-    <!-- Icons generated with https://realfavicongenerator.net/ -->
 
     <!-- Prefetch/Preconnect -->
     <!-- <link rel="dns-prefetch" href="https://fonts.googleapis.com"> -->
     <!-- <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin="anonymous"> -->
     <!-- <link rel="dns-prefetch" href="https://fonts.gstatic.com/s/"> -->
     <!-- <link rel="preconnect" href="https://fonts.gstatic.com/s/" crossorigin="anonymous"> -->
-    <link rel="dns-prefetch" href="https://use.fontawesome.com">
-    <link rel="preconnect" href="https://use.fontawesome.com" crossorigin="anonymous">
 
     <!-- Bootstrap -->
     <!-- <link rel="stylesheet" href="//stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
@@ -66,39 +64,154 @@
 
     <!-- Fonts -->
     <!-- <link rel="stylesheet" href="https://fonts.googleapis.com/css?"> -->
-    <script defer src="https://use.fontawesome.com/releases/v6.6.0/js/all.js" integrity="sha384-dgEl3vRKux81M373f/TdgoDTV5oZj+yjHrr/1qR5b4btG5q63kYS62t5kod+7Q6v" crossorigin="anonymous"></script>
-
-    <!-- Global Site Tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-28080172-12"></script>
-    <script async>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
-      gtag('js', new Date());
-      gtag('config', 'UA-28080172-12');
-    </script>
-
     <!-- Stylesheets -->
-  <style>*,:before,:after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / .5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }*,:before,:after{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}:before,:after{--tw-content:""}html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif,system-ui,sans-serif,"Apple Color Emoji","Segoe UI Emoji",Segoe UI Symbol,"Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}a{color:inherit;text-decoration:inherit}strong{font-weight:bolder}p{margin:0}html{height:100%;scroll-behavior:smooth;--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1));--tw-text-opacity:1;color:rgb(38 38 38 / var(--tw-text-opacity, 1))}body{display:flex;min-height:100%;flex-direction:column}</style><link rel="stylesheet" href="styles-AJMKCF7V.css" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="styles-AJMKCF7V.css"></noscript></head>
+    <style>
+      .app-loading-screen {
+        box-sizing: border-box;
+        display: grid;
+        min-height: 100vh;
+        min-height: 100svh;
+        place-items: center;
+        padding: 24px;
+        color: var(--color-finance-text, #f1f3f2);
+        background:
+          radial-gradient(
+            ellipse at 50% 0%,
+            color-mix(in srgb, var(--color-finance-accent, #83b487) 10%, transparent),
+            transparent 58%
+          ),
+          var(--color-finance-canvas, #15191b);
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+      }
+      .app-loading-panel {
+        box-sizing: border-box;
+        width: min(100%, 440px);
+        padding: 32px;
+        border: 1px solid color-mix(in srgb, var(--color-finance-border, #3c4547) 75%, transparent);
+        border-radius: 14px;
+        background: linear-gradient(
+          150deg,
+          var(--color-finance-surface-highlight, #242a2c),
+          var(--color-finance-surface, #1d2224) 55%,
+          var(--color-finance-surface-lowlight, #1a1f21)
+        );
+        box-shadow: 0 24px 64px rgb(0 0 0 / 24%);
+        text-align: center;
+      }
+      .app-loading-mark {
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 18px;
+      }
+      .app-loading-mark img {
+        display: block;
+        width: 64px;
+        height: 64px;
+        object-fit: contain;
+      }
+      .app-loading-title {
+        margin: 0;
+        font-size: 1.35rem;
+        font-weight: 600;
+        letter-spacing: -0.025em;
+      }
+      .app-loading-status {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin: 18px 0 0;
+        color: var(--color-finance-accent-text, #acdbaf);
+        font-size: 0.95rem;
+        font-weight: 500;
+      }
+      .app-loading-spinner {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid color-mix(in srgb, var(--color-finance-accent, #83b487) 22%, transparent);
+        border-top-color: var(--color-finance-accent-hover, #9bcb9e);
+        border-radius: 9999px;
+        animation: app-spin 0.9s linear infinite;
+        flex: 0 0 auto;
+      }
+      @keyframes app-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .app-loading-help {
+        margin-top: 24px;
+        padding-top: 18px;
+        border-top: 1px solid
+          color-mix(in srgb, var(--color-finance-border, #3c4547) 58%, transparent);
+        color: var(--color-finance-secondary, #b0b9b7);
+        font-size: 0.82rem;
+        line-height: 1.6;
+      }
+      .app-loading-help p {
+        margin: 0;
+      }
+      .app-loading-help a {
+        color: var(--color-finance-accent-text, #acdbaf);
+        text-decoration: underline;
+        text-decoration-color: color-mix(
+          in srgb,
+          var(--color-finance-accent, #83b487) 55%,
+          transparent
+        );
+        text-underline-offset: 3px;
+      }
+      .app-loading-build {
+        display: inline-flex;
+        gap: 6px;
+        margin: 20px 0 0;
+        padding: 5px 9px;
+        border: 1px solid color-mix(in srgb, var(--color-finance-border, #3c4547) 55%, transparent);
+        border-radius: 9999px;
+        color: var(--color-finance-muted, #8d9996);
+        font-size: 0.7rem;
+        font-variant-numeric: tabular-nums;
+      }
+      .app-loading-build strong {
+        color: var(--color-finance-secondary, #b0b9b7);
+        font-weight: 500;
+      }
+      @media (max-width: 480px) {
+        .app-loading-panel {
+          padding: 28px 22px;
+        }
+      }
+    </style>
+  <style>@layer properties;@layer theme,base,components,utilities;@layer theme{:root{--font-sans:Inter, ui-sans-serif, system-ui, sans-serif;--font-mono:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;--color-zinc-400:oklch(70.5% .015 286.067);--color-black:#000;--color-white:#fff;--spacing:.25rem;--breakpoint-2xl:96rem;--container-md:28rem;--container-xl:36rem;--container-3xl:48rem;--container-4xl:56rem;--container-5xl:64rem;--text-xs:.75rem;--text-xs--line-height:calc(1 / .75);--text-sm:.875rem;--text-sm--line-height:calc(1.25 / .875);--text-lg:1.125rem;--text-lg--line-height:calc(1.75 / 1.125);--text-xl:1.25rem;--text-xl--line-height:calc(1.75 / 1.25);--text-2xl:1.5rem;--text-2xl--line-height:calc(2 / 1.5);--text-3xl:1.875rem;--text-3xl--line-height:1.2 ;--font-weight-normal:400;--font-weight-medium:500;--font-weight-semibold:600;--tracking-tight:-.025em;--tracking-normal:0em;--tracking-wide:.025em;--leading-relaxed:1.625;--animate-spin:spin 1s linear infinite;--animate-pulse:pulse 2s cubic-bezier(.4, 0, .6, 1) infinite;--default-transition-duration:.15s;--default-transition-timing-function:cubic-bezier(.4, 0, .2, 1);--default-font-family:var(--font-sans);--default-mono-font-family:var(--font-mono);--color-finance-canvas:#15191b;--color-finance-ambient-glow:transparent;--color-finance-surface:#1d2224;--color-finance-surface-highlight:color-mix(in srgb, #ffffff 5%, #1d2224);--color-finance-surface-lowlight:color-mix(in srgb, #000000 3%, #1d2224);--color-finance-surface-glow:color-mix(in srgb, #ffffff 2.5%, transparent);--color-finance-raised:#242a2c;--color-finance-field:#252b2d;--color-finance-field-border:#465052;--color-finance-field-hover-border:#566062;--color-finance-hover:#2b3234;--color-finance-table-row:#1d2224;--color-finance-table-stripe:color-mix( in srgb, #242a2c 34%, #1d2224 );--color-finance-table-header:color-mix( in srgb, #242a2c 90%, #304b36 );--color-finance-table-hover:color-mix( in srgb, #83b487 7%, #2b3234 );--color-finance-table-border:color-mix( in srgb, #3c4547 55%, transparent );--color-finance-border:#3c4547;--color-finance-border-strong:#566062;--color-finance-card-border:var(--color-finance-border);--color-finance-chrome:#101416;--color-finance-text:#f1f3f2;--color-finance-secondary:#b0b9b7;--color-finance-muted:var(--color-finance-secondary);--color-finance-placeholder:#7e8987;--color-finance-disabled:#596361;--color-finance-accent:#83b487;--color-finance-accent-hover:#9bcb9e;--color-finance-accent-pressed:#69996f;--color-finance-accent-strong:#304b36;--color-finance-accent-soft:#24362a;--color-finance-accent-text:#acdbaf;--color-finance-accent-button-start:hsl(108 20% 43%);--color-finance-accent-button-mid:hsl(108 20% 37%);--color-finance-accent-button-end:hsl(108 20% 32%);--color-finance-button-border:color-mix( in srgb, #566062 55%, #242a2c );--color-finance-button-border-hover:color-mix( in srgb, #566062 70%, #242a2c );--color-finance-accent-button-border:hsl(108 20% 42%);--color-finance-accent-button-hover-start:hsl(108 22% 48%);--color-finance-accent-button-hover-mid:hsl(108 22% 42%);--color-finance-accent-button-hover-end:hsl(108 22% 37%);--color-finance-accent-button-hover-border:hsl(108 22% 47%);--color-finance-accent-button-pressed-start:hsl(108 20% 36%);--color-finance-accent-button-pressed-mid:hsl(108 20% 31%);--color-finance-accent-button-pressed-end:hsl(108 20% 27%);--color-finance-accent-button-pressed-border:hsl(108 20% 42%);--color-finance-on-accent:#f1f3f2;--color-finance-positive:#91c995;--color-finance-negative:#f0787d;--color-finance-warning:#e4bc69;--radius-card:.4rem;--radius-control:.25rem;--shadow-finance-raised:inset 0 1px 0 rgb(255 255 255 / 5%), inset 0 -1px 0 rgb(0 0 0 / 14%), 0 10px 24px -18px rgb(0 0 0 / 82%);--shadow-finance-control:inset 0 1px 2px rgb(0 0 0 / 22%), 0 1px 0 rgb(255 255 255 / 4%)}@supports (color: color-mix(in lab,red,red)){:root{--color-finance-table-stripe:color-mix( in srgb, var(--color-finance-raised) 34%, var(--color-finance-table-row) )}}@supports (color: color-mix(in lab,red,red)){:root{--color-finance-table-header:color-mix( in srgb, var(--color-finance-raised) 90%, var(--color-finance-accent-strong) )}}@supports (color: color-mix(in lab,red,red)){:root{--color-finance-table-hover:color-mix( in srgb, var(--color-finance-accent) 7%, var(--color-finance-hover) )}}@supports (color: color-mix(in lab,red,red)){:root{--color-finance-table-border:color-mix( in srgb, var(--color-finance-border) 55%, transparent )}}@supports (color: color-mix(in lab,red,red)){:root{--color-finance-button-border:color-mix( in srgb, var(--color-finance-border-strong) 55%, var(--color-finance-raised) )}}@supports (color: color-mix(in lab,red,red)){:root{--color-finance-button-border-hover:color-mix( in srgb, var(--color-finance-border-strong) 70%, var(--color-finance-raised) )}}}@layer base{*,:after,:before{box-sizing:border-box;margin:0;padding:0;border:0 solid}html{line-height:1.5;-webkit-text-size-adjust:100%;tab-size:4;font-family:var(--default-font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji");font-feature-settings:var(--default-font-feature-settings, normal);font-variation-settings:var(--default-font-variation-settings, normal);-webkit-tap-highlight-color:transparent}h1{font-size:inherit;font-weight:inherit}a{color:inherit;-webkit-text-decoration:inherit;text-decoration:inherit}strong{font-weight:bolder}img{display:block;vertical-align:middle}img{max-width:100%;height:auto}}@layer utilities{}@layer base{html{height:100%;scroll-behavior:smooth;background-color:var(--color-finance-canvas);color:var(--color-finance-text);color-scheme:dark}body{display:flex;height:100dvh;min-height:0px;flex-direction:column;overflow:hidden;background-color:var(--color-finance-canvas);color:var(--color-finance-text);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background-image:radial-gradient(ellipse 36% 34% at 0% 0%,var(--color-finance-ambient-glow),transparent 100%);background-attachment:fixed}}@layer components{}@layer utilities{}@property --tw-translate-x{syntax:"*";inherits:false;initial-value:0;}@property --tw-translate-y{syntax:"*";inherits:false;initial-value:0;}@property --tw-translate-z{syntax:"*";inherits:false;initial-value:0;}@property --tw-rotate-x{syntax:"*";inherits:false;}@property --tw-rotate-y{syntax:"*";inherits:false;}@property --tw-rotate-z{syntax:"*";inherits:false;}@property --tw-skew-x{syntax:"*";inherits:false;}@property --tw-skew-y{syntax:"*";inherits:false;}@property --tw-space-y-reverse{syntax:"*";inherits:false;initial-value:0;}@property --tw-divide-y-reverse{syntax:"*";inherits:false;initial-value:0;}@property --tw-border-style{syntax:"*";inherits:false;initial-value:solid;}@property --tw-gradient-position{syntax:"*";inherits:false;}@property --tw-gradient-from{syntax:"<color>";inherits:false;initial-value:#0000;}@property --tw-gradient-via{syntax:"<color>";inherits:false;initial-value:#0000;}@property --tw-gradient-to{syntax:"<color>";inherits:false;initial-value:#0000;}@property --tw-gradient-stops{syntax:"*";inherits:false;}@property --tw-gradient-via-stops{syntax:"*";inherits:false;}@property --tw-gradient-from-position{syntax:"<length-percentage>";inherits:false;initial-value:0%;}@property --tw-gradient-via-position{syntax:"<length-percentage>";inherits:false;initial-value:50%;}@property --tw-gradient-to-position{syntax:"<length-percentage>";inherits:false;initial-value:100%;}@property --tw-leading{syntax:"*";inherits:false;}@property --tw-font-weight{syntax:"*";inherits:false;}@property --tw-tracking{syntax:"*";inherits:false;}@property --tw-ordinal{syntax:"*";inherits:false;}@property --tw-slashed-zero{syntax:"*";inherits:false;}@property --tw-numeric-figure{syntax:"*";inherits:false;}@property --tw-numeric-spacing{syntax:"*";inherits:false;}@property --tw-numeric-fraction{syntax:"*";inherits:false;}@property --tw-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000;}@property --tw-shadow-color{syntax:"*";inherits:false;}@property --tw-shadow-alpha{syntax:"<percentage>";inherits:false;initial-value:100%;}@property --tw-inset-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000;}@property --tw-inset-shadow-color{syntax:"*";inherits:false;}@property --tw-inset-shadow-alpha{syntax:"<percentage>";inherits:false;initial-value:100%;}@property --tw-ring-color{syntax:"*";inherits:false;}@property --tw-ring-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000;}@property --tw-inset-ring-color{syntax:"*";inherits:false;}@property --tw-inset-ring-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000;}@property --tw-ring-inset{syntax:"*";inherits:false;}@property --tw-ring-offset-width{syntax:"<length>";inherits:false;initial-value:0px;}@property --tw-ring-offset-color{syntax:"*";inherits:false;initial-value:#fff;}@property --tw-ring-offset-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000;}@property --tw-blur{syntax:"*";inherits:false;}@property --tw-brightness{syntax:"*";inherits:false;}@property --tw-contrast{syntax:"*";inherits:false;}@property --tw-grayscale{syntax:"*";inherits:false;}@property --tw-hue-rotate{syntax:"*";inherits:false;}@property --tw-invert{syntax:"*";inherits:false;}@property --tw-opacity{syntax:"*";inherits:false;}@property --tw-saturate{syntax:"*";inherits:false;}@property --tw-sepia{syntax:"*";inherits:false;}@property --tw-drop-shadow{syntax:"*";inherits:false;}@property --tw-drop-shadow-color{syntax:"*";inherits:false;}@property --tw-drop-shadow-alpha{syntax:"<percentage>";inherits:false;initial-value:100%;}@property --tw-drop-shadow-size{syntax:"*";inherits:false;}@property --tw-duration{syntax:"*";inherits:false;}@property --tw-border-spacing-x{syntax:"<length>";inherits:false;initial-value:0;}@property --tw-border-spacing-y{syntax:"<length>";inherits:false;initial-value:0;}@layer properties{@supports ((-webkit-hyphens: none) and (not (margin-trim: block))) or ((-moz-orient: inline) and (not (color:rgb(from red r g b)))){*,:before,:after{--tw-translate-x:0;--tw-translate-y:0;--tw-translate-z:0;--tw-rotate-x:initial;--tw-rotate-y:initial;--tw-rotate-z:initial;--tw-skew-x:initial;--tw-skew-y:initial;--tw-space-y-reverse:0;--tw-divide-y-reverse:0;--tw-border-style:solid;--tw-gradient-position:initial;--tw-gradient-from:#0000;--tw-gradient-via:#0000;--tw-gradient-to:#0000;--tw-gradient-stops:initial;--tw-gradient-via-stops:initial;--tw-gradient-from-position:0%;--tw-gradient-via-position:50%;--tw-gradient-to-position:100%;--tw-leading:initial;--tw-font-weight:initial;--tw-tracking:initial;--tw-ordinal:initial;--tw-slashed-zero:initial;--tw-numeric-figure:initial;--tw-numeric-spacing:initial;--tw-numeric-fraction:initial;--tw-shadow:0 0 #0000;--tw-shadow-color:initial;--tw-shadow-alpha:100%;--tw-inset-shadow:0 0 #0000;--tw-inset-shadow-color:initial;--tw-inset-shadow-alpha:100%;--tw-ring-color:initial;--tw-ring-shadow:0 0 #0000;--tw-inset-ring-color:initial;--tw-inset-ring-shadow:0 0 #0000;--tw-ring-inset:initial;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-offset-shadow:0 0 #0000;--tw-blur:initial;--tw-brightness:initial;--tw-contrast:initial;--tw-grayscale:initial;--tw-hue-rotate:initial;--tw-invert:initial;--tw-opacity:initial;--tw-saturate:initial;--tw-sepia:initial;--tw-drop-shadow:initial;--tw-drop-shadow-color:initial;--tw-drop-shadow-alpha:100%;--tw-drop-shadow-size:initial;--tw-duration:initial;--tw-border-spacing-x:0;--tw-border-spacing-y:0}}}</style><link rel="stylesheet" href="styles-5PU7COGW.css" media="print" data-beasties-media="all"><noscript><link rel="stylesheet" href="styles-5PU7COGW.css"></noscript></head>
 
   <body>
     <app-root>
-      <div style="text-align: center; padding-top: 20px">
-        <i class="fa fa-spinner fa-spin"></i> Loading...
-
-        <p>
-          If this is loading forever, there may be a bug.
-          <br>
-          Hit <strong>F12</strong> to bring up the Debug console, and
-          <a href="https://github.com/deniszholob/expense-exchange/issues" target="_blank" rel="noopener">
-            report
-          </a>
-          any errors.
-        </p>
+      <div class="app-loading-screen" aria-busy="true">
+        <section class="app-loading-panel" aria-labelledby="app-loading-title">
+          <div class="app-loading-mark" aria-hidden="true">
+            <img src="assets/expense-exchange-icon.png" alt width="64" height="64">
+          </div>
+          <h1 class="app-loading-title" id="app-loading-title">Expense Exchange</h1>
+          <p class="app-loading-status" role="status">
+            <span class="app-loading-spinner" aria-hidden="true"></span>
+            Loading your workspace…
+          </p>
+          <div class="app-loading-help">
+            <p>If this takes longer than expected, there may be a problem.</p>
+            <p>
+              Open the Debug console with <strong>F12</strong> and
+              <a href="https://github.com/deniszholob/expense-exchange/issues" target="_blank" rel="noopener">report any errors</a>.
+            </p>
+          </div>
+          <p class="app-loading-build">
+            <strong>Build</strong>
+            <span>0.1.0 · 2026-11-19T00:49:45.323Z</span>
+          </p>
+        </section>
       </div>
     </app-root>
 
     <noscript> Please enable JavaScript to continue using this application. </noscript>
-  <link rel="modulepreload" href="chunk-NBXHHQU5.js"><script src="polyfills-SC4UBBZS.js" type="module"></script><script src="main-P6OBO4D2.js" type="module"></script></body>
+  <link rel="modulepreload" href="chunk-BUGbcAnw.js"><link rel="modulepreload" href="chunk-MV-nKHgO.js"><script src="main-Q6OLUEBG.js" type="module"></script><script>document.querySelectorAll('link[data-beasties-media]').forEach(function(l){l.media=l.getAttribute('data-beasties-media');l.removeAttribute('data-beasties-media')})</script></body>
 </html>
