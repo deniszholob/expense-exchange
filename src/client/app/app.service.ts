@@ -245,8 +245,19 @@ export class AppService {
           .healthControllerGetHealth()
           .pipe(timeout({ first: REMOTE_STATUS_TIMEOUT_MS })),
       );
+    } catch {
       if (checkId !== this.remoteConnectionCheckId) return;
-      this.$apiHealthy.set(true);
+      this.$apiHealthy.set(false);
+      this.$authError.set(
+        'Unable to connect to the selected API. Check the server URL and status.',
+      );
+      this.$authStatusReady.set(true);
+      return;
+    }
+
+    if (checkId !== this.remoteConnectionCheckId) return;
+    this.$apiHealthy.set(true);
+    try {
       const status = await firstValueFrom(
         this.authApi
           .authControllerStatus()
@@ -272,9 +283,8 @@ export class AppService {
       }
     } catch {
       if (checkId !== this.remoteConnectionCheckId) return;
-      this.$apiHealthy.set(false);
       this.$authError.set(
-        'Unable to connect to the selected API. Check the server URL and status.',
+        'The API is reachable, but its authentication status could not be loaded. Check the server configuration.',
       );
     } finally {
       if (checkId === this.remoteConnectionCheckId)

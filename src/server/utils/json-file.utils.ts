@@ -13,13 +13,14 @@ export async function readJsonFile(filePath: string): Promise<unknown> {
 export async function writeJsonFileAtomically(
   filePath: string,
   value: unknown,
+  options: { readonly mode?: number } = {},
 ): Promise<void> {
   await mkdir(dirname(filePath), { recursive: true });
   const temporaryPath = `${filePath}.${randomUUID()}.tmp`;
   try {
     await writeFile(temporaryPath, `${JSON.stringify(value, null, 2)}\n`, {
       encoding: 'utf8',
-      mode: 0o600,
+      ...(options.mode === undefined ? {} : { mode: options.mode }),
     });
     await rename(temporaryPath, filePath);
   } finally {

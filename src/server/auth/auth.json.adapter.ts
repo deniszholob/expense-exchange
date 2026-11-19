@@ -70,6 +70,7 @@ export class AuthJsonAdapter extends AuthRepository {
     await writeJsonFileAtomically(
       this.passwordResetChallengePath(accountId),
       FilesystemPasswordResetChallengeSchema.parse(challenge),
+      { mode: 0o600 },
     );
   }
 
